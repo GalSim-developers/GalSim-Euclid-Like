@@ -9,6 +9,7 @@ http://svo2.cab.inta-csic.es/svo/theory/fps3/index.php?mode=browse&gname=Euclid&
 import numpy as np
 import os
 from galsim import Bandpass, LookupTable, galsim_warn
+from importlib.resources import files
 
 
 def getBandpasses(AB_zeropoint=True, default_thin_trunc=True, **kwargs):
@@ -18,7 +19,7 @@ def getBandpasses(AB_zeropoint=True, default_thin_trunc=True, **kwargs):
     TODO : Add the NISP bandpasses
     """
     # Read in the bandpass file
-    bandpass_file = os.path.join(os.path.dirname(__file__), 'data', 'Euclid_VIS.vis.dat')
+    bandpass_file = files('euclidlike.data').joinpath('Euclid_VIS.vis.dat')
     bandpass = np.loadtxt(bandpass_file, dtype=float)
     wave = bandpass[:, 0]
     data = bandpass[:, 1]
