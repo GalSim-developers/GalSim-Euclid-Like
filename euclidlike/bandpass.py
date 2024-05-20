@@ -46,7 +46,7 @@ def getBandpasses(AB_zeropoint=True, default_thin_trunc=True, **kwargs):
     bandpass_dict = {}
     for index, bp_name in enumerate(['VIS']):
         # Create the bandpass object
-        bp = Bandpass(LookupTable(wave, data[index]), wave_type='nm')
+        bp = Bandpass(LookupTable(wave, data[index]), wave_type='Angstrom')
 
         # Use any arguments related to truncation, thinning, etc.
         if len(tmp_truncate_dict) > 0 or default_thin_trunc:
