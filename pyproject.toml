@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=38", "wheel", "pybind11>=2.2"]
+
+[project]
+name = "galsim_euclidlike"
+version = "0.0.1"
+authors = [
+  { name="GalSim Developers", email="dummy@gmail.com" },
+]
+description = "GalSim helper function for Euclid-like simulation"
+readme = "README.md"
+requires-python = ">=3.7"
+license = {text = "GalSim"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "numpy>=1.17",
+    "galsim",
+    "astropy>=2.0",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/GalSim-developers/GalSim-Euclid-Like"
+"Bug Tracker" = "https://github.com/GalSim-developers/GalSim-Euclid-Like/issues"
+
+[tool.setuptools]
+packages = [
+  "galsim_euclidlike",
+]
