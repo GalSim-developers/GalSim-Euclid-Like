@@ -27,7 +27,7 @@ def get_fake_wavelength_psf(
             galsim.InterpolatedImage(
                 roman.getPSF(
                     8, "W146", wavelength=wl,
-                ).drawImage(scale=scale, nx=npix, ny=npix)
+                ).drawImage(scale=scale, nx=npix, ny=npix, method="no_pixel")
             )
         )
     return wl_array, psfobjs
