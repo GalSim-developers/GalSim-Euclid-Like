@@ -1,5 +1,9 @@
 """
 This file includes any routines needed to define the Euclid bandpass.
+This module is heavily based on the roman bandpass.py file from the GalSim package.
+https://github.com/GalSim-developers/GalSim/blob/releases/2.5/galsim/roman/roman_bandpass.py
+The Euclid VIS bandpass is read in from the Euclid_VIS.vis.dat file which can be downloaded from
+http://svo2.cab.inta-csic.es/svo/theory/fps3/index.php?mode=browse&gname=Euclid&gname2=VIS&asttype=.
 """
 
 import numpy as np
@@ -10,6 +14,8 @@ from galsim import Bandpass, LookupTable, galsim_warn
 def getBandpasses(AB_zeropoint=True, default_thin_trunc=True, **kwargs):
     """
     Returns the bandpass information for the Euclid VIS band.
+    TODO : Add an informative docstring
+    TODO : Add the NSIP bandpass
     """
     # Read in the bandpass file
     bandpass_file = os.path.join(os.path.dirname(__file__), 'data', 'Euclid_VIS.vis.dat')
