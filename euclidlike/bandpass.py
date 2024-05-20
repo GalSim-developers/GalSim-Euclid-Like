@@ -15,7 +15,7 @@ def getBandpasses(AB_zeropoint=True, default_thin_trunc=True, **kwargs):
     """
     Returns the bandpass information for the Euclid VIS band.
     TODO : Add an informative docstring
-    TODO : Add the NSIP bandpass
+    TODO : Add the NISP bandpasses
     """
     # Read in the bandpass file
     bandpass_file = os.path.join(os.path.dirname(__file__), 'data', 'Euclid_VIS.vis.dat')
@@ -23,7 +23,7 @@ def getBandpasses(AB_zeropoint=True, default_thin_trunc=True, **kwargs):
     wave = bandpass[:, 0]
     data = bandpass[:, 1]
 
-    # In case we want to add NSIP bandpass
+    # In case we want to add NISP bandpasses
     data = np.atleast_2d(data)
 
     # Below is the original code from the GalSim package. 
