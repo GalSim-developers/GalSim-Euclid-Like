@@ -12,7 +12,7 @@ def get_fake_wavelength_psf(
     Args:
     scale (float):  the scale of the PSF image (needs oversampling)
     nsample (int):  number of samples in wavelength
-    npix (int):  number of grids (number of grids) of the PSF image
+    npix (int):  number of pixels of the PSF image, the area is npix x npix
     wavelength_min (float):  the minimum wave number to sample [units: nm]
     wavelength_max (float):  the maximum wave number to sample [units: nm]
 
