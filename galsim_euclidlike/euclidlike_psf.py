@@ -1,9 +1,10 @@
+import galsim
 import numpy as np
 from galsim import roman
 
 
 def get_fake_wavelength_psf(
-    scale, nsample, ngrid, wavelength_min=550, wavelength_max=950,
+    scale, nsample, npix, wavelength_min=550, wavelength_max=950,
 ):
     """ This function get the oversampled PSF image as a function of wavelength
     as an input the Euclid-like simulation
@@ -11,17 +12,22 @@ def get_fake_wavelength_psf(
     Args:
     scale (float):  the scale of the PSF image (needs oversampling)
     nsample (int):  number of samples in wavelength
-    ngrid (int):  number of grids (number of grids) of the PSF image
+    npix (int):  number of grids (number of grids) of the PSF image
+    wavelength_min (float):  the minimum wave number to sample [units: nm]
+    wavelength_max (float):  the maximum wave number to sample [units: nm]
 
     Returns:
     wl_array (ndarray):  wavelength array
-    psf_array (ndarray): PSF image array for different wave lengths
-
+    psfobjs (ndarray): PSF interpolated image for different wave lengths
     """
-    psf_array = np.zeros((nsample, ngrid, ngrid))
+    psfobjs = []
     wl_array = np.linspace(wavelength_min, wavelength_max, nsample)
     for i, wl in enumerate(wl_array):
-        psf_array[i, :, :] = roman.getPSF(
-            8, "W146", wavelength=wl,
-        ).drawImage(scale=scale, nx=ngrid, ny=ngrid).array
-    return wl_array, psf_array
+        psfobjs.append(
+            galsim.InterpolatedImage(
+                roman.getPSF(
+                    8, "W146", wavelength=wl,
+                ).drawImage(scale=scale, nx=npix, ny=npix)
+            )
+        )
+    return wl_array, psfobjs
