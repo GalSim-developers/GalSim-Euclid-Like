@@ -27,5 +27,5 @@ dependencies = [
 
 [tool.setuptools]
 packages = [
-  "galsim_euclidlike",
+  "euclidlike",
 ]
