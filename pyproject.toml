@@ -1,8 +1,8 @@
 [build-system]
-requires = ["setuptools>=38", "wheel", "pybind11>=2.2"]
+requires = ["setuptools", "wheel"]
 
 [project]
-name = "galsim_euclidlike"
+name = "EuclidLike"
 version = "0.0.1"
 authors = [
   { name="GalSim Developers", email="dummy@gmail.com" },
@@ -17,7 +17,7 @@ classifiers = [
 ]
 dependencies = [
     "numpy>=1.17",
-    "galsim",
+    "galsim>=2.5",
     "astropy>=2.0",
 ]
 
@@ -28,4 +28,11 @@ dependencies = [
 [tool.setuptools]
 packages = [
   "euclidlike",
+]
+include-package-data = true
+
+[tool.setuptools.package-data]
+"*" = [
+  "data/*.dat",
+  "data/*.fits",
 ]
