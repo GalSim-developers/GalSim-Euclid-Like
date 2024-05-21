@@ -13,4 +13,9 @@ def test_euclid_bandpass():
         mag = AB_sed.calculateMagnitude(bandpass=filter_)
         np.testing.assert_almost_equal(mag,0.0,decimal=6,
             err_msg="Zeropoint not set accurately enough for bandpass filter "+filter_name)
+
+    # Check if the zeropoints have not been set
+    nozp_bp = galsim.roman.getBandpasses(AB_zeropoint=False)
+    for key in nozp_bp:
+        assert nozp_bp[key].zeropoint is None
     return
