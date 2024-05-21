@@ -5,11 +5,14 @@ from galsim import roman
 from . import n_ccd, n_pix_col, n_pix_row, pixel_scale
 
 """
-@file euclidlike_psfs.py
+@file euclidlike_psf.py
 
 Part of the Euclid-like simulation module. This file includes routines needed
 to define a Euclid-like PSF.
 """
+
+fake_scale_default = 0.02
+fake_npix_default = 257
 
 
 def get_fake_wavelength_psf(
@@ -43,19 +46,19 @@ def get_fake_wavelength_psf(
 
 
 def getPSF(
-        SCA, bandpass,
-        SCA_pos=None, wcs=None,
+        ccd, bandpass,
+        ccd_pos=None, wcs=None,
         wavelength=None, gsparams=None,
         logger=None
 ):
     """Get a single PSF for Roman ST observations.
 
-    The user must provide the SCA and bandpass; the latter is used when setting
+    The user must provide the ccd and bandpass; the latter is used when setting
     up the pupil plane configuration and when interpolating chromatic
     information, if requested.
 
     The PSF that is returned by default will be oriented with respect to the
-    SCA coordinates, not world coordinates as is typical in GalSim.  The pupil
+    ccd coordinates, not world coordinates as is typical in GalSim.  The pupil
     plane has a fixed orientation with respect to the focal plane, so the PSF
     rotates with the telescope.  To obtain a PSF in world coordinates, which
     can be convolved with galaxies (that are normally described in world
@@ -86,14 +89,14 @@ def getPSF(
     Jitter and charge diffusion are, by default, not included.
 
     Args:
-    SCA (int):  Single value specifying the SCA for which the PSF should be
+    ccd (int):  Single value specifying the ccd for which the PSF should be
         loaded.
     bandpass (str): Single string specifying the bandpass to use when
         defining the pupil plane configuration and/or interpolation of
         chromatic PSFs.
-    SCA_pos:  Single galsim.PositionD indicating the position within the SCA
+    ccd_pos:  Single galsim.PositionD indicating the position within the ccd
         for which the PSF should be created. If None, the exact center of the
-        SCA is chosen. [default: None]
+        ccd is chosen. [default: None]
     wcs:  The WCS to use to project the PSF into world coordinates. [default:
         galsim.PixelScale(galsim.roman.pixel_scale)]
     wavelength (float):  An option to get an achromatic PSF for a single
@@ -113,16 +116,17 @@ def getPSF(
 
     """
 
-    if SCA <= 0 or SCA > n_ccd:
-        raise galsim.GalSimRangeError("Invalid SCA.", SCA, 1, n_ccd)
+    if ccd <= 0 or ccd > n_ccd:
+        raise galsim.GalSimRangeError("Invalid ccd.", ccd, 1, n_ccd)
 
-    # SCA_pos: if None, then all should just be center of the SCA.
-    if SCA_pos is None:
-        SCA_pos = galsim.PositionD(n_pix_col/2, n_pix_row/2)
+    assert bandpass == "VIS", "Only VIS band is supported"
 
+    # ccd_pos: if None, then all should just be center of the ccd.
+    if ccd_pos is None:
+        ccd_pos = galsim.PositionD(x=n_pix_col/2, y=n_pix_row/2)
 
-    # Now call _get_single_PSF().
-    psf = _get_single_PSF(SCA, bandpass, SCA_pos, wavelength, gsparams)
+    # Now get psf model
+    psf = _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength, gsparams)
     # Apply WCS.
     # The current version is in arcsec units, but oriented parallel to the
     # image coordinates. So to apply the right WCS, project to pixels using the
@@ -130,6 +134,26 @@ def getPSF(
     # provided wcs.
     if wcs is not None:
         scale = galsim.PixelScale(pixel_scale)
-        psf = wcs.toWorld(scale.toImage(psf), image_pos=SCA_pos)
+        psf = wcs.toWorld(scale.toImage(psf), image_pos=ccd_pos)
 
     return psf
+
+
+def _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength, gsparams):
+    """
+    Routine for making a single PSF.  This gets called by `getPSF` after it
+    parses all the options that were passed in.  Users will not directly
+    interact with this routine.
+    """
+
+    # Now set up the PSF, including the option to interpolate over waves
+    if wavelength is None:
+        psf_obj = None
+        pass
+    else:
+        wl_array, psfobjs = get_fake_wavelength_psf(
+            scale=fake_scale_default, nsample=17, npix=fake_npix_default,
+        )
+        index = np.searchsorted(wl_array, wavelength)
+        psf_obj = psfobjs[index]
+    return psf_obj
