@@ -53,31 +53,6 @@ def getPSF(
 ):
     """Get a single PSF for Roman ST observations.
 
-    The user must provide the ccd and bandpass; the latter is used when setting
-    up the pupil plane configuration and when interpolating chromatic
-    information, if requested.
-
-    The PSF that is returned by default will be oriented with respect to the
-    ccd coordinates, not world coordinates as is typical in GalSim.  The pupil
-    plane has a fixed orientation with respect to the focal plane, so the PSF
-    rotates with the telescope.  To obtain a PSF in world coordinates, which
-    can be convolved with galaxies (that are normally described in world
-    coordinates), you may pass in a ``wcs`` parameter to this function.  This
-    will project the PSF into world coordinates according to that WCS before
-    returning it.  Otherwise, the return value is equivalent to using
-    ``wcs=galim.PixelScale(galsim.roman.pixel_scale)``.
-
-    The calculation takes advantage of the fact that the diffraction limit and
-    aberrations have a simple, understood wavelength-dependence.  (The Roman
-    abberation data for Cycle 9 does in fact provide aberrations as a function
-    of wavelength, but the deviation from the expected chromatic dependence is
-    sub-percent so we neglect it here.)  For reference, the script used to
-    parse the Zernikes given on the webpage and create the files in the GalSim
-    repository can be found in ``devel/external/parse_roman_zernikes_1217.py``.
-    The resulting chromatic object can be used to draw into any of the Roman
-    bandpasses, though the pupil plane configuration will only be correct for
-    those bands in the same range (i.e., long- or short-wavelength bands).
-
     For applications that require very high accuracy in the modeling of the
     PSF, with very limited aliasing, you may want to lower the
     folding_threshold in the gsparams.  Otherwise very bright stars will show
@@ -85,8 +60,6 @@ def getPSF(
     outskirts of the PSF.  Using ``gsparams =
     GSParams(folding_threshold=2.e-3)`` generally provides good results even
     for very bright (e.g. mag=10) stars.
-
-    Jitter and charge diffusion are, by default, not included.
 
     Args:
     ccd (int):  Single value specifying the ccd for which the PSF should be
