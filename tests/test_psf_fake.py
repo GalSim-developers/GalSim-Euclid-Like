@@ -1,4 +1,4 @@
-from galsim_euclidlike import euclidlike_psf
+from euclidlike import euclidlike_psf
 
 
 def test_psf_fake():
