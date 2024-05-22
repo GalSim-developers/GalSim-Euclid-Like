@@ -28,7 +28,7 @@ photons are assigned wavelengths according to the SED of the galaxy, and then ea
 the appropriate application of the chromatic PSF according to the wavelength.
 
 To select a different set of Euclid filters, you may use the `filters` option on the command line.
-E.g. `python demo14.py --filters=VIS`
+E.g. `python end_to_end_demo.py --filters=VIS`
 """
 
 import argparse
@@ -42,7 +42,7 @@ import datetime
 
 def parse_args(argv):
     parser = argparse.ArgumentParser(prog='demo14', add_help=True)
-    parser.add_argument('-f', '--filters', nargs='+', action='store',
+    parser.add_argument('-f', '--filters', nargs='+', action='store', default="VIS",
                         help='Which filters to simulate')
     parser.add_argument('-o', '--outpath', type=str, default='output',
                         help='Which directory to put the output files')
