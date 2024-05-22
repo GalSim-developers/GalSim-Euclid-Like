@@ -22,3 +22,10 @@ cd GalSim-Euclid-Like
 conda activate euclidlike
 pip install -e .
 ```
+
+To make sure installation is successful
+```
+$ python
+>>> import euclidlike
+>>> euclidlike.getBandpasses()
+```
