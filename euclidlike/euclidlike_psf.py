@@ -1,6 +1,8 @@
 import galsim
 import numpy as np
 from galsim import roman
+import astropy.io.fits as pyfits
+from importlib.resources import files
 
 from . import n_ccd, n_pix_col, n_pix_row, pixel_scale
 
@@ -18,8 +20,8 @@ fake_npix_default = 257
 def get_fake_wavelength_psf(
     scale, nsample, npix, wavelength_min=550, wavelength_max=950,
 ):
-    """ This function get the oversampled PSF image as a function of wavelength
-    as an input to the Euclid-like simulations.
+    """ This function gets the fake oversampled PSF image as a function of
+    wavelength as an input to the Euclid-like simulations.
 
     Args:
     scale (float):  the scale of the PSF image (needs oversampling)
@@ -43,6 +45,27 @@ def get_fake_wavelength_psf(
             roman.getPSF(
                 sca_id, "W146", wavelength=wl,
             ).drawImage(scale=scale, nx=npix, ny=npix, method="no_pixel")
+        )
+    return wave_list, im_list
+
+
+def get_euclid_wavelength_psf():
+    """ This function get the oversampled PSF image as a function of wavelength
+    from Lance as an input the Euclid-like simulation
+    """
+    # NOTE: We do not have PSF variation
+    psf_file = files("euclidlike.data").joinpath("monopsfs_6_6.fits.gz")
+    image_array = pyfits.getdata(psf_file)
+    # The following are the values for the data from Lance Miller
+    nsample = 17
+    pixel_scale = 0.1
+    wavelength_min = 540
+    wavelength_max = 910
+    wave_list = np.linspace(wavelength_min, wavelength_max, nsample)
+    im_list = []
+    for i in range(nsample):
+        im_list.append(
+            galsim.Image(image_array[i], scale=pixel_scale)
         )
     return wave_list, im_list
 
