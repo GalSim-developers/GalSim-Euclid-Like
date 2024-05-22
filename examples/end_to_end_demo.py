@@ -136,9 +136,9 @@ def main(argv):
     # GalSim share directory.  Which means all the stars will be pretty blue.
     vega_sed = galsim.SED('vega.txt', 'nm', 'flambda')
 
-    # Pick a plausible observation (AG Draconis)
-    ra_targ = galsim.Angle.from_hms('16:01:41.01257')
-    dec_targ = galsim.Angle.from_dms('66:48:10.1312')
+    # Pick a plausible observation (Center of the Euclid Deep Field North (EDF-N))
+    ra_targ = galsim.Angle.from_hms('17:45:40')
+    dec_targ = galsim.Angle.from_dms('66:0:0')
     targ_pos = galsim.CelestialCoord(ra=ra_targ, dec=dec_targ)
 
     # Get the WCS for an observation at this position.
