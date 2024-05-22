@@ -164,13 +164,6 @@ def main(argv):
         # Create the PSF
         # We are ignoring the position-dependence of the PSF within each CCD, just using the PSF
         # at the center of the sensor.
-        # Note: pupil_bin=8 is faster at the expense of lower resolution for the diffraction spikes.
-        # The n_waves keyword calculates this many PSF models in advance at different wavelengths
-        # which we can interpolate between when drawing the galaxies.  For more accuracy w.r.t.
-        # the chromaticity, you can increase this value of `n_waves`.
-        # Note: Removing n_waves parameter would actually be both slower and less accurate, since
-        # the OpticalPSF model would redo the wavefront calculation for each object, and then
-        # would still make an approximation that would be similar to n_waves=3.
         logger.info('Building PSF for CCD %d, filter %s.'%(use_CCD, filter_name))
         # TODO : uncomment the line below when the getPSF routine is implemented in the Euclid-like module
         # psf = euclidlike.getPSF(use_CCD, filter_name, wcs=wcs)
