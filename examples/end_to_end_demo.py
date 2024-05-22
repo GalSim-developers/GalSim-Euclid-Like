@@ -147,8 +147,10 @@ def main(argv):
 
     # The output of this routine is a dict of WCS objects, one for each CCD. We then take the WCS
     # for the CCD that we are using.
-    wcs_dict = euclidlike.getWCS(world_pos=targ_pos, CCDs=use_CCD, date=date)
-    wcs = wcs_dict[use_CCD]
+    # TODO : uncomment the lines below when the getWCS routine is implemented in the Euclid-like module
+    # wcs_dict = euclidlike.getWCS(world_pos=targ_pos, CCDs=use_CCD, date=date)
+    # wcs = wcs_dict[use_CCD]
+    wcs = galsim.PixelScale(euclidlike.pixel_scale)
 
     # Now start looping through the filters to draw.
     for ifilter, filter_name in enumerate(filters):
