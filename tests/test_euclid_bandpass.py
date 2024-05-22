@@ -19,3 +19,8 @@ def test_euclid_bandpass():
     for key in nozp_bp:
         assert nozp_bp[key].zeropoint is None
     return
+
+if __name__ == "__main__":
+    testfns = [v for k, v in vars().items() if k[:5] == 'test_' and callable(v)]
+    for testfn in testfns:
+        testfn()
