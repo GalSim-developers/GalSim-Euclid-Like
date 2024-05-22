@@ -1,5 +1,5 @@
 """
-Demo #14
+@file end_to_end_demo.py
 
 This script is an adaptation of the demo13 script in Galsim for Euclid. The script is intended to
 produce a relatively realistic scene of galaxies and stars as will be observed by the 
@@ -13,12 +13,11 @@ The script uses the Euclid-like module to set up the approximate filters, PSF, a
 Euclid Space Telescope. It also uses the COSMOSCatalog class to read in the COSMOS catalog
 of galaxy properties.
 
-Comparing this module to examples/demo13.py in Galsim, it currently misses the following features:
+The current package misses the following features:
 
-1) Reciprocity failure: Flux-dependent sensitivity of the detector.
-2) Non-linearity: Charge-dependent gain in converting from units of electrons to ADU. Non-linearity
+1) Non-linearity: Charge-dependent gain in converting from units of electrons to ADU. Non-linearity
    in some form is also relevant for CCDs in addition to NIR detectors.
-4) And any non-linear effects that are specific to the Euclid detectors such as 
+2) And any non-linear effects that are specific to the Euclid detectors such as 
    charge-transfer inefficiency.
 
 It also uses chromatic photon shooting, which is generally a more efficient way to simulate
@@ -41,7 +40,7 @@ import euclidlike
 import datetime
 
 def parse_args(argv):
-    parser = argparse.ArgumentParser(prog='demo14', add_help=True)
+    parser = argparse.ArgumentParser(prog='end_to_end_demo', add_help=True)
     parser.add_argument('-f', '--filters', nargs='+', action='store', default="VIS",
                         help='Which filters to simulate')
     parser.add_argument('-o', '--outpath', type=str, default='output',
