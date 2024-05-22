@@ -1,4 +1,6 @@
-from euclidlike import get_fake_wavelength_psf, getPSF
+from euclidlike import (
+    get_fake_wavelength_psf, get_euclid_wavelength_psf, getPSF
+)
 
 
 def test_psf_fake():
@@ -11,6 +13,14 @@ def test_psf_fake():
     assert len(psfobjs) == nsample
     assert psfobjs[0].array.shape == (npix, npix)
     assert wl_array.shape == (nsample, )
+    return
+
+
+def test_psf_euclid():
+    wl_array, psfobjs = get_euclid_wavelength_psf()
+    assert len(psfobjs) == 17
+    assert psfobjs[0].array.shape == (480, 480)
+    assert wl_array.shape == (17, )
     return
 
 
