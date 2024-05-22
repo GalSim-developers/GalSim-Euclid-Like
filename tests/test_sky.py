@@ -7,7 +7,7 @@ import numpy as np
 
 
 def test_sky():
-
+    """Verify numerical accuracy compared to reference code"""
     # select a few positions - Euclid deep field centers
     pos1 = SkyCoord('17:58:55.9 +66:01:03.7', unit=(u.hourangle, u.deg))
     pos2 = SkyCoord('04:04:57.84 -48:25:22.8', unit=(u.hourangle, u.deg))
@@ -24,8 +24,19 @@ def test_sky():
         # correct galsim.roman outputs to Euclid-like scenario
         sky2 *= euclidlike.collecting_area/galsim.roman.collecting_area*euclidlike.gain
         fracdiff = (sky2-sky1)/sky1
-        print(sky1, sky2, fracdiff)
         np.testing.assert_almost_equal(fracdiff, 0, 3)
+    return
+
+def test_sky_noarg():
+    """Confirm it runs if no input position is given"""
+    foo = euclidlike.getSkyLevel(euclidlike.getBandpasses()['VIS'])
+    return
+
+def test_sky_units():
+    """Confirm it raises an exception if the units are wrong in bandpass"""
+    foo = euclidlike.getBandpasses()['VIS']
+    foo.wave_type = "fake_value"
+    np.testing.assert_raises(ValueError, euclidlike.getSkyLevel, foo)
     return
 
 if __name__ == "__main__":

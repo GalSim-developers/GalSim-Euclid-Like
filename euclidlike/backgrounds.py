@@ -1,5 +1,5 @@
 """
-This file includes any routines needed to define the background level, for which the main contribution (currently the only one implemented)) is zodiacal light.
+This file includes any routines needed to define the background level, for which the main contribution (currently the only one implemented) is zodiacal light.
 """
 import numpy as np
 import galsim
@@ -51,8 +51,8 @@ def getSkyLevel(bandpass, world_pos=None, exptime=None, epoch=2025, date=None):
     # Check for proper type for position, and extract the ecliptic coordinates.
     if world_pos is None:
         # Use our defaults for the case of unspecified position.
-        ecliptic_lat = 30.*degrees
-        ecliptic_lon = 90.*degrees
+        ecliptic_lat = 30.0 # degrees
+        ecliptic_lon = 90.0 # degrees
     else:
         if not isinstance(world_pos, galsim.CelestialCoord):
             raise TypeError("world_pos must be supplied as a galsim.CelestialCoord.")
@@ -66,6 +66,10 @@ def getSkyLevel(bandpass, world_pos=None, exptime=None, epoch=2025, date=None):
         raise TypeError("bandpass must be supplied as a galsim.Bandpass")
     
     # Then call our routine to calculate the sky background
+    # For now, simply require that the blue/red limits be in nm, as will be the case in general for
+    # how we've set up the bandpasses
+    if bandpass.wave_type != "nm":
+        raise ValueError("Error, bandpass wavelength units are not as assumed by sky level routine")
     sky_val = getZodiBackground(ecliptic_lat, ecliptic_lon, bandpass.blue_limit/1000.,
                                 bandpass.red_limit/1000., bandpass.wave_list/1000.,
                                 bandpass.func(bandpass.wave_list))
