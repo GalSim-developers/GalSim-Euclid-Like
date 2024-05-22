@@ -147,10 +147,10 @@ def main(argv):
 
     # The output of this routine is a dict of WCS objects, one for each CCD. We then take the WCS
     # for the CCD that we are using.
-    # TODO : uncomment the lines below when the getWCS routine is implemented in the Euclid-like module
+    # TODO : uncomment the line below when the getWCS routine is implemented in the Euclid-like module
     # wcs_dict = euclidlike.getWCS(world_pos=targ_pos, CCDs=use_CCD, date=date)
-    # wcs = wcs_dict[use_CCD]
-    wcs = galsim.PixelScale(euclidlike.pixel_scale)
+    wcs_dict = galsim.roman.getWCS(world_pos=targ_pos, SCAs=use_CCD, date=date)
+    wcs = wcs_dict[use_CCD]
 
     # Now start looping through the filters to draw.
     for ifilter, filter_name in enumerate(filters):
@@ -173,7 +173,13 @@ def main(argv):
         # the OpticalPSF model would redo the wavefront calculation for each object, and then
         # would still make an approximation that would be similar to n_waves=3.
         logger.info('Building PSF for CCD %d, filter %s.'%(use_CCD, filter_name))
-        psf = euclidlike.getPSF(use_CCD, filter_name, wcs=wcs)
+        # TODO : uncomment the line below when the getPSF routine is implemented in the Euclid-like module
+        # psf = euclidlike.getPSF(use_CCD, filter_name, wcs=wcs)
+        lam = 700     # nm
+        diam = 1.2    # meters
+        lam_over_diam = (lam * 1.e-9) / diam  # radians
+        lam_over_diam *= 206265  # Convert to arcsec
+        psf = galsim.Airy(lam_over_diam)
 
         # Set up the full image for the galaxies
         full_image = galsim.ImageF(euclidlike.n_pix_col, euclidlike.n_pix_row, wcs=wcs)
