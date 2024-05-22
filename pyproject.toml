@@ -35,4 +35,5 @@ include-package-data = true
 "*" = [
   "data/*.dat",
   "data/*.fits",
+  "data/*.fits.gz",
 ]
