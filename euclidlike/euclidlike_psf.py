@@ -51,7 +51,7 @@ def getPSF(
         wavelength=None, gsparams=None,
         logger=None
 ):
-    """Get a single PSF for Roman ST observations.
+    """Get a single PSF for Euclid like simulation.
 
     For applications that require very high accuracy in the modeling of the
     PSF, with very limited aliasing, you may want to lower the
@@ -98,12 +98,17 @@ def getPSF(
     if ccd_pos is None:
         ccd_pos = galsim.PositionD(x=n_pix_col/2, y=n_pix_row/2)
 
+    if not isinstance(wavelength, (galsim.Bandpass, float, type(None))):
+        raise TypeError(
+            "wavelength should either be a Bandpass, float, or None."
+        )
+
     # Now get psf model
     psf = _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength, gsparams)
     # Apply WCS.
     # The current version is in arcsec units, but oriented parallel to the
     # image coordinates. So to apply the right WCS, project to pixels using the
-    # Roman mean pixel_scale, then project back to world coordinates with the
+    # Euclid mean pixel_scale, then project back to world coordinates with the
     # provided wcs.
     if wcs is not None:
         scale = galsim.PixelScale(pixel_scale)
