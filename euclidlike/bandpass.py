@@ -1,4 +1,6 @@
 """
+@file bandpass.py
+
 This file includes any routines needed to define the Euclid bandpass.
 This module is heavily based on the roman bandpass.py file from the GalSim package.
 https://github.com/GalSim-developers/GalSim/blob/releases/2.5/galsim/roman/roman_bandpass.py
@@ -14,9 +16,19 @@ from importlib.resources import files
 
 def getBandpasses(AB_zeropoint=True, default_thin_trunc=True, **kwargs):
     """
-    Returns the bandpass information for the Euclid VIS band.
-    TODO : Add an informative docstring
-    TODO : Add the NISP bandpasses
+    Function to get the bandpass information for the Euclid VIS band.
+
+    This routine reads in a file containing a list of wavelengths and
+    transmission values for the Euclid VIS band. The file is located in the
+    euclidlike.data directory. The routine then creates a Bandpass object
+    using the LookupTable class from the GalSim package.
+
+    Args:
+    AB_zeropoint (bool) : If True, set the zeropoint of the bandpass to the AB magnitude system. [default: True]
+    default_thin_trunc (bool) : If True, use the default thinning and truncation parameters. [default: True]
+    kwargs : Additional keyword arguments to pass to either `Bandpass.thin` or `Bandpass.truncate`.
+
+    TODO : Add the NISP bandpasses?
     """
     # Read in the bandpass file
     bandpass_file = files('euclidlike.data').joinpath('Euclid_VIS.vis.dat')
