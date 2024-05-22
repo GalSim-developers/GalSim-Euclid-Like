@@ -1,26 +1,25 @@
 """
 Demo #14
 
-This script is a python version of the demo13 script in Galsim. The script is intended to produce
-a relatively realistic scene of galaxies and stars as will be observed by the Euclid Space Telescope,
-including the Euclid-like PSF, WCS, and various detector effects.
+This script is an adaptation of the demo13 script in Galsim for Euclid. The script is intended to
+produce a relatively realistic scene of galaxies and stars as will be observed by the 
+Euclid Space Telescope, including the Euclid-like PSF, WCS, and various detector effects.
 
-The python script resembles that of the demo code in Galsim in python scripts: examples/demo13.py.
 The demo13.py script can be found here:
 
 https://github.com/GalSim-developers/GalSim/blob/releases/2.5/examples/demo13.py
 
-The script uses the Euclid-like module to set up the filters, PSF, and WCS for the Euclid-like
-telescope.  It also uses the COSMOSCatalog class to read in the COSMOS catalog of galaxy properties.
+The script uses the Euclid-like module to set up the approximate filters, PSF, and WCS for the 
+Euclid Space Telescope. It also uses the COSMOSCatalog class to read in the COSMOS catalog
+of galaxy properties.
 
 Comparing this module to examples/demo13.py in Galsim, it currently misses the following features:
 
 1) Reciprocity failure: Flux-dependent sensitivity of the detector.
-2) Non-linearity: Charge-dependent gain in converting from units of electrons to ADU.  Non-linearity
+2) Non-linearity: Charge-dependent gain in converting from units of electrons to ADU. Non-linearity
    in some form is also relevant for CCDs in addition to NIR detectors.
-3) Interpixel capacitance: Influence of charge in a pixel on the voltage reading of neighboring
-   ones.
-4) And any non-linear effects that are specific to the Euclid detectors.
+4) And any non-linear effects that are specific to the Euclid detectors such as 
+   charge-transfer inefficiency.
 
 It also uses chromatic photon shooting, which is generally a more efficient way to simulate
 scenes with many faint galaxies.  The default FFT method for drawing chromatically is fairly
@@ -29,7 +28,7 @@ photons are assigned wavelengths according to the SED of the galaxy, and then ea
 the appropriate application of the chromatic PSF according to the wavelength.
 
 To select a different set of Euclid filters, you may use the `filters` option on the command line.
-E.g. `python demo14.py -f VIS NISP`
+E.g. `python demo14.py --filters=VIS`
 """
 
 import argparse
@@ -86,7 +85,7 @@ def main(argv):
     logger.setLevel(level)
 
     # Read in the Euclid filters, setting an AB zeropoint appropriate for this telescope given its
-    # diameter and (since we didn't use any keyword arguments to modify this) using the typical
+    # collecting area and (since we didn't use any keyword arguments to modify this) using the typical
     # exposure time for Euclid images.  By default, this routine truncates the parts of the
     # bandpasses that are near 0 at the edges, and thins them by the default amount.
     euclidlike_filters = euclidlike.getBandpasses(AB_zeropoint=True)
@@ -146,11 +145,8 @@ def main(argv):
     # Get the WCS for an observation at this position.
     date = datetime.datetime(2025, 5, 16)
 
-    # We omit the position angle (PA) of the observatory, which means that it will just find the
-    # optimal one (the one that has the solar panels pointed most directly towards the Sun given
-    # this targ_pos and date).
-    # The output of this routine is a dict of WCS objects, one for each SCA.  We then take the WCS
-    # for the SCA that we are using.
+    # The output of this routine is a dict of WCS objects, one for each CCD. We then take the WCS
+    # for the CCD that we are using.
     wcs_dict = euclidlike.getWCS(world_pos=targ_pos, CCDs=use_CCD, date=date)
     wcs = wcs_dict[use_CCD]
 
@@ -343,20 +339,7 @@ def main(argv):
 
         # The subsequent steps account for the non-ideality of the detectors.
 
-        # 1) Reciprocity failure:
-        # Reciprocity, in the context of photography, is the inverse relationship between the
-        # incident flux (I) of a source object and the exposure time (t) required to produce a given
-        # response(p) in the detector, i.e., p = I*t. However, in NIR detectors, this relation does
-        # not hold always. The pixel response to a high flux is larger than its response to a low
-        # flux. This flux-dependent non-linearity is known as 'reciprocity failure.'
-
-        # If we had wanted to, we could have specified a different exposure time than the default
-        # one for Euclid, but otherwise the following routine does not take any arguments.
-        # This routine is currently not defined in the Euclid-like module.
-        # euclidlike.addReciprocityFailure(full_image)
-        # logger.debug('Included reciprocity failure in {0}-band image'.format(filter_name))
-
-        # 2) Adding dark current to the image:
+        # 1) Adding dark current to the image:
         # Even when the detector is unexposed to any radiation, the electron-hole pairs that
         # are generated within the depletion region due to finite temperature are swept by the
         # high electric field at the junction of the photodiode. This small reverse bias
@@ -373,7 +356,7 @@ def main(argv):
         # non-linear effects that follow. Hence, these must be included at this stage of the
         # image generation process. We subtract these backgrounds in the end.
 
-        # 3) Applying a quadratic non-linearity:
+        # 2) Applying a quadratic non-linearity:
         # In order to convert the units from electrons to ADU, we must use the gain factor. The gain
         # has a weak dependency on the charge present in each pixel. This dependency is accounted
         # for by changing the pixel values (in electrons) and applying a constant nominal gain
@@ -384,7 +367,7 @@ def main(argv):
         # This routine is currently not defined in the Euclid-like module.
         # euclidlike.applyNonlinearity(full_image)
 
-        # Note that users who wish to apply some other nonlinearity function (perhaps for other NIR
+        # Note that users who wish to apply some other nonlinearity function (perhaps for other NISP
         # detectors, or for CCDs) can use the more general nonlinearity routine, which uses the
         # following syntax:
         # full_image.applyNonlinearity(NLfunc=NLfunc)
@@ -392,16 +375,7 @@ def main(argv):
         # should relate to the input ones.
         # logger.debug('Applied nonlinearity to {0}-band image'.format(filter_name))
 
-        # 4) Including Interpixel capacitance:
-        # The voltage read at a given pixel location is influenced by the charges present in the
-        # neighboring pixel locations due to capacitive coupling of sense nodes. This interpixel
-        # capacitance effect is modeled as a linear effect that is described as a convolution of a
-        # 3x3 kernel with the image. 
-        # This routine is currently not defined in the Euclid-like module.
-        # euclidlike.applyIPC(full_image)
-        # logger.debug('Applied interpixel capacitance to {0}-band image'.format(filter_name))
-
-        # 5) Adding read noise:
+        # 3) Adding read noise:
         # Read noise is the noise due to the on-chip amplifier that converts the charge into an
         # analog voltage.  We already applied the Poisson noise due to the sky level, so read noise
         # should just be added as Gaussian noise:
@@ -426,16 +400,10 @@ def main(argv):
 
         logger.debug('Subtracted background for {0}-band image'.format(filter_name))
         # Write the final image to a file.
-        out_filename = os.path.join(outpath,'demo13_{0}.fits'.format(filter_name))
+        out_filename = os.path.join(outpath,'end_to_end_demo_{0}.fits'.format(filter_name))
         full_image.write(out_filename)
 
         logger.info('Completed {0}-band image.'.format(filter_name))
-
-    logger.info('You can display the output in ds9 with a command line that looks something like:')
-    logger.info('ds9 -zoom 0.6 -scale limits -10 100 -rgb '+
-                '-red output/demo13_H158.fits '+
-                '-green output/demo13_J129.fits '+
-                '-blue output/demo13_Y106.fits')
 
 if __name__ == "__main__":
     main(sys.argv[1:])
