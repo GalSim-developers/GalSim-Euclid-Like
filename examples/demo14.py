@@ -71,9 +71,6 @@ def main(argv):
     seed1 = galsim.BaseDeviate(seed).raw()
     use_CCD = args.ccd
 
-    print(use_filters)
-    return 
-
     # Make output directory if not already present.
     if not os.path.isdir(outpath):
         os.mkdir(outpath)
