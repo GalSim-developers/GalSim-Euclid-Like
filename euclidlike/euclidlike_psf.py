@@ -29,20 +29,20 @@ def get_fake_wavelength_psf(
     wavelength_max (float):  the maximum wave number to sample [units: nm]
 
     Returns:
-    wl_array (ndarray):  wavelength array
-    psfobjs (ndarray): PSF interpolated image for different wave lengths
+    wave_list (ndarray):  wavelength array
+    im_list (ndarray): a list of PSF images for different wave lengths
     """
-    psfobjs = []
-    wl_array = np.linspace(wavelength_min, wavelength_max, nsample)
-    for i, wl in enumerate(wl_array):
-        psfobjs.append(
-            galsim.InterpolatedImage(
-                roman.getPSF(
-                    8, "W146", wavelength=wl,
-                ).drawImage(scale=scale, nx=npix, ny=npix, method="no_pixel")
-            )
+    im_list = []
+    wave_list = np.linspace(wavelength_min, wavelength_max, nsample)
+    # this is an arbitary sca id used for simulation
+    sca_id = 8
+    for i, wl in enumerate(wave_list):
+        im_list.append(
+            roman.getPSF(
+                sca_id, "W146", wavelength=wl,
+            ).drawImage(scale=scale, nx=npix, ny=npix, method="no_pixel")
         )
-    return wl_array, psfobjs
+    return wave_list, im_list
 
 
 def getPSF(
@@ -129,9 +129,26 @@ def _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength, gsparams):
         psf_obj = None
         pass
     else:
-        wl_array, psfobjs = get_fake_wavelength_psf(
+        wave_list, im_list = get_fake_wavelength_psf(
             scale=fake_scale_default, nsample=17, npix=fake_npix_default,
         )
-        index = np.searchsorted(wl_array, wavelength)
-        psf_obj = psfobjs[index]
+
+        # First, some wavelength-related sanity checks.
+        if wavelength < wave_list[0] or wavelength > wave_list[-1]:
+            raise galsim.GalSimRangeError(
+                "Requested wavelength is outside the allowed range.",
+                wavelength, wave_list[0], wave_list[-1],
+            )
+
+        lower_idx = np.searchsorted(wave_list, wavelength) - 1
+
+        frac = (
+            wavelength - wave_list[lower_idx]
+        ) / (
+            wave_list[lower_idx+1] - wave_list[lower_idx]
+        )
+        psf_obj = galsim.InterpolatedImage(
+            frac * im_list[lower_idx+1] + (1.0 - frac) * im_list[lower_idx],
+        )
     return psf_obj
+
