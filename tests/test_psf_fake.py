@@ -11,3 +11,8 @@ def test_psf_fake():
     assert psfobjs[0].image.array.shape == (npix, npix)
     assert wl_array.shape == (nsample, )
     return
+
+if __name__ == "__main__":
+    testfns = [v for k, v in vars().items() if k[:5] == 'test_' and callable(v)]
+    for testfn in testfns:
+        testfn()
