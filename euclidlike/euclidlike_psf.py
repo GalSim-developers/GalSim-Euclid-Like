@@ -20,8 +20,8 @@ fake_npix_default = 257
 def get_fake_wavelength_psf(
     scale, nsample, npix, wavelength_min=550, wavelength_max=950,
 ):
-    """ This function get the fake oversampled PSF image as a function of
-    wavelength as an input the Euclid-like simulation
+    """ This function gets the fake oversampled PSF image as a function of
+    wavelength as an input to the Euclid-like simulations.
 
     Args:
     scale (float):  the scale of the PSF image (needs oversampling)
@@ -31,8 +31,10 @@ def get_fake_wavelength_psf(
     wavelength_max (float):  the maximum wave number to sample [units: nm]
 
     Returns:
-    wave_list (ndarray):  wavelength array
-    im_list (ndarray): a list of PSF images for different wave lengths
+
+    wl_array (ndarray):  wavelength array
+    psfobjs (ndarray): PSF interpolated image for different wavelengths
+
     """
     im_list = []
     wave_list = np.linspace(wavelength_min, wavelength_max, nsample)
