@@ -5,3 +5,4 @@ from .instrument_params import n_ccd, n_pix_row, n_pix_col, pixel_scale_mm
 from .bandpass import getBandpasses
 
 from .euclidlike_psf import get_fake_wavelength_psf
+from .backgrounds import getSkyLevel
