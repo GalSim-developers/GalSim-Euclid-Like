@@ -27,8 +27,6 @@ def getBandpasses(AB_zeropoint=True, default_thin_trunc=True, **kwargs):
     AB_zeropoint (bool) : If True, set the zeropoint of the bandpass to the AB magnitude system. [default: True]
     default_thin_trunc (bool) : If True, use the default thinning and truncation parameters. [default: True]
     kwargs : Additional keyword arguments to pass to either `Bandpass.thin` or `Bandpass.truncate`.
-
-    TODO : Add the NISP bandpasses?
     """
     # Read in the bandpass file
     bandpass_file = files('euclidlike.data').joinpath('Euclid_VIS.vis.dat')
