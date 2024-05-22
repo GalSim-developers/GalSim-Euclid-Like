@@ -23,3 +23,5 @@ def test_optics():
     
     np.testing.assert_almost_equal(pixel_size_arcsec, euclidlike.instrument_params.pixel_scale, 2)
     
+if __name__ == "__main__":
+    test_optics()
