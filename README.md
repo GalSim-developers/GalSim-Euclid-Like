@@ -11,7 +11,7 @@ galsim>=2.5,
 astropy>=2.0,
 ```
 
-The source code has not published to pypi. To install from source code:
+The source code has not been published to pypi. To install from source code:
 ```
 git clone git@github.com:GalSim-developers/GalSim-Euclid-Like.git
 ```
