@@ -1,0 +1,28 @@
+name: Pylint
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ "3.10"]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pylint
+        pip install .
+    - name: Analysing the code with pylint
+      run: |
+        pylint -rn -sn --recursive=y ./euclidlike
+        pylint -rn -sn --recursive=y ./tests
+      # the following line allows the CI test to pass, even if pylint fails
+      continue-on-error: true
+
