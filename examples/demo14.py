@@ -1,11 +1,14 @@
 """
 Demo #14
 
-The python script resembles that of the demo code in Galsim in python scripts: examples/demo13.py.
+This script is a python version of the demo13 script in Galsim. The script is intended to produce
+a relatively realistic scene of galaxies and stars as will be observed by the Euclid Space Telescope,
+including the Euclid-like PSF, WCS, and various detector effects.
 
-This script is intended to produce a relatively realistic scene of galaxies and stars as will
-be observed by the Euclid Space Telescope, including the Euclid-like PSF, WCS, and various detector
-effects.
+The python script resembles that of the demo code in Galsim in python scripts: examples/demo13.py.
+The demo13.py script can be found here:
+
+https://github.com/GalSim-developers/GalSim/blob/releases/2.5/examples/demo13.py
 
 The script uses the Euclid-like module to set up the filters, PSF, and WCS for the Euclid-like
 telescope.  It also uses the COSMOSCatalog class to read in the COSMOS catalog of galaxy properties.
