@@ -389,8 +389,7 @@ def _parse_WCS_inputs(world_pos, PA, date, PA_is_FPA, CCDs):
     # Get the date. (Vernal equinox in 2025, taken from
     # http://www.astropixels.com/ephemeris/soleq2001.html, if none was supplied.)
     if date is None:
-        # date = datetime.datetime(2025, 3, 20, 9, 2, 0)
-
+        date = datetime.datetime(2025, 3, 20, 9, 2, 0)
 
     # Are we allowed to look here?
     if not allowedPos(world_pos, date):
