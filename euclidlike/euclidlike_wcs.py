@@ -43,11 +43,8 @@ instr_name = "VIS"
 optics_design_ver = "ERO"
 # prog_version = "d2"
 
-# Information about center points of the SCAs in the WFI focal plane coordinate system (f1, f2)
-# coordinates.  These are rotated by an angle theta_fpa with respect to the payload axes, as
-# projected onto the sky.  The origin is centered on the telescope boresight, but can be related to
-# the center of the FPA by subtracting fpa_xc_mm and fpa_yc_mm.
-#
+# Information about center points of the CCDs in the VIS focal plane coordinate system
+# coordinates.
 # Units are mm.
 infile = files('euclidlike.data').joinpath('ccd_data.dat')
 ccd_data = np.genfromtxt(
@@ -71,10 +68,7 @@ fpa_yc_mm = 0.859/plate_scale
 xc_fpa = 0.*coord.radians
 yc_fpa = np.deg2rad(0.859)*coord.radians
 
-# The next array contains rotation offsets of individual SCA Y axis relative to FPA f2 axis. Same
-# sign convention as theta_fpa. These represent mechanical installation deviations from perfect
-# alignment and are ideally zero. These will be measured during focal plane integration and
-# testing.
+# The next array contains rotation offsets of individual CCD Y axis relative to FPA.
 ccd_rot = np.zeros_like(ccd_xc_mm)
 
 # Rotation of WFI local axes relative to payload axes: this is expressed as a CCW rotation
@@ -128,12 +122,12 @@ def getWCS(world_pos, PA=None, date=None, CCDs=None, PA_is_FPA=False):
                         vernal equinox in 2025 will be used.  [default: None]
         PA_is_FPA:      If True, then the position angle that was provided was the PA of the focal
                         plane array, not the observatory. [default: False]
-        SCAs:           A single number or iterable giving the SCAs for which the WCS should be
-                        obtained.  If None, then the WCS is calculated for all SCAs.
+        CCDs:           A single number or iterable giving the CCDs for which the WCS should be
+                        obtained.  If None, then the WCS is calculated for all CCDs.
                         [default: None]
 
     Returns:
-        A dict of WCS objects for each SCA.
+        A dict of WCS objects for each CCD.
     """
     # First just parse the input quantities.
     date, CCDs, pa_fpa, pa_obsy = _parse_WCS_inputs(
@@ -212,7 +206,7 @@ def getWCS(world_pos, PA=None, date=None, CCDs=None, PA_is_FPA=False):
 def convertCenter(world_pos, CCD, PA=None, date=None, PA_is_FPA=False, tol=0.5*coord.arcsec):
     """
     This is a simple helper routine that takes an input position ``world_pos`` that is meant to
-    correspond to the position of the center of an SCA, and tells where the center of the focal
+    correspond to the position of the center of an CCD, and tells where the center of the focal
     plane array should be.  The goal is to provide a position that can be used as an input to
     getWCS(), which wants the center of the focal plane array.
 
@@ -230,9 +224,9 @@ def convertCenter(world_pos, CCD, PA=None, date=None, PA_is_FPA=False, tol=0.5*c
 
     Parameters:
         world_pos:  A galsim.CelestialCoord indicating the position to observe at the center of the
-                    given SCA.  Note that if the given position is not observable on
+                    given CCD.  Note that if the given position is not observable on
                     the given date, then the routine will raise an exception.
-        SCA:        A single number giving the SCA for which the center should be located at
+        CCD:        A single number giving the CCD for which the center should be located at
                     ``world_pos``.
         PA:         galsim.Angle representing the position angle of the observatory +Y axis, unless
                     ``PA_is_FPA=True``, in which case it's the position angle of the FPA.  For
@@ -252,14 +246,14 @@ def convertCenter(world_pos, CCD, PA=None, date=None, PA_is_FPA=False, tol=0.5*c
         A CelestialCoord object indicating the center of the focal plane array.
     """
     if not isinstance(CCD, int):
-        raise TypeError("Must pass in an int corresponding to the SCA")
+        raise TypeError("Must pass in an int corresponding to the CCD")
     if not isinstance(tol, coord.Angle):
         raise TypeError("tol must be a galsim.Angle")
     use_CCD = CCD
     # Parse inputs appropriately.
     _, _, pa_fpa, _ = _parse_WCS_inputs(world_pos, PA, date, PA_is_FPA, [CCD])
 
-    # Now pretend world_pos was the FPA center and we want to find the location of this SCA:
+    # Now pretend world_pos was the FPA center and we want to find the location of this CCD:
     _, u, v = _get_ccd_center_pos(use_CCD, world_pos, pa_fpa)
     # The (u, v) values give an offset, and we can invert this.
     fpa_cent = world_pos.deproject(-u, -v, projection='gnomonic')
@@ -395,7 +389,8 @@ def _parse_WCS_inputs(world_pos, PA, date, PA_is_FPA, CCDs):
     # Get the date. (Vernal equinox in 2025, taken from
     # http://www.astropixels.com/ephemeris/soleq2001.html, if none was supplied.)
     if date is None:
-        date = datetime.datetime(2025, 3, 20, 9, 2, 0)
+        # date = datetime.datetime(2025, 3, 20, 9, 2, 0)
+
 
     # Are we allowed to look here?
     if not allowedPos(world_pos, date):
