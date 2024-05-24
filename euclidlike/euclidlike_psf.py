@@ -56,16 +56,15 @@ def get_euclid_wavelength_psf():
     # NOTE: We do not have PSF variation
     psf_file = files("euclidlike.data").joinpath("monopsfs_6_6.fits.gz")
     image_array = pyfits.getdata(psf_file)
+    wave_data = pyfits.getdata(psf_file, 1) # get wavelengths directly from data
+    wave_list = np.hstack(wave_data)*1e3 # factor of 1e3 to convert from micrometer to nm
     # The following are the values for the data from Lance Miller
-    nsample = 17
-    pixel_scale = 0.1
-    wavelength_min = 540
-    wavelength_max = 910
-    wave_list = np.linspace(wavelength_min, wavelength_max, nsample)
+    nsample = len(wave_list)
+    scale = pixel_scale/3 # images are oversampled by a factor of 3
     im_list = []
     for i in range(nsample):
         im_list.append(
-            galsim.Image(image_array[i], scale=pixel_scale)
+            galsim.Image(image_array[i], scale=scale)
         )
     return wave_list, im_list
 
@@ -99,17 +98,17 @@ def getPSF(
         galsim.PixelScale(galsim.roman.pixel_scale)]
     wavelength (float):  An option to get an achromatic PSF for a single
         wavelength, for users who do not care about chromaticity of the PSF.
-        If None, then the fully chromatic PSF is returned.  Alternatively the
-        user should supply either (a) a wavelength in nanometers, and they will
-        get achromatic OpticalPSF objects for that wavelength, or (b) a
-        bandpass object, in which case they will get achromatic OpticalPSF
+        If None, then the fully chromatic PSF is returned as an InterpolatedChromaticObject. 
+        Alternatively the user should supply either (a) a wavelength in nanometers,
+        and they will get an InterpolatedImage object for that wavelength, or (b) a
+        bandpass object, in which case they will get an InterpolatedImage
         objects defined at the effective wavelength of that bandpass.
         [default: None]
     gsparams:  An optional GSParams argument.  See the docstring for GSParams
         for details. [default: None]
 
     Returns:
-        A single PSF object (either a ChromaticOpticalPSF or an OpticalPSF
+        A single PSF object (either an InterpolatedChromaticObject or an InterpolatedImage
         depending on the inputs).
 
     """
@@ -149,30 +148,14 @@ def _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength, gsparams):
     interact with this routine.
     """
 
-    # Now set up the PSF, including the option to interpolate over waves
-    if wavelength is None:
-        psf_obj = None
-        pass
-    else:
-        wave_list, im_list = get_fake_wavelength_psf(
-            scale=fake_scale_default, nsample=17, npix=fake_npix_default,
-        )
-
-        # First, some wavelength-related sanity checks.
-        if wavelength < wave_list[0] or wavelength > wave_list[-1]:
-            raise galsim.GalSimRangeError(
-                "Requested wavelength is outside the allowed range.",
-                wavelength, wave_list[0], wave_list[-1],
-            )
-
-        lower_idx = np.searchsorted(wave_list, wavelength) - 1
-
-        frac = (
-            wavelength - wave_list[lower_idx]
-        ) / (
-            wave_list[lower_idx+1] - wave_list[lower_idx]
-        )
-        psf_obj = galsim.InterpolatedImage(
-            frac * im_list[lower_idx+1] + (1.0 - frac) * im_list[lower_idx],
-        )
+    wave_list, im_list = get_euclid_wavelength_psf()
+    # instantiate psf object from list of images and wavelengths
+    psf_obj = galsim.InterpolatedChromaticObject.from_images(im_list , wave_list)
+    if wavelength is not None:
+        if isinstance(wavelength, galsim.Bandpass):
+            wave =  wavelength.effective_wavelength
+        else:
+            wave = wavelength
+        psf_obj = psf_obj.evaluateAtWavelength(wave)
+    
     return psf_obj
