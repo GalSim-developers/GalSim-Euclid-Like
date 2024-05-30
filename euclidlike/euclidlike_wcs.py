@@ -21,27 +21,27 @@ from galsim import BoundsI
 from galsim import GalSimRangeError, GalSimError
 
 from .instrument_params import (
+    pixel_scale_mm,
     plate_scale,
     n_ccd,
+    n_ccd_row,
+    n_ccd_col,
     n_pix_row,
     n_pix_col,
     det2ccd,
+    ccd2det,
     min_sun_angle,
     max_sun_angle,
 )
 
 
-# Basic Euclid reference info, with lengths in mm.
-# pixel_size_mm = 0.01
-# focal_length = 18714
-# pix_scale = (pixel_size_mm/focal_length)*coord.radians
+# Basic Euclid reference info.
 n_pv = 10  # Number of PV coefficients used, where arrays are n_pv x 2 in dimension
 
-# Version-related information, right now the information are based on the ERO data
+# Version-related information. At the moment the version are based on Scaramella et al. 2021
 tel_name = "Euclid"
 instr_name = "VIS"
-optics_design_ver = "ERO"
-# prog_version = "d2"
+optics_design_ver = "S21"
 
 # Information about center points of the CCDs in the VIS focal plane coordinate system
 # coordinates.
@@ -67,6 +67,12 @@ fpa_xc_mm = 0.0
 fpa_yc_mm = 0.859/plate_scale
 xc_fpa = 0.*coord.radians
 yc_fpa = np.deg2rad(0.859)*coord.radians
+
+# Gaps between CCDs
+x_gap_as = 12.7
+y_gap_as = 64.4
+x_gap_mm = x_gap_as/plate_scale
+y_gap_mm = y_gap_as/plate_scale
 
 # The next array contains rotation offsets of individual CCD Y axis relative to FPA.
 ccd_rot = np.zeros_like(ccd_xc_mm)
@@ -118,13 +124,15 @@ def getWCS(world_pos, PA=None, date=None, CCDs=None, PA_is_FPA=False):
                         supplies a ``PA`` value, the routine does not check
                         whether this orientation is actually allowed.
                         [default: None]
-        date:           The date of the observation, as a python datetime object.  If None, then the
-                        vernal equinox in 2025 will be used.  [default: None]
-        PA_is_FPA:      If True, then the position angle that was provided was the PA of the focal
-                        plane array, not the observatory. [default: False]
-        CCDs:           A single number or iterable giving the CCDs for which the WCS should be
-                        obtained.  If None, then the WCS is calculated for all CCDs.
-                        [default: None]
+        date:           The date of the observation, as a python datetime
+                        object.  If None, then the vernal equinox in 2025 will
+                        be used.  [default: None]
+        PA_is_FPA:      If True, then the position angle that was provided was
+                        the PA of the focal plane array, not the observatory.
+                        [default: False]
+        CCDs:           A single number or iterable giving the CCDs for which
+                        the WCS should be obtained.  If None, then the WCS is
+                        calculated for all CCDs. [default: None]
 
     Returns:
         A dict of WCS objects for each CCD.
@@ -218,6 +226,7 @@ def convertCenter(world_pos, CCD, PA=None, date=None, PA_is_FPA=False, tol=0.5*c
     its initial result based on empirical tests.  The ``tol`` kwarg can be used to adjust how
     careful it will be, but it always does at least one iteration.
 
+    TODO: update thiis part
     To fully understand all possible inputs and outputs to this routine, users may wish to consult
     the diagram on the GalSim wiki,
     https://github.com/GalSim-developers/GalSim/wiki/GalSim-Roman-module-diagrams
@@ -271,6 +280,119 @@ def convertCenter(world_pos, CCD, PA=None, date=None, PA_is_FPA=False, tol=0.5*c
         fpa_cent = coord.CelestialCoord(fpa_cent.ra + delta_ra, fpa_cent.dec + delta_dec)
 
     return fpa_cent
+
+
+def findCCD(wcs_dict, world_pos, include_border=False):
+    """
+    This is a subroutine to take a dict of WCS (one per CCD) from euclidlike.getWCS() and query
+    which CCD a particular real-world coordinate would be located on.  The position (``world_pos``)
+    should be specified as a galsim.CelestialCoord.  If the position is not located on any of the
+    CCDs, the result will be None.  Note that if ``wcs_dict`` does not include all CCDs in it, then
+    it's possible the position might lie on one of the CCDs that was not included.
+
+    Depending on what the user wants to do with the results, they may wish to use the
+    ``include_border`` keyword.  This keyword determines whether or not to include an additional
+    border corresponding to half of the gaps between CCDs.  For example, if a user is drawing a
+    single image they may wish to only know whether a given position falls onto a CCD, and if so,
+    which one (ignoring everything in the gaps).  In contrast, a user who plans to make a sequence
+    of dithered images might find it most useful to know whether the position is either on a CCD or
+    close enough that in a small dither sequence it might appear on the CCD at some point.  Use of
+    ``include_border`` switches between these scenarios.
+
+    Parameters:
+        wcs_dict:        The dict of WCS's output from euclidlike.getWCS().
+        world_pos:       A galsim.CelestialCoord indicating the sky position of interest.
+        include_border:  If True, then include the half-border around CCD to cover the gap
+                         between each sensor. [default: False]
+
+    Returns:
+        an integer value of the CCD on which the position falls, or None if the position is not
+        on any CCD.
+
+    """
+    # Sanity check args.
+    if not isinstance(wcs_dict, dict):
+        raise TypeError("wcs_dict should be a dict containing WCS output by euclidlike.getWCS.")
+
+    if not isinstance(world_pos, coord.CelestialCoord):
+        raise TypeError("Position on the sky must be given as a galsim.CelestialCoord.")
+
+    # Set up the minimum and maximum pixel values, depending on whether or not to include the
+    # border.  We put it immediately into a galsim.BoundsI(), since the routine returns xmin, xmax,
+    # ymin, ymax:
+    xmin, xmax, ymin, ymax = _calculate_minmax_pix(include_border)
+    bounds_list = [
+        BoundsI(x1, x2, y1, y2)
+        for x1, x2, y1, y2 in zip(xmin, xmax, ymin, ymax)
+    ]
+
+    ccd = None
+    for i_ccd in wcs_dict:
+        wcs = wcs_dict[i_ccd]
+        image_pos = wcs.toImage(world_pos)
+        if bounds_list[i_ccd].includes(image_pos):
+            ccd = i_ccd
+            break
+
+    return ccd
+
+
+def _calculate_minmax_pix(include_border=False):
+    """
+    This is a helper routine to calculate the minimum and maximum pixel values that should be
+    considered within a CCD, possibly including the complexities of including 1/2 of the gap
+    between CCDs. In that case it depends on the detailed geometry of the Euclid focal plane.
+
+    Parameters:
+        include_border:     A boolean value that determines whether to include 1/2 of the gap
+                            between CCDs as part of the CCD itself.  [default: False]
+
+    Returns:
+        a tuple of NumPy arrays for the minimum x pixel value, maximum x pixel value, minimum y
+        pixel value, and maximum y pixel value for each CCD.
+    """
+    # First, set up the default (no border).
+    # The minimum and maximum pixel values are (1, n_pix).
+    min_x_pix = np.ones(n_ccd).astype(int)
+    max_x_pix = min_x_pix + n_pix_col - 1
+    min_y_pix = min_x_pix.copy()
+    max_y_pix = min_y_pix + n_pix_row - 1
+
+    # Then, calculate the half-gaps, grouping together CCDs whenever possible.
+    if include_border:
+        # The gaps are set following https://arxiv.org/abs/2108.01201 table 1
+        # At the moment the ccd edges that are also at the edge of the focal
+        # plane are handle separately. But, the border is like any other
+        # border.
+        half_border_x_pix = int(0.5*x_gap_mm/pixel_scale_mm)
+        half_border_y_pix = int(0.5*y_gap_mm/pixel_scale_mm)
+        val_x_edge = half_border_x_pix
+        val_y_edge = half_border_y_pix
+
+        for i in range(1, n_ccd_row+1):
+            for j in range(1, n_ccd_col+1):
+                i_ccd = ccd2det[f"{i}_{j}"]
+                if i == 1:
+                    min_x_pix[i_ccd] -= val_x_edge
+                    max_x_pix[i_ccd] += half_border_x_pix
+                elif i == 6:
+                    min_x_pix[i_ccd] -= half_border_x_pix
+                    max_x_pix[i_ccd] += val_x_edge
+                else:
+                    min_x_pix[i_ccd] -= half_border_x_pix
+                    max_x_pix[i_ccd] += half_border_x_pix
+
+                if j == 1:
+                    min_y_pix[i_ccd] -= half_border_y_pix
+                    max_y_pix[i_ccd] += val_y_edge
+                elif j == 6:
+                    min_y_pix[i_ccd] -= val_y_edge
+                    max_y_pix[i_ccd] += half_border_y_pix
+                else:
+                    min_y_pix[i_ccd] -= half_border_y_pix
+                    max_y_pix[i_ccd] += half_border_y_pix
+
+    return min_x_pix, max_x_pix, min_y_pix, max_y_pix
 
 
 def _populate_required_fields(header):
@@ -420,13 +542,13 @@ def _parse_WCS_inputs(world_pos, PA, date, PA_is_FPA, CCDs):
 
 def allowedPos(world_pos, date):
     """
-    This routine can be used to check whether Roman would be allowed to look at a particular
+    This routine can be used to check whether Euclid would be allowed to look at a particular
     position (``world_pos``) on a given ``date``.   This is determined by the angle of this position
     relative to the Sun.
 
-    In general, Roman can point at angles relative to the Sun in the range 90+20 & 90-3 degrees.
+    In general, Euclid can point at angles relative to the Sun in the range 90+20 & 90-3 degrees.
     Obviously, pointing too close to the Sun would result in overly high sky backgrounds.  It is
-    less obvious why Roman cannot look at a spot directly opposite from the Sun (180 degrees on the
+    less obvious why Euclid cannot look at a spot directly opposite from the Sun (180 degrees on the
     sky).  The reason is that the observatory is aligned such that if the observer is looking at
     some sky position, the solar panels are oriented at 90 degrees from that position.  So it's
     always optimal for the observatory to be pointing at an angle of 90 degrees relative to the
