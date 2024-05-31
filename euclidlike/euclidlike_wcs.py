@@ -371,7 +371,7 @@ def _calculate_minmax_pix(include_border=False):
 
         for i in range(1, n_ccd_row+1):
             for j in range(1, n_ccd_col+1):
-                i_ccd = ccd2det[f"{i}_{j}"]
+                i_ccd = ccd2det[f"{i}-{j}"]
                 if i == 1:
                     min_x_pix[i_ccd] -= val_x_edge
                     max_x_pix[i_ccd] += half_border_x_pix
