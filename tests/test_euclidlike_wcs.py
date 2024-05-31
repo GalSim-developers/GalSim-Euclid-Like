@@ -39,7 +39,7 @@ def test_euclidlike_wcs():
     test_date = datetime.datetime(2025, 3, 20, 9, 2)
     pa = euclidlike.bestPA(pos, test_date)
     np.testing.assert_almost_equal(pa.rad, 0., decimal=3)
-    # Now make it look at the same RA as the sun but quite different declination.  It wants +Z
+    # Now make it look at the same RA as the sun but quite different declination. It wants +Z
     # pointing North toward Sun, so we'll get a -90 degree angle for the PA.
     pos = galsim.CelestialCoord(0.*galsim.degrees, -89.*galsim.degrees)
     pa = euclidlike.bestPA(pos, test_date)
