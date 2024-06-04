@@ -32,7 +32,7 @@ astropy>=2.0,
 ```
 
 NOTE:
-At the moment `GalSim` has to installed manually to have acces to chromatic PSF interpollation that we need (see [here](https://github.com/GalSim-developers/GalSim/pull/1296)).  
+At the moment `GalSim` has to be installed manually to have acces to chromatic PSF interpollation that we need (see [here](https://github.com/GalSim-developers/GalSim/pull/1296)).  
 To install GalSim:
 ```
 git clone git@github.com:GalSim-developers/GalSim.git
