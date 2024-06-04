@@ -28,6 +28,7 @@ jobs:
         pip install .
         pip install pytest
         conda install fftw
+        export LIBRARY_PATH="$CONDA/lib:$LIBRARY_PATH"
         pip install git+https://github.com/GalSim-developers/GalSim@1294_from_images
     - name: Run unit tests with pytest
       run: |
