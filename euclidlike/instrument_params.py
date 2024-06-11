@@ -27,7 +27,7 @@ n_pix_col = 4096
 # Physical pixel size
 pixel_scale_mm = 0.012  # mm
 
-plate_scale = 8.33  # arcesec / mm
+plate_scale = 8.33  # arcsec / mm
 
 # Mapping DETID to CCDID
 det2ccd = {
