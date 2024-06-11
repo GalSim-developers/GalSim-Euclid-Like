@@ -97,6 +97,8 @@ def main(argv):
     # We'll use this one for our flux normalization of stars, so we'll need this regardless of
     # which bandpass we are simulating.
     vis_bandpass = euclidlike_filters['VIS']
+    vis_bandpass.red_limit = 910
+    vis_bandpass.blue_limit = 540
 
     # Note: This example uses both the I<23.5 and I<25.2 COSMOS catalogs to try to better span
     #       a range from bigger, bright galaxies to fainter ones.  We also dilate and magnify
@@ -160,18 +162,20 @@ def main(argv):
         # filter bandpass, partly because "filter" is a reserved word in python.  So we follow
         # that convention here as well.
         bandpass = euclidlike_filters[filter_name]
+        bandpass.red_limit = 910
+        bandpass.blue_limit = 540
 
         # Create the PSF
         # We are ignoring the position-dependence of the PSF within each CCD, just using the PSF
         # at the center of the sensor.
         logger.info('Building PSF for CCD %d, filter %s.'%(use_CCD, filter_name))
         # TODO : uncomment the line below when the getPSF routine is implemented in the Euclid-like module
-        # psf = euclidlike.getPSF(use_CCD, filter_name, wcs=wcs)
+        psf = euclidlike.getPSF(use_CCD, filter_name, wcs=wcs)
         lam = 700     # nm
         diam = 1.2    # meters
         lam_over_diam = (lam * 1.e-9) / diam  # radians
         lam_over_diam *= 206265  # Convert to arcsec
-        psf = galsim.Airy(lam_over_diam)
+        #psf = galsim.Airy(lam_over_diam)
 
         # Set up the full image for the galaxies
         full_image = galsim.ImageF(euclidlike.n_pix_col, euclidlike.n_pix_row, wcs=wcs)
@@ -281,7 +285,7 @@ def main(argv):
                 logger.debug('flux = %s',flux)
 
                 # Normalize the SED to have this flux in the VIS band.
-                sed = vega_sed.withFlux(flux, vis_bandpass)
+                sed = vega_sed.withFlux(flux, bandpass)
 
                 obj = galsim.DeltaFunction() * sed
 
