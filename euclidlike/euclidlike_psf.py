@@ -95,7 +95,7 @@ def getPSF(
         for which the PSF should be created. If None, the exact center of the
         ccd is chosen. [default: None]
     wcs:  The WCS to use to project the PSF into world coordinates. [default:
-        galsim.PixelScale(galsim.roman.pixel_scale)]
+        galsim.PixelScale(euclid_like.roman.pixel_scale)]
     wavelength (float):  An option to get an achromatic PSF for a single
         wavelength, for users who do not care about chromaticity of the PSF.
         If None, then the fully chromatic PSF is returned as an InterpolatedChromaticObject. 
