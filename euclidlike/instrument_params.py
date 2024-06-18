@@ -106,7 +106,7 @@ ccd2det = {
     "6-6": 33,
 }
 
-# Maxinum allowed angle from the telecope solar panels to the sun in degrees.
+# Maximum allowed angle from the telescope solar panels to the sun in degrees.
 min_sun_angle = 3.0 * galsim.degrees
 max_sun_angle = 20.0 * galsim.degrees
 
