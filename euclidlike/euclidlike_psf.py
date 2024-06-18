@@ -75,7 +75,7 @@ def getPSF(
         ccd, bandpass,
         ccd_pos=None, wcs=None,
         wavelength=None, gsparams=None,
-        logger=None
+        logger=None, stepk = None, maxk = None
 ):
     """Get a single PSF for Euclid like simulation.
 
@@ -130,7 +130,7 @@ def getPSF(
         )
 
     # Now get psf model
-    psf = _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength, gsparams)
+    psf = _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength, gsparams, stepk, maxk)
     # Apply WCS.
     # The current version is in arcsec units, but oriented parallel to the
     # image coordinates. So to apply the right WCS, project to pixels using the
@@ -143,7 +143,7 @@ def getPSF(
     return psf
 
 
-def _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength, gsparams):
+def _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength, gsparams, stepk = None, maxk = None):
     """
     Routine for making a single PSF.  This gets called by `getPSF` after it
     parses all the options that were passed in.  Users will not directly
@@ -152,7 +152,7 @@ def _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength, gsparams):
 
     wave_list, im_list = get_euclid_wavelength_psf()
     # instantiate psf object from list of images and wavelengths
-    psf_obj = galsim.InterpolatedChromaticObject.from_images(im_list, wave_list)
+    psf_obj = galsim.InterpolatedChromaticObject.from_images(im_list, wave_list, _force_stepk = stepk, _force_maxk = maxk)
     if wavelength is not None:
         if isinstance(wavelength, galsim.Bandpass):
             wave = wavelength.effective_wavelength

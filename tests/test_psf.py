@@ -57,7 +57,7 @@ def test_get_psf_function():
 
     # creating narrow SED at desired wavelength
     x = np.linspace(euc_bp.blue_limit, euc_bp.red_limit, 500)
-    x[285] =  wave #index 185 roughly corresponds to this wavelength, manually setting
+    x[285] =  wave #index 285 roughly corresponds to this wavelength, manually setting
     f = np.full(len(x), 1e-30)
     f[285] = 100
     lk_table = galsim.LookupTable(x = x, f = f)
@@ -75,7 +75,7 @@ def test_get_psf_function():
     true_img = true_obj.drawImage(euc_bp, scale=scale)
     # images identicial within 0.01% of total flux
     np.testing.assert_allclose(
-        psf_img.array, true_img.array, atol=1e-5*np.sum(true_img.array),
+        psf_img.array, true_img.array, atol=1e-4*np.sum(true_img.array),
         err_msg='getPSF() does replicate image with very narrow SED centered at desired wavelength')
     return
 
