@@ -2,14 +2,14 @@
 @file end_to_end_demo.py
 
 This script is an adaptation of the demo13 script in Galsim for Euclid. The script is intended to
-produce a relatively realistic scene of galaxies and stars as will be observed by the 
+produce a relatively realistic scene of galaxies and stars as will be observed by the
 Euclid Space Telescope, including the Euclid-like PSF, WCS, and various detector effects.
 
 The demo13.py script can be found here:
 
 https://github.com/GalSim-developers/GalSim/blob/releases/2.5/examples/demo13.py
 
-The script uses the Euclid-like module to set up the approximate filters, PSF, and WCS for the 
+The script uses the Euclid-like module to set up the approximate filters, PSF, and WCS for the
 Euclid Space Telescope. It also uses the COSMOSCatalog class to read in the COSMOS catalog
 of galaxy properties.
 
@@ -17,7 +17,7 @@ The current package misses the following features:
 
 1) Non-linearity: Charge-dependent gain in converting from units of electrons to ADU. Non-linearity
    in some form is also relevant for CCDs in addition to NIR detectors.
-2) And any non-linear effects that are specific to the Euclid detectors such as 
+2) And any non-linear effects that are specific to the Euclid detectors such as
    charge-transfer inefficiency.
 
 It also uses chromatic photon shooting, which is generally a more efficient way to simulate
@@ -32,12 +32,13 @@ E.g. `python end_to_end_demo.py --filters=VIS`
 
 import argparse
 import numpy as np
-import sys, os
+import sys
+import os
 import logging
-import time
 import galsim
 import euclidlike
 import datetime
+
 
 def parse_args(argv):
     parser = argparse.ArgumentParser(prog='end_to_end_demo', add_help=True)
@@ -49,15 +50,16 @@ def parse_args(argv):
                         help='How many objects to draw')
     parser.add_argument('--seed', type=int, default=12345,
                         help='Initial seed for random numbers')
-    parser.add_argument('-c', '--ccd', type=int, default=7, choices=range(0,35),
-                        help='Which ccd to simulate (default is arbitrarily CCD 7)')
+    parser.add_argument('-c', '--ccd', type=int, default=8, choices=range(0,35),
+                        help='Which ccd to simulate (default is arbitrarily CCD 8)')
     parser.add_argument('-t', '--test', action='store_const', default=False, const=True,
                         help='Whether to use the smaller test sample, rather than the full COSMOS samples')
-    parser.add_argument('-v', '--verbosity', type=int, default=2, choices=range(0,4),
+    parser.add_argument('-v', '--verbosity', type=int, default=2, choices=range(0, 4),
                         help='Verbosity level')
 
     args = parser.parse_args(argv)
     return args
+
 
 def main(argv):
 
@@ -76,10 +78,12 @@ def main(argv):
     # Use a logger to output some information about the run.
     logging.basicConfig(format="%(message)s", stream=sys.stdout)
     logger = logging.getLogger("demo13")
-    logging_levels = { 0: logging.CRITICAL,
-                       1: logging.WARNING,
-                       2: logging.INFO,
-                       3: logging.DEBUG }
+    logging_levels = {
+        0: logging.CRITICAL,
+        1: logging.WARNING,
+        2: logging.INFO,
+        3: logging.DEBUG,
+    }
     level = logging_levels[args.verbosity]
     logger.setLevel(level)
 
@@ -92,7 +96,7 @@ def main(argv):
 
     # Get the names of the ones we will use here.
     filters = [filter_name for filter_name in euclidlike_filters if filter_name in use_filters]
-    logger.debug('Using filters: %s',filters)
+    logger.debug('Using filters: %s', filters)
 
     # We'll use this one for our flux normalization of stars, so we'll need this regardless of
     # which bandpass we are simulating.
@@ -131,8 +135,8 @@ def main(argv):
         cat1 = galsim.COSMOSCatalog(sample='25.2', area=euclidlike.collecting_area, exptime=euclidlike.long_exptime)
         cat2 = galsim.COSMOSCatalog(sample='23.5', area=euclidlike.collecting_area, exptime=euclidlike.long_exptime)
 
-    logger.info('Read in %d galaxies from I<25.2 catalog'%cat1.nobjects)
-    logger.info('Read in %d galaxies from I<23.5 catalog'%cat2.nobjects)
+    logger.info('Read in %d galaxies from I<25.2 catalog' % cat1.nobjects)
+    logger.info('Read in %d galaxies from I<23.5 catalog' % cat2.nobjects)
 
     # For the stars, we'll use the vega SED, since that's the only stellar SED we have in the
     # GalSim share directory.  Which means all the stars will be pretty blue.
@@ -149,8 +153,7 @@ def main(argv):
     # The output of this routine is a dict of WCS objects, one for each CCD. We then take the WCS
     # for the CCD that we are using.
     # TODO : uncomment the line below when the getWCS routine is implemented in the Euclid-like module
-    # wcs_dict = euclidlike.getWCS(world_pos=targ_pos, CCDs=use_CCD, date=date)
-    wcs_dict = galsim.roman.getWCS(world_pos=targ_pos, SCAs=use_CCD, date=date)
+    wcs_dict = euclidlike.getWCS(world_pos=targ_pos, CCDs=use_CCD, date=date)
     wcs = wcs_dict[use_CCD]
 
     # Now start looping through the filters to draw.
@@ -247,8 +250,8 @@ def main(argv):
             # if we wanted that information, but we don't need it.
             x = obj_rng() * euclidlike.n_pix_row
             y = obj_rng() * euclidlike.n_pix_col
-            image_pos = galsim.PositionD(x,y)
-            logger.debug('Position = %s',image_pos)
+            image_pos = galsim.PositionD(x, y)
+            logger.debug('Position = %s', image_pos)
 
             # Now decide which of our three kinds of objects we want to draw:
             # 80% faint galaxy
@@ -260,11 +263,11 @@ def main(argv):
 
                 # Select a random galaxy from the catalog.
                 obj = cat1.makeGalaxy(chromatic=True, gal_type='parametric', rng=obj_rng)
-                logger.debug('galaxy index = %s',obj.index)
+                logger.debug('galaxy index = %s', obj.index)
 
                 # Rotate the galaxy randomly
                 theta = obj_rng() * 2 * np.pi * galsim.radians
-                logger.debug('theta = %s',theta)
+                logger.debug('theta = %s', theta)
                 obj = obj.rotate(theta)
 
             elif p < 0.9:
@@ -282,7 +285,7 @@ def main(argv):
                 sigma = (np.log(1 + sigma_x**2/mu_x**2))**0.5
                 gd = galsim.GaussianDeviate(obj_rng, mean=mu, sigma=sigma)
                 flux = np.exp(gd())
-                logger.debug('flux = %s',flux)
+                logger.debug('flux = %s', flux)
 
                 # Normalize the SED to have this flux in the VIS band.
                 sed = vega_sed.withFlux(flux, bandpass)
@@ -294,7 +297,7 @@ def main(argv):
                 logger.debug('Bright galaxy')
 
                 obj = cat2.makeGalaxy(chromatic=True, gal_type='parametric', rng=obj_rng)
-                logger.debug('galaxy index = %s',obj.index)
+                logger.debug('galaxy index = %s', obj.index)
 
                 # Scale up the area by a factor of 2, and the flux by a factor of 4.
                 # This is not necessarily physical, but it is intended to add some more big,
@@ -319,7 +322,7 @@ def main(argv):
 
         # Now we're done with the per-object drawing for this image.  The rest will be done for the
         # entire image at once.
-        logger.info('All objects have been drawn for filter %s.',filter_name)
+        logger.info('All objects have been drawn for filter %s.', filter_name)
         logger.info('Adding the noise and detector non-idealities.')
 
         # At this point in the image generation process, an integer number of photons gets
@@ -404,10 +407,11 @@ def main(argv):
 
         logger.debug('Subtracted background for {0}-band image'.format(filter_name))
         # Write the final image to a file.
-        out_filename = os.path.join(outpath,'end_to_end_demo_{0}.fits'.format(filter_name))
+        out_filename = os.path.join(outpath, 'end_to_end_demo_{0}.fits'.format(filter_name))
         full_image.write(out_filename)
 
         logger.info('Completed {0}-band image.'.format(filter_name))
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])
