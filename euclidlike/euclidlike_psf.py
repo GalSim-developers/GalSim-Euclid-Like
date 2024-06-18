@@ -75,7 +75,7 @@ def getPSF(
         ccd, bandpass,
         ccd_pos=None, wcs=None,
         wavelength=None, gsparams=None,
-        logger=None, stepk = None, maxk = None
+        logger=None
 ):
     """Get a single PSF for Euclid like simulation.
 
@@ -84,8 +84,7 @@ def getPSF(
     folding_threshold in the gsparams.  Otherwise very bright stars will show
     some reflections in the spider pattern and possibly some boxiness at the
     outskirts of the PSF.  Using ``gsparams =
-    GSParams(folding_threshold=2.e-3)`` generally provides good results even
-    for very bright (e.g. mag=10) stars.
+    GSParams(folding_threshold=1.e-4)`` generally provides good results.
 
     Args:
     ccd (int):  Single value specifying the ccd for which the PSF should be
@@ -130,7 +129,7 @@ def getPSF(
         )
 
     # Now get psf model
-    psf = _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength, gsparams, stepk, maxk)
+    psf = _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength, gsparams)
     # Apply WCS.
     # The current version is in arcsec units, but oriented parallel to the
     # image coordinates. So to apply the right WCS, project to pixels using the
@@ -143,7 +142,7 @@ def getPSF(
     return psf
 
 
-def _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength, gsparams, stepk = None, maxk = None):
+def _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength, gsparams = None):
     """
     Routine for making a single PSF.  This gets called by `getPSF` after it
     parses all the options that were passed in.  Users will not directly
@@ -152,7 +151,7 @@ def _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength, gsparams, stepk = No
 
     wave_list, im_list = get_euclid_wavelength_psf()
     # instantiate psf object from list of images and wavelengths
-    psf_obj = galsim.InterpolatedChromaticObject.from_images(im_list, wave_list, _force_stepk = stepk, _force_maxk = maxk)
+    psf_obj = galsim.InterpolatedChromaticObject.from_images(im_list, wave_list, gsparams = gsparams)
     if wavelength is not None:
         if isinstance(wavelength, galsim.Bandpass):
             wave = wavelength.effective_wavelength
