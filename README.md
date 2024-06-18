@@ -24,11 +24,21 @@ Attribution for software and data used by particular routines in this library is
 
 ## Installation
 
-GalSim-Euclid-Like requires `python>3.10` and the following dependencies:
+GalSim-Euclid-Like requires `python>3.10` and the following dependencies (see NOTE below):
 ```
 numpy>=1.17,
 galsim>=2.5,
 astropy>=2.0,
+```
+
+NOTE:
+At the moment `GalSim` has to be installed manually to have acces to chromatic PSF interpollation that we need (see [here](https://github.com/GalSim-developers/GalSim/pull/1296)).  
+To install GalSim:
+```
+git clone git@github.com:GalSim-developers/GalSim.git
+cd GalSim
+git checkout 1294_from_images
+pip install .
 ```
 
 The source code has not been published to pypi. To install from source code:
