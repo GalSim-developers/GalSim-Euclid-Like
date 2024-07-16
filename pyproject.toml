@@ -28,6 +28,7 @@ dependencies = [
 [tool.setuptools]
 packages = [
   "euclidlike",
+  "euclidlike_imsim",
 ]
 include-package-data = true
 
