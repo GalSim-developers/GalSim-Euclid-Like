@@ -9,7 +9,7 @@ class RomanWCS(WCSBuilder):
 
     def buildWCS(self, config, base, logger):
 
-        req = { 'SCA' : int,
+        req = { 'CCD' : int,
                 'ra'  : Angle,
                 'dec' : Angle,
                 'pa'  : Angle,
@@ -26,9 +26,9 @@ class RomanWCS(WCSBuilder):
         wcs = roman.getWCS(world_pos        = pointing,
                                 PA          = kwargs['pa'],
                                 date        = Time(kwargs['mjd'],format='mjd').datetime,
-                                SCAs        = kwargs['SCA'],
+                                SCAs        = kwargs['CCD'],
                                 PA_is_FPA   = True
-                                )[kwargs['SCA']]
+                                )[kwargs['CCD']]
         return wcs
 
 RegisterWCSType('RomanWCS', RomanWCS())

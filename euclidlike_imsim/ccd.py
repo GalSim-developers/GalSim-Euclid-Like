@@ -1,5 +1,4 @@
 import galsim
-import galsim.roman as roman
 import galsim.config
 from galsim.config import RegisterImageType
 from galsim.config import BuildStamps
@@ -9,7 +8,9 @@ from galsim.image import Image
 from astropy.time import Time
 import numpy as np
 
-class RomanSCAImageBuilder(ScatteredImageBuilder):
+import euclidlike
+
+class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
 
     def setup(self, config, base, image_num, obj_num, ignore, logger):
         """Do the initialization and setup for building the image.
@@ -28,10 +29,7 @@ class RomanSCAImageBuilder(ScatteredImageBuilder):
         Returns:
             xsize, ysize
         """
-        # import os, psutil
-        # process = psutil.Process()
-        # print('sca setup 1',process.memory_info().rss)
-        logger.debug('image %d: Building RomanSCA: image, obj = %d,%d',
+        logger.debug('image %d: Building EuclidlikeCCD: image, obj = %d,%d',
                      image_num,image_num,obj_num)
 
         self.nobjects = self.getNObj(config, base, image_num, logger=logger)
@@ -41,7 +39,7 @@ class RomanSCAImageBuilder(ScatteredImageBuilder):
         extra_ignore = [ 'image_pos', 'world_pos', 'stamp_size', 'stamp_xsize', 'stamp_ysize',
                          'nobjects' ]
         req = {
-            'SCA' : int,
+            'CCD' : int,
             'filter' : str,
             'mjd'  : float,
             'exptime' : float
@@ -60,8 +58,8 @@ class RomanSCAImageBuilder(ScatteredImageBuilder):
         }
         params = galsim.config.GetAllParams(config, base, req=req, opt=opt, ignore=ignore+extra_ignore)[0]
 
-        self.sca = params['SCA']
-        base['SCA'] = self.sca
+        self.ccd = params['CCD']
+        base['CCD'] = self.ccd
         self.filter = params['filter']
         self.mjd = params['mjd']
         self.exptime = params['exptime']
@@ -96,7 +94,7 @@ class RomanSCAImageBuilder(ScatteredImageBuilder):
         if 'bandpass' not in config:
             base['bandpass'] = galsim.config.BuildBandpass(base['image'], 'bandpass', base, logger=logger)
 
-        return roman.n_pix, roman.n_pix
+        return euclidlike.n_pix_col, euclidlike.n_pix_row
 
     # def getBandpass(self, filter_name):
     #     if not hasattr(self, 'all_roman_bp'):
@@ -130,7 +128,7 @@ class RomanSCAImageBuilder(ScatteredImageBuilder):
         full_image.header['MJD-OBS']  = self.mjd
         full_image.header['DATE-OBS'] = str(Time(self.mjd,format='mjd').datetime)
         full_image.header['FILTER']   = self.filter
-        full_image.header['ZPTMAG']   = 2.5*np.log10(self.exptime*roman.collecting_area)
+        full_image.header['ZPTMAG']   = 2.5*np.log10(self.exptime*euclidlike.collecting_area)
 
         base['current_image'] = full_image
 
@@ -206,13 +204,13 @@ class RomanSCAImageBuilder(ScatteredImageBuilder):
         wcs = base['wcs']
         bp = base['bandpass']
         rng = galsim.config.GetRNG(config, base)
-        logger.info('image %d: Start RomanSCA detector effects',base.get('image_num',0))
+        logger.info('image %d: Start EuclidlikeCCD detector effects',base.get('image_num',0))
 
         # Things that will eventually be subtracted (if sky_subtract) will have their expectation
         # value added to sky_image.  So technically, this includes things that aren't just sky.
         # E.g. includes dark_current and thermal backgrounds.
         sky_image = image.copy()
-        sky_level = roman.getSkyLevel(bp, world_pos=wcs.toWorld(image.true_center))
+        sky_level = euclidlike.getSkyLevel(bp, world_pos=wcs.toWorld(image.true_center))
         logger.debug('Adding sky_level = %s',sky_level)
         if self.stray_light:
             logger.debug('Stray light fraction = %s',stray_light_fraction)
@@ -221,10 +219,10 @@ class RomanSCAImageBuilder(ScatteredImageBuilder):
 
         # The other background is the expected thermal backgrounds in this band.
         # These are provided in e-/pix/s, so we have to multiply by the exposure time.
-        if self.thermal_background:
-            tb = roman.thermal_backgrounds[self.filter] * self.exptime
-            logger.debug('Adding thermal background: %s',tb)
-            sky_image += roman.thermal_backgrounds[self.filter] * self.exptime
+        # if self.thermal_background:
+        #     tb = roman.thermal_backgrounds[self.filter] * self.exptime
+        #     logger.debug('Adding thermal background: %s',tb)
+        #     sky_image += roman.thermal_backgrounds[self.filter] * self.exptime
 
         # The image up to here is an expectation value.
         # Realize it as an integer number of photons.
@@ -251,11 +249,6 @@ class RomanSCAImageBuilder(ScatteredImageBuilder):
         # The order we chose is historical, matching previous recommendations, but Mosby and
         # Rauscher don't seem to think those recommendations are well-motivated.
 
-        # TODO: Add burn-in and persistence here.
-
-        if self.reciprocity_failure:
-            logger.debug("Applying reciprocity failure")
-            roman.addReciprocityFailure(image)
 
         if self.dark_current:
             dc = dark_current * self.exptime
@@ -263,17 +256,6 @@ class RomanSCAImageBuilder(ScatteredImageBuilder):
             sky_image += dc
             dark_noise = galsim.noise.DeviateNoise(galsim.random.PoissonDeviate(rng, dc))
             image.addNoise(dark_noise)
-
-        if self.nonlinearity:
-            logger.debug("Applying classical nonlinearity")
-            roman.applyNonlinearity(image)
-
-        # Mosby and Rauscher say there are two read noises.  One happens before IPC, the other
-        # one after.
-        # TODO: Add read_noise1
-        if self.ipc:
-            logger.debug("Applying IPC")
-            roman.applyIPC(image)
 
         if self.read_noise:
             logger.debug("Adding read noise %s",read_noise)
@@ -292,4 +274,4 @@ class RomanSCAImageBuilder(ScatteredImageBuilder):
             image -= sky_image
 
 # Register this as a valid type
-RegisterImageType('roman_sca', RomanSCAImageBuilder())
+RegisterImageType('euclidlike_ccd', EuclidlikeCCDImageBuilder())

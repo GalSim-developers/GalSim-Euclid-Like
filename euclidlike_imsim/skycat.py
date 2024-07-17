@@ -4,9 +4,10 @@ Interface to obtain objects from skyCatalogs.
 import os
 import numpy as np
 import galsim
-import galsim.roman as roman
 from galsim.config import InputLoader, RegisterInputType, RegisterValueType, \
     RegisterObjectType
+
+import euclidlike
 
 
 class SkyCatalogInterface:
@@ -48,18 +49,18 @@ class SkyCatalogInterface:
         if xsize is not None:
             self.xsize = xsize
         else:
-            self.xsize = roman.n_pix
+            self.xsize = euclidlike.n_pix_col
         if ysize is not None:
             self.ysize = ysize
         else:
-            self.ysize = roman.n_pix
+            self.ysize = euclidlike.n_pix_row
         self.obj_types = obj_types
         self.edge_pix = edge_pix
         self.logger = galsim.config.LoggerWrapper(logger)
 
         if obj_types is not None:
             self.logger.warning(f'Object types restricted to {obj_types}')
-        self.sca_center = wcs.toWorld(galsim.PositionD(self.xsize/2.0, self.ysize/2.0))
+        self.ccd_center = wcs.toWorld(galsim.PositionD(self.xsize/2.0, self.ysize/2.0))
         self._objects = None
 
         # import os, psutil
@@ -95,11 +96,11 @@ class SkyCatalogInterface:
             # print('skycat obj 2',process.memory_info().rss)                
         return self._objects
 
-    def get_sca_center(self):
+    def get_ccd_center(self):
         """
-        Return the SCA center.
+        Return the CCD center.
         """
-        return self.sca_center
+        return self.ccd_center
 
     def getNObjects(self):
         """
@@ -156,7 +157,7 @@ class SkyCatalogInterface:
         gsobjs = skycat_obj.get_gsobject_components(gsparams)
 
         # Compute the flux or get the cached value.
-        flux = skycat_obj.get_roman_flux(self.bandpass.name, mjd=self.mjd)*self.exptime*roman.collecting_area
+        flux = skycat_obj.get_roman_flux(self.bandpass.name, mjd=self.mjd)*self.exptime*euclidlike.collecting_area
         if np.isnan(flux):
             return None
 
@@ -180,11 +181,11 @@ class SkyCatalogInterface:
             if faint:
                 gsobjs[component] = gsobjs[component].evaluateAtWavelength(self.bandpass)
                 gs_obj_list.append(gsobjs[component]*self._trivial_sed
-                               *self.exptime*roman.collecting_area)
+                               *self.exptime*euclidlike.collecting_area)
             else:
                 if component in seds:
                     gs_obj_list.append(gsobjs[component]*seds[component]
-                                   *self.exptime*roman.collecting_area)
+                                   *self.exptime*euclidlike.collecting_area)
 
         if not gs_obj_list:
             return None
@@ -245,14 +246,14 @@ def SkyCatObj(config, base, ignore, gsparams, logger):
     # Ensure that this sky catalog matches the CCD being simulated by
     # comparing center locations on the sky.
     world_center = base['world_center']
-    sca_center = skycat.get_sca_center()
-    sep = sca_center.distanceTo(base['world_center'])/galsim.arcsec
+    ccd_center = skycat.get_ccd_center()
+    sep = ccd_center.distanceTo(base['world_center'])/galsim.arcsec
     # Centers must agree to within at least 1 arcsec:
     if sep > 1.0:
-        message = ("skyCatalogs selection and SCA center do not agree: \n"
-                   "skycat.sca_center: "
-                   f"{sca_center.ra/galsim.degrees:.5f}, "
-                   f"{sca_center.dec/galsim.degrees:.5f}\n"
+        message = ("skyCatalogs selection and CCD center do not agree: \n"
+                   "skycat.ccd_center: "
+                   f"{ccd_center.ra/galsim.degrees:.5f}, "
+                   f"{ccd_center.dec/galsim.degrees:.5f}\n"
                    "world_center: "
                    f"{world_center.ra/galsim.degrees:.5f}, "
                    f"{world_center.dec/galsim.degrees:.5f} \n"

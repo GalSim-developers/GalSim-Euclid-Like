@@ -1,4 +1,3 @@
-import galsim.roman as roman
 from astropy.time import Time
 import fitsio as fio
 import galsim
@@ -11,12 +10,12 @@ class ObSeqDataLoader(object):
     """
     _req_params = {'file_name' : str,
                     'visit'    : int,
-                    'SCA'      : int}
-    def __init__(self, file_name, visit, SCA, logger=None):
+                    'CCD'      : int}
+    def __init__(self, file_name, visit, CCD, logger=None):
         self.logger = galsim.config.LoggerWrapper(logger)
         self.file_name = file_name
         self.visit = visit
-        self.sca = SCA
+        self.ccd = CCD
 
         # try:
         self.read_obseq()
@@ -38,7 +37,7 @@ class ObSeqDataLoader(object):
 
         self.ob            = {}
         self.ob['visit']   = self.visit
-        self.ob['sca']     = self.sca
+        self.ob['ccd']     = self.ccd
         self.ob['ra']      = ob['ra']*galsim.degrees
         self.ob['dec']     = ob['dec']*galsim.degrees
         self.ob['pa']      = ob['pa'] *galsim.degrees
