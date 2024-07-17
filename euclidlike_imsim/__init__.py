@@ -1,5 +1,6 @@
 try:
     from lsst.utils.threads import disable_implicit_threading
+
     disable_implicit_threading()
 except:
     pass
@@ -11,4 +12,5 @@ from .wcs import *
 from .skycat import *
 from .photonOps import *
 from .bandpass import *
+
 # from .detector_physics import *

@@ -10,6 +10,7 @@ import numpy as np
 
 import euclidlike
 
+
 class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
 
     def setup(self, config, base, image_num, obj_num, ignore, logger):
@@ -29,55 +30,63 @@ class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
         Returns:
             xsize, ysize
         """
-        logger.debug('image %d: Building EuclidlikeCCD: image, obj = %d,%d',
-                     image_num,image_num,obj_num)
+        logger.debug(
+            "image %d: Building EuclidlikeCCD: image, obj = %d,%d",
+            image_num,
+            image_num,
+            obj_num,
+        )
 
         self.nobjects = self.getNObj(config, base, image_num, logger=logger)
-        logger.debug('image %d: nobj = %d',image_num,self.nobjects)
+        logger.debug("image %d: nobj = %d", image_num, self.nobjects)
 
         # These are allowed for Scattered, but we don't use them here.
-        extra_ignore = [ 'image_pos', 'world_pos', 'stamp_size', 'stamp_xsize', 'stamp_ysize',
-                         'nobjects' ]
-        req = {
-            'CCD' : int,
-            'filter' : str,
-            'mjd'  : float,
-            'exptime' : float
-        }
+        extra_ignore = [
+            "image_pos",
+            "world_pos",
+            "stamp_size",
+            "stamp_xsize",
+            "stamp_ysize",
+            "nobjects",
+        ]
+        req = {"CCD": int, "filter": str, "mjd": float, "exptime": float}
         opt = {
-            'draw_method' : str,
-            'stray_light' : bool,
-            'thermal_background' : bool,
-            'reciprocity_failure' : bool,
-            'dark_current' : bool,
-            'nonlinearity' : bool,
-            'ipc' : bool,
-            'read_noise' : bool,
-            'sky_subtract' : bool,
-            'ignore_noise' : bool
+            "draw_method": str,
+            "stray_light": bool,
+            "thermal_background": bool,
+            "reciprocity_failure": bool,
+            "dark_current": bool,
+            "nonlinearity": bool,
+            "ipc": bool,
+            "read_noise": bool,
+            "sky_subtract": bool,
+            "ignore_noise": bool,
         }
-        params = galsim.config.GetAllParams(config, base, req=req, opt=opt, ignore=ignore+extra_ignore)[0]
+        params = galsim.config.GetAllParams(
+            config, base, req=req, opt=opt, ignore=ignore + extra_ignore
+        )[0]
 
-        self.ccd = params['CCD']
-        base['CCD'] = self.ccd
-        self.filter = params['filter']
-        self.mjd = params['mjd']
-        self.exptime = params['exptime']
+        self.ccd = params["CCD"]
+        base["CCD"] = self.ccd
+        self.filter = params["filter"]
+        self.mjd = params["mjd"]
+        self.exptime = params["exptime"]
 
-        self.ignore_noise = params.get('ignore_noise',False)
+        self.ignore_noise = params.get("ignore_noise", False)
         # self.exptime = params.get('exptime', roman.exptime)  # Default is roman standard exposure time.
-        self.stray_light = params.get('stray_light', False)
-        self.thermal_background = params.get('thermal_background', False)
-        self.reciprocity_failure = params.get('reciprocity_failure', False)
-        self.dark_current = params.get('dark_current', False)
-        self.nonlinearity = params.get('nonlinearity', False)
-        self.ipc = params.get('ipc', False)
-        self.read_noise = params.get('read_noise', False)
-        self.sky_subtract = params.get('sky_subtract', False)
+        self.stray_light = params.get("stray_light", False)
+        self.thermal_background = params.get("thermal_background", False)
+        self.reciprocity_failure = params.get("reciprocity_failure", False)
+        self.dark_current = params.get("dark_current", False)
+        self.nonlinearity = params.get("nonlinearity", False)
+        self.ipc = params.get("ipc", False)
+        self.read_noise = params.get("read_noise", False)
+        self.sky_subtract = params.get("sky_subtract", False)
 
         # If draw_method isn't in image field, it may be in stamp.  Check.
-        self.draw_method = params.get('draw_method',
-                                      base.get('stamp',{}).get('draw_method','auto'))
+        self.draw_method = params.get(
+            "draw_method", base.get("stamp", {}).get("draw_method", "auto")
+        )
 
         # pointing = CelestialCoord(ra=params['ra'], dec=params['dec'])
         # wcs = roman.getWCS(world_pos        = pointing,
@@ -91,8 +100,10 @@ class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
         # config['wcs'] = wcs
 
         # If user hasn't overridden the bandpass to use, get the standard one.
-        if 'bandpass' not in config:
-            base['bandpass'] = galsim.config.BuildBandpass(base['image'], 'bandpass', base, logger=logger)
+        if "bandpass" not in config:
+            base["bandpass"] = galsim.config.BuildBandpass(
+                base["image"], "bandpass", base, logger=logger
+            )
 
         return euclidlike.n_pix_col, euclidlike.n_pix_row
 
@@ -114,51 +125,61 @@ class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
         Returns:
             the final image and the current noise variance in the image as a tuple
         """
-        full_xsize = base['image_xsize']
-        full_ysize = base['image_ysize']
-        wcs = base['wcs']
+        full_xsize = base["image_xsize"]
+        full_ysize = base["image_ysize"]
+        wcs = base["wcs"]
 
         full_image = Image(full_xsize, full_ysize, dtype=float)
-        full_image.setOrigin(base['image_origin'])
+        full_image.setOrigin(base["image_origin"])
         full_image.wcs = wcs
         full_image.setZero()
 
         full_image.header = galsim.FitsHeader()
-        full_image.header['EXPTIME']  = self.exptime
-        full_image.header['MJD-OBS']  = self.mjd
-        full_image.header['DATE-OBS'] = str(Time(self.mjd,format='mjd').datetime)
-        full_image.header['FILTER']   = self.filter
-        full_image.header['ZPTMAG']   = 2.5*np.log10(self.exptime*euclidlike.collecting_area)
+        full_image.header["EXPTIME"] = self.exptime
+        full_image.header["MJD-OBS"] = self.mjd
+        full_image.header["DATE-OBS"] = str(Time(self.mjd, format="mjd").datetime)
+        full_image.header["FILTER"] = self.filter
+        full_image.header["ZPTMAG"] = 2.5 * np.log10(
+            self.exptime * euclidlike.collecting_area
+        )
 
-        base['current_image'] = full_image
+        base["current_image"] = full_image
 
-        if 'image_pos' in config and 'world_pos' in config:
+        if "image_pos" in config and "world_pos" in config:
             raise GalSimConfigValueError(
                 "Both image_pos and world_pos specified for Scattered image.",
-                (config['image_pos'], config['world_pos']))
+                (config["image_pos"], config["world_pos"]),
+            )
 
-        if 'image_pos' not in config and 'world_pos' not in config:
-            xmin = base['image_origin'].x
-            xmax = xmin + full_xsize-1
-            ymin = base['image_origin'].y
-            ymax = ymin + full_ysize-1
-            config['image_pos'] = {
-                'type' : 'XY' ,
-                'x' : { 'type' : 'Random' , 'min' : xmin , 'max' : xmax },
-                'y' : { 'type' : 'Random' , 'min' : ymin , 'max' : ymax }
+        if "image_pos" not in config and "world_pos" not in config:
+            xmin = base["image_origin"].x
+            xmax = xmin + full_xsize - 1
+            ymin = base["image_origin"].y
+            ymax = ymin + full_ysize - 1
+            config["image_pos"] = {
+                "type": "XY",
+                "x": {"type": "Random", "min": xmin, "max": xmax},
+                "y": {"type": "Random", "min": ymin, "max": ymax},
             }
 
         nbatch = self.nobjects // 1000 + 1
         for batch in range(nbatch):
-            start_obj_num = (self.nobjects * batch // nbatch)
-            end_obj_num = (self.nobjects * (batch+1) // nbatch)
+            start_obj_num = self.nobjects * batch // nbatch
+            end_obj_num = self.nobjects * (batch + 1) // nbatch
             nobj_batch = end_obj_num - start_obj_num
             if nbatch > 1:
-                logger.warning("Start batch %d/%d with %d objects [%d, %d)",
-                               batch+1, nbatch, nobj_batch, start_obj_num, end_obj_num)
+                logger.warning(
+                    "Start batch %d/%d with %d objects [%d, %d)",
+                    batch + 1,
+                    nbatch,
+                    nobj_batch,
+                    start_obj_num,
+                    end_obj_num,
+                )
             stamps, current_vars = galsim.config.BuildStamps(
-                    nobj_batch, base, logger=logger, obj_num=start_obj_num, do_noise=False)
-            base['index_key'] = 'image_num'
+                nobj_batch, base, logger=logger, obj_num=start_obj_num, do_noise=False
+            )
+            base["index_key"] = "image_num"
 
             for k in range(nobj_batch):
                 # This is our signal that the object was skipped.
@@ -171,12 +192,18 @@ class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
                     # avoid an error.  But this isn't covered in the imsim test suite.
                     continue
 
-                logger.debug('image %d: full bounds = %s', image_num, str(full_image.bounds))
-                logger.debug('image %d: stamp %d bounds = %s',
-                        image_num, k+start_obj_num, str(stamps[k].bounds))
-                logger.debug('image %d: Overlap = %s', image_num, str(bounds))
+                logger.debug(
+                    "image %d: full bounds = %s", image_num, str(full_image.bounds)
+                )
+                logger.debug(
+                    "image %d: stamp %d bounds = %s",
+                    image_num,
+                    k + start_obj_num,
+                    str(stamps[k].bounds),
+                )
+                logger.debug("image %d: Overlap = %s", image_num, str(bounds))
                 full_image[bounds] += stamps[k][bounds]
-            stamps=None
+            stamps = None
 
         # # Bring the image so far up to a flat noise variance
         # current_var = FlattenNoiseVariance(
@@ -200,21 +227,23 @@ class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
         if self.ignore_noise:
             return
 
-        base['current_noise_image'] = base['current_image']
-        wcs = base['wcs']
-        bp = base['bandpass']
+        base["current_noise_image"] = base["current_image"]
+        wcs = base["wcs"]
+        bp = base["bandpass"]
         rng = galsim.config.GetRNG(config, base)
-        logger.info('image %d: Start EuclidlikeCCD detector effects',base.get('image_num',0))
+        logger.info(
+            "image %d: Start EuclidlikeCCD detector effects", base.get("image_num", 0)
+        )
 
         # Things that will eventually be subtracted (if sky_subtract) will have their expectation
         # value added to sky_image.  So technically, this includes things that aren't just sky.
         # E.g. includes dark_current and thermal backgrounds.
         sky_image = image.copy()
         sky_level = euclidlike.getSkyLevel(bp, world_pos=wcs.toWorld(image.true_center))
-        logger.debug('Adding sky_level = %s',sky_level)
+        logger.debug("Adding sky_level = %s", sky_level)
         if self.stray_light:
-            logger.debug('Stray light fraction = %s',stray_light_fraction)
-            sky_level *= (1.0 + stray_light_fraction)
+            logger.debug("Stray light fraction = %s", stray_light_fraction)
+            sky_level *= 1.0 + stray_light_fraction
         wcs.makeSkyImage(sky_image, sky_level)
 
         # The other background is the expected thermal backgrounds in this band.
@@ -227,12 +256,12 @@ class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
         # The image up to here is an expectation value.
         # Realize it as an integer number of photons.
         poisson_noise = galsim.noise.PoissonNoise(rng)
-        if self.draw_method == 'phot':
+        if self.draw_method == "phot":
             logger.debug("Adding poisson noise to sky photons")
             sky_image1 = sky_image.copy()
             sky_image1.addNoise(poisson_noise)
             image.quantize()  # In case any profiles used InterpolatedImage, in which case
-                              # the image won't necessarily be integers.
+            # the image won't necessarily be integers.
             image += sky_image1
         else:
             logger.debug("Adding poisson noise")
@@ -249,19 +278,20 @@ class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
         # The order we chose is historical, matching previous recommendations, but Mosby and
         # Rauscher don't seem to think those recommendations are well-motivated.
 
-
         if self.dark_current:
             dc = dark_current * self.exptime
-            logger.debug("Adding dark current: %s",dc)
+            logger.debug("Adding dark current: %s", dc)
             sky_image += dc
-            dark_noise = galsim.noise.DeviateNoise(galsim.random.PoissonDeviate(rng, dc))
+            dark_noise = galsim.noise.DeviateNoise(
+                galsim.random.PoissonDeviate(rng, dc)
+            )
             image.addNoise(dark_noise)
 
         if self.read_noise:
-            logger.debug("Adding read noise %s",read_noise)
+            logger.debug("Adding read noise %s", read_noise)
             image.addNoise(GaussianNoise(rng, sigma=read_noise))
 
-        logger.debug("Applying gain %s",gain)
+        logger.debug("Applying gain %s", gain)
         image /= gain
 
         # Make integer ADU now.
@@ -273,5 +303,6 @@ class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
             sky_image.quantize()
             image -= sky_image
 
+
 # Register this as a valid type
-RegisterImageType('euclidlike_ccd', EuclidlikeCCDImageBuilder())
+RegisterImageType("euclidlike_ccd", EuclidlikeCCDImageBuilder())
