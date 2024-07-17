@@ -1,22 +1,25 @@
-import galsim.roman as roman
 from astropy.time import Time
 import fitsio as fio
 import galsim
 import galsim.config
 from galsim.angle import Angle
-from galsim.config import InputLoader,RegisterValueType,RegisterInputType
+from galsim.config import InputLoader, RegisterValueType, RegisterInputType
+
 
 class ObSeqDataLoader(object):
     """Read the exposure information from the observation sequence.
     """
-    _req_params = {'file_name' : str,
-                    'visit'    : int,
-                    'SCA'      : int}
-    def __init__(self, file_name, visit, SCA, logger=None):
+    _req_params = {
+        'file_name': str,
+        'visit': int,
+        'CCD': int
+    }
+
+    def __init__(self, file_name, visit, CCD, logger=None):
         self.logger = galsim.config.LoggerWrapper(logger)
         self.file_name = file_name
         self.visit = visit
-        self.sca = SCA
+        self.ccd = CCD
 
         # try:
         self.read_obseq()
@@ -36,32 +39,42 @@ class ObSeqDataLoader(object):
 
         ob = fio.FITS(self.file_name)[-1][self.visit]
 
-        self.ob            = {}
-        self.ob['visit']   = self.visit
-        self.ob['sca']     = self.sca
-        self.ob['ra']      = ob['ra']*galsim.degrees
-        self.ob['dec']     = ob['dec']*galsim.degrees
-        self.ob['pa']      = ob['pa'] *galsim.degrees
-        self.ob['date']    = Time(ob['date'],format='mjd').datetime 
-        self.ob['mjd']     = ob['date']
-        self.ob['filter']  = ob['filter']
+        self.ob = {}
+        self.ob['visit'] = self.visit
+        self.ob['ccd'] = self.ccd
+        self.ob['ra'] = ob['ra'] * galsim.degrees
+        self.ob['dec'] = ob['dec'] * galsim.degrees
+        self.ob['pa'] = ob['pa'] * galsim.degrees
+        self.ob['date'] = Time(ob['date'], format='mjd').datetime
+        self.ob['mjd'] = ob['date']
+        self.ob['filter'] = ob['filter']
         self.ob['exptime'] = ob['exptime']
 
     def get(self, field, default=None):
         if field not in self.ob and default is None:
-            raise KeyError("OpsimData field %s not present in ob"%field)
+            raise KeyError("OpsimData field %s not present in ob" % field)
         return self.ob.get(field, default)
+
 
 def ObSeqData(config, base, value_type):
     """Returns the obseq data for a pointing.
     """
     pointing = galsim.config.GetInputObj('obseq_data', config, base, 'OpSeqDataLoader')
-    req = { 'field' : str }
+    req = {'field': str}
     kwargs, safe = galsim.config.GetAllParams(config, base, req=req)
     field = kwargs['field']
 
     val = value_type(pointing.get(field))
     return val, safe
 
-RegisterInputType('obseq_data', InputLoader(ObSeqDataLoader, file_scope=True, takes_logger=True))
-RegisterValueType('ObSeqData', ObSeqData, [float, int, str, Angle], input_type='obseq_data')
+
+RegisterInputType(
+    'obseq_data',
+    InputLoader(ObSeqDataLoader, file_scope=True, takes_logger=True)
+)
+RegisterValueType(
+    'ObSeqData',
+    ObSeqData,
+    [float, int, str, Angle],
+    input_type='obseq_data'
+)
