@@ -2,7 +2,7 @@ import euclidlike
 from galsim.config import BandpassBuilder, RegisterBandpassType, GetAllParams
 
 
-class EuclidBandpassBuilder(BandpassBuilder):
+class EuclidlikeBandpassBuilder(BandpassBuilder):
     """A class for loading a Bandpass from a file
 
     FileBandpass expected the following parameter:
@@ -33,4 +33,4 @@ class EuclidBandpassBuilder(BandpassBuilder):
         return bandpass, safe
 
 
-RegisterBandpassType('EuclidBandpassTrimmed', EuclidBandpassBuilder())
+RegisterBandpassType('EuclidlikeBandpassTrimmed', EuclidlikeBandpassBuilder())
