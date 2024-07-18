@@ -1,7 +1,7 @@
 """
 @file bandpass.py
 
-This file includes any routines needed to define the Euclid bandpass.
+This file includes any routines needed to define the Euclid bandpasses.
 This module is heavily based on the roman bandpass.py file from the GalSim package.
 https://github.com/GalSim-developers/GalSim/blob/releases/2.5/galsim/roman/roman_bandpass.py
 
@@ -20,7 +20,7 @@ from importlib.resources import files
 
 def getBandpasses(AB_zeropoint=True, default_thin_trunc=True, **kwargs):
     """
-    Function to get the bandpass information for the Euclid VIS band the three Euclid NISP passbands.
+    Function to get the bandpass information for the Euclid VIS band and the three Euclid NISP passbands.
 
     This routine reads in files containing a list of wavelengths and
     transmission values for the Euclid bands. The files are located in the
