@@ -191,10 +191,10 @@ def getWCS(world_pos, PA=None, date=None, CCDs=None, PA_is_FPA=False):
         header.extend([
             ('CRVAL1', crval.ra / coord.degrees),
             ('CRVAL2', crval.dec / coord.degrees),
-            ('CD1_1', cos_pa_sca * PVs["CD1_1"][i_ccd] + sin_pa_sca * PVs["CD1_2"][i_ccd]),
-            ('CD1_2', -sin_pa_sca * PVs["CD1_1"][i_ccd] + cos_pa_sca * PVs["CD1_2"][i_ccd]),
-            ('CD2_1', cos_pa_sca * PVs["CD2_1"][i_ccd] + sin_pa_sca * PVs["CD2_2"][i_ccd]),
-            ('CD2_2', -sin_pa_sca * PVs["CD2_1"][i_ccd] + cos_pa_sca * PVs["CD2_2"][i_ccd]),
+            ('CD1_1', cos_pa_sca * PVs["CD1_1"][i_ccd] - sin_pa_sca * PVs["CD1_2"][i_ccd]),
+            ('CD1_2', sin_pa_sca * PVs["CD1_1"][i_ccd] + cos_pa_sca * PVs["CD1_2"][i_ccd]),
+            ('CD2_1', cos_pa_sca * PVs["CD2_1"][i_ccd] - sin_pa_sca * PVs["CD2_2"][i_ccd]),
+            ('CD2_2', sin_pa_sca * PVs["CD2_1"][i_ccd] + cos_pa_sca * PVs["CD2_2"][i_ccd]),
         ])
         for key in PVs.dtype.names:
             if "PV" not in key:
