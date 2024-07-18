@@ -1,12 +1,13 @@
-import galsim.roman as roman
-from galsim.config import BandpassBuilder, RegisterBandpassType,GetAllParams
+import euclidlike
+from galsim.config import BandpassBuilder, RegisterBandpassType, GetAllParams
 
-class RomanBandpassBuilder(BandpassBuilder):
+
+class EuclidBandpassBuilder(BandpassBuilder):
     """A class for loading a Bandpass from a file
 
     FileBandpass expected the following parameter:
 
-        name (str)          The name of the Roman filter to get. (required)
+        name (str)          The name of the Euclid filter to get. (required)
     """
     def buildBandpass(self, config, base, logger):
         """Build the Bandpass based on the specifications in the config dict.
@@ -23,8 +24,13 @@ class RomanBandpassBuilder(BandpassBuilder):
         kwargs, safe = GetAllParams(config, base, req=req)
 
         name = kwargs['name']
-        bandpass = roman.getBandpasses(red_limit=2000)[name]
+        # Hard set the limit due to PSF definition
+        bandpass = euclidlike.getBandpasses(
+            blue_limit=540,
+            red_limit=910,
+        )[name]
 
         return bandpass, safe
 
-RegisterBandpassType('RomanBandpassTrimmed', RomanBandpassBuilder())
+
+RegisterBandpassType('EuclidBandpassTrimmed', EuclidBandpassBuilder())
