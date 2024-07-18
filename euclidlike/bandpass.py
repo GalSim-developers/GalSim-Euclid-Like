@@ -4,8 +4,12 @@
 This file includes any routines needed to define the Euclid bandpass.
 This module is heavily based on the roman bandpass.py file from the GalSim package.
 https://github.com/GalSim-developers/GalSim/blob/releases/2.5/galsim/roman/roman_bandpass.py
+
 The Euclid VIS bandpass is read in from the Euclid_VIS.vis.dat file which can be downloaded from
 http://svo2.cab.inta-csic.es/svo/theory/fps3/index.php?mode=browse&gname=Euclid&gname2=VIS&asttype=.
+
+The Euclid NISP bandpasses are read in from files downloaded from
+https://euclid.esac.esa.int/msp/refdata/nisp/NISP-PHOTO-PASSBANDS-V1
 """
 
 import numpy as np
@@ -16,10 +20,10 @@ from importlib.resources import files
 
 def getBandpasses(AB_zeropoint=True, default_thin_trunc=True, **kwargs):
     """
-    Function to get the bandpass information for the Euclid VIS band.
+    Function to get the bandpass information for the Euclid VIS band the three Euclid NISP passbands.
 
-    This routine reads in a file containing a list of wavelengths and
-    transmission values for the Euclid VIS band. The file is located in the
+    This routine reads in files containing a list of wavelengths and
+    transmission values for the Euclid bands. The files are located in the
     euclidlike.data directory. The routine then creates a Bandpass object
     using the LookupTable class from the GalSim package.
 
@@ -28,17 +32,30 @@ def getBandpasses(AB_zeropoint=True, default_thin_trunc=True, **kwargs):
     default_thin_trunc (bool) : If True, use the default thinning and truncation parameters. [default: True]
     kwargs : Additional keyword arguments to pass to either `Bandpass.thin` or `Bandpass.truncate`.
     """
-    # Read in the bandpass file
+    # Read in the bandpass files, using a dict to distinguish the different filters
+    wave = {}
+    data = {}
+    # Start with VIS
     bandpass_file = files('euclidlike.data').joinpath('Euclid_VIS.vis.dat')
     bandpass = np.loadtxt(bandpass_file, dtype=float)
-    wave = bandpass[:, 0]
-    data = bandpass[:, 1]
+    # Wavelengths in Angstroms
+    wave['VIS'] = bandpass[:, 0]
+    data['VIS'] = bandpass[:, 1]
 
-    # In case we want to add NISP bandpasses
-    data = np.atleast_2d(data)
+    # Then do NISP
+    nisp_bands = ['Y', 'H', 'J']
+    all_bands = nisp_bands.copy()
+    all_bands.append('VIS')
+    for nisp_band in nisp_bands:
+        bandpass_file = files('euclidlike.data').joinpath('NISP-PHOTO-PASSBANDS-V1-%s_throughput.dat.txt'%nisp_band)
+        bandpass = np.loadtxt(bandpass_file, dtype=float)
+        # These wavelengths are in nm but we want to be consistent for all bands, so multiply by 10
+        # to get Angstroms
+        wave[nisp_band] = bandpass[:,0]*10
+        data[nisp_band] = bandpass[:,1]
 
-    # Below is the original code from the GalSim package. 
-    # I have modified it to read in the Euclid_VIS.vis.dat file.
+    # Below is the original code from the GalSim package modified for the format of these Euclid
+    # bandpass files. 
 
     # Parse kwargs for truncation, thinning, etc., and check for nonsense.
     truncate_kwargs = ['blue_limit', 'red_limit', 'relative_throughput']
@@ -61,9 +78,9 @@ def getBandpasses(AB_zeropoint=True, default_thin_trunc=True, **kwargs):
             raise TypeError("Unknown kwargs: %s"%(' '.join(kwargs.keys())))
 
     bandpass_dict = {}
-    for index, bp_name in enumerate(['VIS']):
+    for index, bp_name in enumerate(all_bands):
         # Create the bandpass object
-        bp = Bandpass(LookupTable(wave, data[index]), wave_type='Angstrom')
+        bp = Bandpass(LookupTable(wave[bp_name], data[bp_name]), wave_type='Angstrom')
 
         # Use any arguments related to truncation, thinning, etc.
         if len(tmp_truncate_dict) > 0 or default_thin_trunc:
