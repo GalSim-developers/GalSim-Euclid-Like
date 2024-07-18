@@ -3,21 +3,8 @@ import euclidlike
 import numpy as np
 
 from euclidlike import (
-    get_fake_wavelength_psf, get_euclid_wavelength_psf, getPSF
+     get_euclid_wavelength_psf, getPSF, getBrightPSF
 )
-
-
-def test_psf_fake():
-    scale = 0.01
-    nsample = 10
-    npix = 257
-    wl_array, psfobjs = get_fake_wavelength_psf(
-        scale, nsample, npix,
-    )
-    assert len(psfobjs) == nsample
-    assert psfobjs[0].array.shape == (npix, npix)
-    assert wl_array.shape == (nsample, )
-    return
 
 
 def test_psf_euclid():
@@ -78,6 +65,20 @@ def test_get_psf_function():
         psf_img.array, true_img.array, atol=1e-4*np.sum(true_img.array),
         err_msg='getPSF() does replicate image with very narrow SED centered at desired wavelength')
     return
+
+def test_get_bright_psf_function():
+    euc_bp = euclidlike.getBandpasses()['VIS']
+    euc_bp.red_limit = 910
+    euc_bp.blue_limit = 540
+    # check optical PSF wavelength at bandpass effective wavelength
+    bright_psf = getBrightPSF()
+    np.testing.assert_allclose(
+        bright_psf._lam, euc_bp.effective_wavelength, atol=0,
+        err_msg='getBrightPSF() does not use effective wavelength as default')
+    bright_psf = getBrightPSF(wavelength = 800.)
+    np.testing.assert_allclose(
+        bright_psf._lam, 800., atol=0,
+        err_msg='getBrightPSF() fails to properly initialize OpticalPSF with user-input wavelength')
 
 if __name__ == "__main__":
     testfns = [v for k, v in vars().items() if k[:5] == 'test_' and callable(v)]
