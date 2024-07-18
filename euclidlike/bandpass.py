@@ -25,7 +25,8 @@ def getBandpasses(AB_zeropoint=True, default_thin_trunc=True, **kwargs):
     This routine reads in files containing a list of wavelengths and
     transmission values for the Euclid bands. The files are located in the
     euclidlike.data directory. The routine then creates a Bandpass object
-    using the LookupTable class from the GalSim package.
+    using the LookupTable class from the GalSim package, and returns a dict with bandpasses for the
+    keys.
 
     Args:
     AB_zeropoint (bool) : If True, set the zeropoint of the bandpass to the AB magnitude system. [default: True]
