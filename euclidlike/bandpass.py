@@ -49,7 +49,7 @@ def getBandpasses(AB_zeropoint=True, default_thin_trunc=True, **kwargs):
     for band in nisp_bands:
         use_nisp_bands.append('NISP_%s'%band)
     for index, nisp_band in enumerate(nisp_bands):
-        bandpass_file = files('euclidlike.data').joinpath('NISP-PHOTO-PASSBANDS-V1-%s_throughput.dat.txt'%nisp_band)
+        bandpass_file = files('euclidlike.data').joinpath('NISP-PHOTO-PASSBANDS-V1-%s_throughput.dat'%nisp_band)
         bandpass = np.loadtxt(bandpass_file, dtype=float)
         # These wavelengths are in nm but we want to be consistent for all bands, so multiply by 10
         # to get Angstroms
