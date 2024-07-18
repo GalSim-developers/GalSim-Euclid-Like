@@ -185,7 +185,7 @@ class SkyCatalogInterface:
 
         # Compute the flux or get the cached value.
         flux = (
-            skycat_obj.get_roman_flux(self.bandpass.name, mjd=self.mjd)
+            skycat_obj.get_euclid_flux(self.bandpass.name, mjd=self.mjd)
             * self.exptime
             * euclidlike.collecting_area
         )
