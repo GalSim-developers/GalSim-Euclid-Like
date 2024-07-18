@@ -5,7 +5,7 @@ import euclidlike
 def test_euclid_bandpass():
     # Obtain the bandpasses with AB_zeropoint set
     bp = euclidlike.getBandpasses(AB_zeropoint=True)
-
+    
     # Check if the zeropoints have been set correctly
     AB_spec = lambda x: (3631e-23)
     AB_sed = galsim.SED(spec=AB_spec, wave_type='nm', flux_type='fnu')
