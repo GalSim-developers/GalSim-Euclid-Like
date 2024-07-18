@@ -112,7 +112,7 @@ max_sun_angle = 20.0 * galsim.degrees
 
 # Define variables that distinguish between VIS and NISP bandpasses
 vis_bands = ['VIS']
-nisp_bands = ['Y', 'J', 'H']
+nisp_bands = ['NISP_Y', 'NISP_J', 'NISP_H']
 
 # Items to potentially do later; part of the galsim.roman setup that currently has no correspondence
 # here.

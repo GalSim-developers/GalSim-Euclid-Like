@@ -42,18 +42,24 @@ def getBandpasses(AB_zeropoint=True, default_thin_trunc=True, **kwargs):
     wave['VIS'] = bandpass[:, 0]
     data['VIS'] = bandpass[:, 1]
 
-    # Then do NISP
+    # Then do NISP - make sure band names that are stored include 'NISP_'
     nisp_bands = ['Y', 'H', 'J']
-    all_bands = nisp_bands.copy()
-    all_bands.append('VIS')
-    for nisp_band in nisp_bands:
+    use_nisp_bands = []
+    for band in nisp_bands:
+        use_nisp_bands.append('NISP_%s'%band)
+    for index, nisp_band in enumerate(nisp_bands):
         bandpass_file = files('euclidlike.data').joinpath('NISP-PHOTO-PASSBANDS-V1-%s_throughput.dat.txt'%nisp_band)
         bandpass = np.loadtxt(bandpass_file, dtype=float)
         # These wavelengths are in nm but we want to be consistent for all bands, so multiply by 10
         # to get Angstroms
-        wave[nisp_band] = bandpass[:,0]*10
-        data[nisp_band] = bandpass[:,1]
+        wave[use_nisp_bands[index]] = bandpass[:,0]*10
+        data[use_nisp_bands[index]] = bandpass[:,1]
 
+    # make a list with all bands for later use.
+    all_bands = use_nisp_bands.copy()
+    all_bands.append('VIS')
+
+        
     # Below is the original code from the GalSim package modified for the format of these Euclid
     # bandpass files. 
 
