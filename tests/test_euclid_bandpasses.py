@@ -5,6 +5,12 @@ import euclidlike
 def test_euclid_bandpass():
     # Obtain the bandpasses with AB_zeropoint set
     bp = euclidlike.getBandpasses(AB_zeropoint=True)
+
+    # Check existence - did we get all the bands?
+    for band in euclidlike.vis_bands:
+        assert bp[band]
+    for band in euclidlike.nisp_bands:
+        assert bp[band]
     
     # Check if the zeropoints have been set correctly
     AB_spec = lambda x: (3631e-23)
