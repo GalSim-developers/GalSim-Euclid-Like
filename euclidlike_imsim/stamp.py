@@ -175,15 +175,11 @@ class Euclidlike_stamp(StampBuilder):
             return method
 
     @classmethod
-    def _fix_seds_25(cls, prof, bandpass):
+    def fix_seds(cls, prof, bandpass):
         # If any SEDs are not currently using a LookupTable for the function or if they are
         # using spline interpolation, then the codepath is quite slow.
         # Better to fix them before doing WavelengthSampler.
 
-        # In GalSim 2.5, SEDs are not necessarily constructed in most chromatic objects.
-        # And really the only ones we need to worry about are the ones that come from
-        # SkyCatalog, since they might not have linear interpolants.
-        # Those objects are always SimpleChromaticTransformations.  So only fix those.
         if (isinstance(prof, galsim.SimpleChromaticTransformation) and
             (not isinstance(prof._flux_ratio._spec, galsim.LookupTable)
              or prof._flux_ratio._spec.interpolant != 'linear')):
@@ -203,9 +199,9 @@ class Euclidlike_stamp(StampBuilder):
         if isinstance(prof, galsim.ChromaticObject):
             if hasattr(prof, 'obj_list'):
                 for obj in prof.obj_list:
-                    cls._fix_seds_25(obj, bandpass)
+                    cls.fix_seds(obj, bandpass)
             if hasattr(prof, 'original'):
-                cls._fix_seds_25(prof.original, bandpass)
+                cls.fix_seds(prof.original, bandpass)
 
     def draw(self, prof, image, method, offset, config, base, logger):
         """Draw the profile on the postage stamp image.
@@ -326,10 +322,6 @@ class Euclidlike_stamp(StampBuilder):
         # print('stamp draw3',process.memory_info().rss)
 
         return image
-
-
-# Pick the right function to be _fix_seds.
-Euclidlike_stamp.fix_seds = Euclidlike_stamp._fix_seds_25
 
 
 # Register this as a valid type
