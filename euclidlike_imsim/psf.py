@@ -1,13 +1,13 @@
 import galsim
-import galsim.roman as roman
+import euclidlike
 import galsim.config
 from galsim.config import RegisterObjectType, RegisterInputType, OpticalPSF, InputLoader
 
 import euclidlike
 
 
-class RomanPSF(object):
-    """Class building needed Roman PSFs."""
+class EuclidlikePSF(object):
+    """Class building needed Euclidlike PSFs."""
 
     def __init__(
         self,
@@ -58,7 +58,7 @@ class RomanPSF(object):
     ):
 
         if pupil_bin == 8:
-            psf = roman.getPSF(
+            psf = euclidlike.getPSF(
                 CCD,
                 bpass.name,
                 SCA_pos=CCD_pos,
@@ -72,7 +72,7 @@ class RomanPSF(object):
                 extra_aberrations=extra_aberrations,
             )
         else:
-            psf = roman.getPSF(
+            psf = euclidlike.getPSF(
                 CCD,
                 bpass.name,
                 SCA_pos=CCD_pos,
@@ -129,7 +129,7 @@ class PSFLoader(InputLoader):
 
     def __init__(self):
         # Override some defaults in the base init.
-        super().__init__(init_func=RomanPSF, takes_logger=True, use_proxy=False)
+        super().__init__(init_func=EuclidlikePSF, takes_logger=True, use_proxy=False)
 
     def getKwargs(self, config, base, logger):
         logger.debug("Get kwargs for PSF")
@@ -140,8 +140,8 @@ class PSFLoader(InputLoader):
         }
         ignore = ["extra_aberrations"]
 
-        # If SCA is in base, then don't require it in the config file.
-        # (Presumably because using Roman image type, which sets it there for convenience.)
+        # If CCD is in base, then don't require it in the config file.
+        # (Presumably because using Euclidlike image type, which sets it there for convenience.)
         if "CCD" in base:
             opt["CCD"] = int
         else:
@@ -156,7 +156,7 @@ class PSFLoader(InputLoader):
             kwargs["CCD"] = base["CCD"]
 
         kwargs["extra_aberrations"] = galsim.config.ParseAberrations(
-            "extra_aberrations", config, base, "RomanPSF"
+            "extra_aberrations", config, base, "EuclidlikePSF"
         )
         kwargs["WCS"] = galsim.config.BuildWCS(
             base["image"], "wcs", base, logger=logger
@@ -171,5 +171,5 @@ class PSFLoader(InputLoader):
 
 
 # Register this as a valid type
-RegisterInputType("roman_psf", PSFLoader())
-# RegisterObjectType('roman_psf', BuildRomanPSF, input_type='romanpsf_loader')
+RegisterInputType("euclidlike_psf", PSFLoader())
+# RegisterObjectType('euclidlike_psf', BuildEuclidlikePSF, input_type='euclidlikepsf_loader')
