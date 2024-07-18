@@ -9,6 +9,7 @@ from astropy.time import Time
 import numpy as np
 
 import euclidlike
+from euclidlike.instrument_params import gain, read_noise
 
 
 class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
@@ -289,7 +290,7 @@ class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
 
         if self.read_noise:
             logger.debug("Adding read noise %s", read_noise)
-            image.addNoise(GaussianNoise(rng, sigma=read_noise))
+            image.addNoise(galsim.GaussianNoise(rng, sigma=read_noise))
 
         logger.debug("Applying gain %s", gain)
         image /= gain
