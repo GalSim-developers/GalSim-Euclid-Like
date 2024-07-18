@@ -33,4 +33,5 @@ class EuclidlikeBandpassBuilder(BandpassBuilder):
         return bandpass, safe
 
 
+RegisterBandpassType('EuclidlikeBandpass', EuclidlikeBandpassBuilder())
 RegisterBandpassType('EuclidlikeBandpassTrimmed', EuclidlikeBandpassBuilder())
