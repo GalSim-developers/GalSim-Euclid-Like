@@ -1,21 +1,26 @@
 import numpy as np
 import galsim
-import galsim.roman as roman
+import euclidlike
 import galsim.config
 from galsim.config import RegisterStampType, StampBuilder
-from galsim import WavelengthSampler
-import gc
 # import os, psutil
 # process = psutil.Process()
 
-class Roman_stamp(StampBuilder):
+
+class Euclidlike_stamp(StampBuilder):
     """This performs the tasks necessary for building the stamp for a single object.
 
     It uses the regular Basic functions for most things.
     It specializes the quickSkip, buildProfile, and draw methods.
     """
-    _trivial_sed = galsim.SED(galsim.LookupTable([100, 2600], [1,1], interpolant='linear'),
-                              wave_type='nm', flux_type='fphotons')
+    _trivial_sed = galsim.SED(
+        galsim.LookupTable(
+            [100, 2600],
+            [1, 1],
+            interpolant='linear'
+        ),
+        wave_type='nm', flux_type='fphotons'
+    )
 
     def setup(self, config, base, xsize, ysize, ignore, logger):
         """
@@ -41,7 +46,7 @@ class Roman_stamp(StampBuilder):
             xsize, ysize, image_pos, world_pos
         """
         # print('stamp setup',process.memory_info().rss)
-        
+
         gal = galsim.config.BuildGSObject(base, 'gal', logger=logger)[0]
         if gal is None:
             raise galsim.config.SkipThisObject('gal is None (invalid parameters)')
@@ -52,11 +57,11 @@ class Roman_stamp(StampBuilder):
             # or cached by the skyCatalogs code.
             gal.flux = gal.calculateFlux(bandpass)
         self.flux = gal.flux
-        # Cap (star) flux at 30M photons to avoid gross artifacts when trying to draw the Roman PSF in finite time and memory
+        # Cap (star) flux at 30M photons to avoid gross artifacts when trying to draw the Euclid PSF in finite time and memory
         flux_cap = 3e7
-        if self.flux>flux_cap:
+        if self.flux > flux_cap:
             if (hasattr(gal, 'original') and hasattr(gal.original, 'original') and isinstance(gal.original.original, galsim.DeltaFunction)) or (isinstance(gal, galsim.DeltaFunction)):
-                gal = gal.withFlux(flux_cap,bandpass)
+                gal = gal.withFlux(flux_cap, bandpass)
                 self.flux = flux_cap
                 gal.flux = flux_cap
         base['flux'] = gal.flux
@@ -64,7 +69,7 @@ class Roman_stamp(StampBuilder):
         # print('stamp setup2',process.memory_info().rss)
 
         # Compute or retrieve the realized flux.
-        self.rng = galsim.config.GetRNG(config, base, logger, "Roman_stamp")
+        self.rng = galsim.config.GetRNG(config, base, logger, "Euclidlike_stamp")
         self.realized_flux = galsim.PoissonDeviate(self.rng, mean=self.flux)()
         base['realized_flux'] = self.realized_flux
 
@@ -84,10 +89,10 @@ class Roman_stamp(StampBuilder):
             gal_achrom = gal.evaluateAtWavelength(bandpass.effective_wavelength)
             if (hasattr(gal_achrom, 'original') and isinstance(gal_achrom.original, galsim.DeltaFunction)):
                 # For bright stars, set the following stamp size limits
-                if self.flux<1e6:
+                if self.flux < 1e6:
                     image_size = 500
                     self.pupil_bin = 8
-                elif self.flux<6e6:
+                elif self.flux < 6e6:
                     image_size = 1000
                     self.pupil_bin = 4
                 else:
@@ -99,12 +104,12 @@ class Roman_stamp(StampBuilder):
                 # psf = galsim.config.BuildGSObject(base, 'psf', logger=logger)[0]['achromatic']
                 # obj = galsim.Convolve(gal_achrom, psf).withFlux(self.flux)
                 obj = gal_achrom.withGSParams(galsim.GSParams(stepk_minimum_hlr=20))
-                image_size = obj.getGoodImageSize(roman.pixel_scale)
+                image_size = obj.getGoodImageSize(euclidlike.pixel_scale)
 
         # print('stamp setup3',process.memory_info().rss)
         base['pupil_bin'] = self.pupil_bin
-        logger.info('Object flux is %d',self.flux)
-        logger.info('Object %d will use stamp size = %s',base.get('obj_num',0),image_size)
+        logger.info('Object flux is %d', self.flux)
+        logger.info('Object %d will use stamp size = %s', base.get('obj_num', 0), image_size)
 
         # Determine where this object is going to go:
         # This is the same as what the base StampBuilder does:
@@ -136,11 +141,11 @@ class Roman_stamp(StampBuilder):
         Returns:
             the PSF
         """
-        if base.get('psf', {}).get('type', 'roman_psf') != 'roman_psf':
+        if base.get('psf', {}).get('type', 'euclidlike_psf') != 'euclidlike_psf':
             return galsim.config.BuildGSObject(base, 'psf', gsparams=gsparams, logger=logger)[0]
 
-        roman_psf = galsim.config.GetInputObj('roman_psf', config, base, 'buildPSF')
-        psf = roman_psf.getPSF(self.pupil_bin, base['image_pos'])
+        euclidlike_psf = galsim.config.GetInputObj('euclidlike_psf', config, base, 'buildPSF')
+        psf = euclidlike_psf.getPSF(self.pupil_bin, base['image_pos'])
         return psf
 
     def getDrawMethod(self, config, base, logger):
@@ -168,35 +173,6 @@ class Roman_stamp(StampBuilder):
             # then respect their wishes.
             logger.info('Use specified method=%s for object %d.',method,base['obj_num'])
             return method
-
-    @classmethod
-    def _fix_seds_24(cls, prof, bandpass):
-        # If any SEDs are not currently using a LookupTable for the function or if they are
-        # using spline interpolation, then the codepath is quite slow.
-        # Better to fix them before doing WavelengthSampler.
-        if isinstance(prof, galsim.ChromaticObject):
-            wave_list, _, _ = galsim.utilities.combine_wave_list(prof.SED, bandpass)
-            sed = prof.SED
-            # TODO: This bit should probably be ported back to Galsim.
-            #       Something like sed.make_tabulated()
-            if (not isinstance(sed._spec, galsim.LookupTable)
-                or sed._spec.interpolant != 'linear'):
-                # Workaround for https://github.com/GalSim-developers/GalSim/issues/1228
-                f = np.broadcast_to(sed(wave_list), wave_list.shape)
-                new_spec = galsim.LookupTable(wave_list, f, interpolant='linear')
-                new_sed = galsim.SED(
-                    new_spec,
-                    'nm',
-                    'fphotons' if sed.spectral else '1'
-                )
-                prof.SED = new_sed
-
-            # Also recurse onto any components.
-            if hasattr(prof, 'obj_list'):
-                for obj in prof.obj_list:
-                    cls._fix_seds_24(obj, bandpass)
-            if hasattr(prof, 'original'):
-                cls._fix_seds_24(prof.original, bandpass)
 
     @classmethod
     def _fix_seds_25(cls, prof, bandpass):
@@ -255,14 +231,14 @@ class Roman_stamp(StampBuilder):
         # for some number of component PSFs.
         # print('stamp draw',process.memory_info().rss)
 
-        gal, *psfs = prof.obj_list if hasattr(prof,'obj_list') else [prof]
+        gal, *psfs = prof.obj_list if hasattr(prof, 'obj_list') else [prof]
 
         faint = self.flux < 40
         bandpass = base['bandpass']
         if faint:
             logger.info("Flux = %.0f  Using trivial sed", self.flux)
         else:
-            self.fix_seds(gal,bandpass)
+            self.fix_seds(gal, bandpass)
 
         image.wcs = base['wcs']
 
@@ -300,13 +276,13 @@ class Roman_stamp(StampBuilder):
                 # just report what happened, give some extra information to diagonose the problem
                 # and raise the error.
                 logger.error('Caught error trying to draw using FFT:')
-                logger.error('%s',e)
+                logger.error('%s', e)
                 logger.error('You may need to add a gsparams field with maximum_fft_size to')
                 logger.error('either the psf or gal field to allow larger FFTs.')
-                logger.info('prof = %r',prof)
-                logger.info('fft_image = %s',fft_image)
-                logger.info('offset = %r',offset)
-                logger.info('wcs = %r',image.wcs)
+                logger.info('prof = %r', prof)
+                logger.info('fft_image = %s', fft_image)
+                logger.info('offset = %r', offset)
+                logger.info('wcs = %r', image.wcs)
                 raise
             # Some pixels can end up negative from FFT numerics.  Just set them to 0.
             fft_image.array[fft_image.array < 0] = 0.
@@ -351,12 +327,10 @@ class Roman_stamp(StampBuilder):
 
         return image
 
+
 # Pick the right function to be _fix_seds.
-if galsim.__version_info__ < (2,5):
-    Roman_stamp.fix_seds = Roman_stamp._fix_seds_24
-else:
-    Roman_stamp.fix_seds = Roman_stamp._fix_seds_25
+Euclidlike_stamp.fix_seds = Euclidlike_stamp._fix_seds_25
 
 
 # Register this as a valid type
-RegisterStampType('Roman_stamp', Roman_stamp())
+RegisterStampType('Euclidlike_stamp', Euclidlike_stamp())
