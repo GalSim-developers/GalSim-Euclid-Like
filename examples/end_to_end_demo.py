@@ -222,7 +222,7 @@ def main(argv):
         # These are provided in e-/pix/s, so we have to multiply by the exposure time.
         # The thermal background is not important for VIS, only for NISP and is
         # currently not defined in the Euclid-like module.
-        # sky_image += euclidlike.thermal_backgrounds[filter_name]*euclidlike.exptime
+        # sky_image += euclidlike.thermal_backgrounds[filter_name]*euclidlike.long_exptime
 
         # Draw the galaxies and stars into the image.
         # We want (most of) the object properties to be the same for all the filters.
