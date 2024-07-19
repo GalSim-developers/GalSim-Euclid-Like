@@ -8,6 +8,6 @@ from .bandpass import getBandpasses
 from .euclidlike_wcs import getWCS, findCCD, allowedPos, bestPA, convertCenter
 
 from .euclidlike_psf import (
-    get_fake_wavelength_psf, get_euclid_wavelength_psf, getPSF
+    get_fake_wavelength_psf, get_euclid_wavelength_psf, getPSF, getBrightPSF, getPSF_optical
 )
 from .backgrounds import getSkyLevel
