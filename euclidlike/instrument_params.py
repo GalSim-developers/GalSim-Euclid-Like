@@ -108,8 +108,8 @@ ccd2det = {
 }
 
 # Maximum allowed angle from the telescope solar panels to the sun in degrees.
-min_sun_angle = 3.0 * galsim.degrees
-max_sun_angle = 20.0 * galsim.degrees
+min_sun_angle = 20.0 * galsim.degrees
+max_sun_angle = 3.0 * galsim.degrees
 
 # Define variables that distinguish between VIS and NISP bandpasses
 vis_bands = ['VIS']
