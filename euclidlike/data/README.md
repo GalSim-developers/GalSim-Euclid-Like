@@ -6,3 +6,4 @@
     - The image size is 480 x 480
 * `pv_coeffs.dat` contains the CD and PV coefficient to build Euclid-like WCS. At the moment they are set to 0 (no distortions).
 * `ccd_data.dat` contains the CCD shifts with respect to the center of the focal plane. Derived from [Scaramella et al.](https://arxiv.org/abs/2108.01201)
+* `euclid_obseq.fits` contains the observation sequence for Euclid.
