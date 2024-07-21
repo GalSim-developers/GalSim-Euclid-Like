@@ -470,8 +470,8 @@ def _get_ccd_center_pos(i_ccd, world_pos, pa_fpa):
     # coordinate for the CCD center is `crval`, which goes into the WCS as CRVAL1, CRVAL2.
     cos_pa = np.cos(pa_fpa)
     sin_pa = np.sin(pa_fpa)
-    u = ccd_crval_u_deg[i_ccd] * cos_pa - ccd_crval_v_deg[i_ccd] * sin_pa
-    v = ccd_crval_u_deg[i_ccd] * sin_pa + ccd_crval_v_deg[i_ccd] * cos_pa
+    u = ccd_crval_v_deg[i_ccd] * cos_pa - ccd_crval_u_deg[i_ccd] * sin_pa
+    v = ccd_crval_v_deg[i_ccd] * sin_pa + ccd_crval_u_deg[i_ccd] * cos_pa
     u = u * coord.degrees
     v = v * coord.degrees
     crval = world_pos.deproject(u, v, projection='gnomonic')
