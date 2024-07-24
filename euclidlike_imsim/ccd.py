@@ -240,7 +240,6 @@ class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
         # value added to sky_image.  So technically, this includes things that aren't just sky.
         # E.g. includes dark_current and thermal backgrounds.
         sky_image = image.copy()
-        # sky_level = euclidlike.getSkyLevel(bp, world_pos=wcs.toWorld(image.true_center))
         sky_level = euclidlike.getSkyLevel(
             bp,
             world_pos=wcs.toWorld(image.true_center),
