@@ -121,10 +121,10 @@ def getBrightPSF(
     gsparams=None,
     logger=None,
 ):
-    """Get a fake achromatic optical PSF for really bright objects in Euclidlike simulations.
-    Using getPSF() for really bright objects can cause some reflections in the spider pattern
-    and some boxiness at the outskirts of the PSF.
-
+    """Get a fake optical PSF for really bright objects in Euclidlike simulations.
+    Depending on the inputs, returns a chromatic or achromatic PSF using the
+    Euclid telescope diameter and Euclid-like aperture.
+    
     Args:
     ccd (int):  Single value specifying the ccd for which the PSF should be
         loaded.
@@ -136,6 +136,12 @@ def getBrightPSF(
         ccd is chosen. [default: None]
     wcs:  The WCS to use to project the PSF into world coordinates. [default:
         galsim.PixelScale(euclidlike.pixel_scale)]
+    n_waves (int): Number of wavelengths to use for setting up interpolation of the
+        chromatic PSF objects, which can lead to much faster image
+        rendering.  If None, then no interpolation is used. Note that
+        users who want to interpolate can always set up the interpolation
+        later on even if they do not do so when calling `getPSF`.
+        [default: None]
     wavelength (float):  An option to get an achromatic PSF for a single
         wavelength, for users who do not care about chromaticity of the PSF. If
         None, then the fully chromatic PSF is returned as an
@@ -218,8 +224,9 @@ def _get_single_bright_psf_obj(
     wavelength,
     gsparams
 ):
-    """Routine for making a single PSF.  This gets called by `getPSF` after it parses all the
-       options that were passed in.  Users will not directly interact with this routine.
+    """Routine for making a single Optical PSF, designed to handle very bright objects.   
+       This gets called by `getBrightPSF` after it parses all the options that were passed in. 
+       Users will not directly interact with this routine.
     """
 
     if wavelength is None:
