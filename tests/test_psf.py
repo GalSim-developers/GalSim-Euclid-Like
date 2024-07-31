@@ -3,21 +3,9 @@ import euclidlike
 import numpy as np
 
 from euclidlike import (
-    get_fake_wavelength_psf, get_euclid_wavelength_psf, getPSF
+     get_euclid_wavelength_psf, getPSF, getBrightPSF
 )
 
-
-def test_psf_fake():
-    scale = 0.01
-    nsample = 10
-    npix = 257
-    wl_array, psfobjs = get_fake_wavelength_psf(
-        scale, nsample, npix,
-    )
-    assert len(psfobjs) == nsample
-    assert psfobjs[0].array.shape == (npix, npix)
-    assert wl_array.shape == (nsample, )
-    return
 
 
 def test_psf_euclid():
@@ -78,6 +66,57 @@ def test_get_psf_function():
         psf_img.array, true_img.array, atol=1e-4*np.sum(true_img.array),
         err_msg='getPSF() does replicate image with very narrow SED centered at desired wavelength')
     return
+
+def test_get_bright_psf_function():
+    euc_bp = euclidlike.getBandpasses()['VIS']
+    euc_bp.red_limit = 910
+    euc_bp.blue_limit = 540
+    # check optical PSF wavelength at bandpass effective wavelength
+    bright_psf = getBrightPSF(1, "VIS", wavelength = 800.)
+    np.testing.assert_allclose(
+        bright_psf._lam, 800., atol=0,
+        err_msg='getBrightPSF() fails to properly initialize OpticalPSF with user-input wavelength')
+    
+    
+    # check size of chromatic bright PSF is reasonable in comparison with euclid-like PSF
+    bright_psf = getBrightPSF(ccd=1, bandpass="VIS")
+    normal_psf = getPSF(ccd=1, bandpass="VIS")
+    scale = euclidlike.pixel_scale
+    sed = galsim.SED('vega.txt', 'nm', 'flambda')
+    sed = galsim.SED(galsim.LookupTable([100, 2600], [1,1], interpolant='linear'),
+                                  wave_type='nm', flux_type='fphotons')
+    star = galsim.Convolve(normal_psf, galsim.DeltaFunction(flux = 1e2)*sed)
+    star_bright = galsim.Convolve(bright_psf, galsim.DeltaFunction(flux = 1e2)*sed)
+    img =  star.drawImage(euc_bp, nx=160, ny=160, scale= scale, method = 'auto')
+    img_bright =  star_bright.drawImage(euc_bp, nx=160, ny=160, scale= scale, method = 'auto')
+    img_mom = galsim.hsm.FindAdaptiveMom(img)
+    img_bright_mom = galsim.hsm.FindAdaptiveMom(img_bright)
+    np.testing.assert_allclose(img_bright_mom.moments_sigma, img_mom.moments_sigma, rtol = 0.01,
+            err_msg = 'Bright chromatic PSF has size at least 1% larger than getPSF()')
+    
+    # check size of achromatic bright PSF is reasonable in comparison with euclid-like PSF
+    bright_psf = getBrightPSF(ccd=1, bandpass="VIS", wavelength = euc_bp.effective_wavelength)
+    star_bright = galsim.Convolve(bright_psf, galsim.DeltaFunction(flux = 1e2)*sed)
+    img_bright =  star_bright.drawImage(euc_bp, nx=160, ny=160, scale= scale, method = 'auto')
+    img_bright_mom = galsim.hsm.FindAdaptiveMom(img_bright)
+    np.testing.assert_allclose(img_bright_mom.moments_sigma, img_mom.moments_sigma, rtol = 0.01,
+            err_msg = 'Bright ahcromatic PSF, at effective wavelength, has size at least 1% larger than getPSF()')
+    
+    # Check nwaves implementation works correctly
+    n_waves = 3
+    psf_int = getBrightPSF(ccd=1, bandpass="VIS", n_waves=n_waves)
+    obj_int = psf_int.evaluateAtWavelength(euc_bp.effective_wavelength  )
+    im_int = obj_int.drawImage(scale=scale)
+    # Check that evaluation at a single wavelength is consistent with previous results.
+    psf_achrom = getBrightPSF(ccd=1, bandpass="VIS", wavelength = euc_bp.effective_wavelength)
+    im_achrom = psf_achrom.drawImage(image= im_int.copy(), scale=scale)
+    # From roman.getPSF() tests: These images should agree well, but not perfectly.
+    #Check for agreement at the level of 1e-3
+    diff_im = (im_int.array-im_achrom.array)
+    np.testing.assert_array_almost_equal(
+        diff_im, np.zeros_like(diff_im), decimal=3,
+        err_msg='PSF at a given wavelength and interpolated chromatic one evaluated at that '
+        'wavelength disagree.')
 
 if __name__ == "__main__":
     testfns = [v for k, v in vars().items() if k[:5] == 'test_' and callable(v)]
