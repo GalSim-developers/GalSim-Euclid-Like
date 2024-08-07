@@ -32,6 +32,14 @@ def test_euclidlike_wcs():
     assert not euclidlike.allowedPos(pos, datetime.date(2025, 6, 20))
     assert euclidlike.bestPA(pos, datetime.date(2025, 6, 20)) is None
 
+    # Check input SSA
+    assert euclidlike.allowedPos(pos, datetime.date(2025, 3, 20), SAA=90*galsim.degrees)
+    # Observable position but we force SSA outside the allowed range
+    assert not euclidlike.allowedPos(pos, datetime.date(2025, 3, 20), SAA=86*galsim.degrees)
+    assert not euclidlike.allowedPos(pos, datetime.date(2025, 3, 20), SAA=111*galsim.degrees)
+    # Not observable position but we force SSA within the allowed range
+    assert euclidlike.allowedPos(pos, datetime.date(2025, 6, 20), SAA=90*galsim.degrees)
+
     # Finally make sure it does something reasonable for the observatory position angle.
     # When the sun is at (0,0), and we look at (90,0), then +Z points towards the Sun and +Y points
     # North, giving a PA of 0 degrees.
