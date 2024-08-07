@@ -13,7 +13,7 @@ To run the code:
 galsim was.yaml
 ```
 
-You might want to specify some config entries in the command line, like:
+You might want to specify some config entries in the command line, likes:
 ```bash
 galsim was.yaml input.obseq_data.visit=33690 image.CCD=1
 ```
@@ -22,7 +22,7 @@ galsim was.yaml input.obseq_data.visit=33690 image.CCD=1
 
 `slurm_runner.sh` contain the SLURM configuration to run "large scale" simulations.
 You will want to update the following line:
-
+- `#!/bin/zsh`: depending on the shell you are using you might want to change it to: `#!/bin/bash`
 - `#SBATCH --output=/path/to/slurm-%A-%a.out`: slurm stdout file
 - `#SBATCH --error=/path/to/slurm-%A-%a.err`: slurm stderr file
 - `source activate [env_name]`: conda environment to use
