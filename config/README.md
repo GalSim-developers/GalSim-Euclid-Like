@@ -27,4 +27,15 @@ You will want to update the following line:
 - `#SBATCH --error=/path/to/slurm-%A-%a.err`: slurm stderr file
 - `source activate [env_name]`: conda environment to use
 - `file_list='/path/to/run_list.txt'`: file containing the pointings to simulate (see note below)
-- 
+
+the `run_list.txt` is a 2 columns file with the pointing and the CCD_ID to simulate. It should lookq like:
+```
+33688 0
+33688 1
+33688 2
+[...]
+33688 35
+33689 0
+33689 1
+[...]
+```
