@@ -133,8 +133,9 @@ def getWCS(world_pos, PA=None, date=None, CCDs=None, PA_is_FPA=False, SAA=None):
         CCDs:           A single number or iterable giving the CCDs for which
                         the WCS should be obtained.  If None, then the WCS is
                         calculated for all CCDs. [default: None]
-        SAA:            Solar Aspect Angle of the telescope for the observation.
-                        If not provided, it will be computed internally.
+        SAA:            A `galsim.Angle` representing the Solar Aspect Angle
+                        of the telescope for the observation. If not provided,
+                        it will be computed internally.
 
     Returns:
         A dict of WCS objects for each CCD.
@@ -246,8 +247,9 @@ def convertCenter(world_pos, CCD, PA=None, date=None, SAA=None, PA_is_FPA=False,
                     orientation for the observatory.  Note that if a user supplies a ``PA`` value,
                     the routine does not check whether this orientation is actually allowed.
                     [default: None]
-        SAA:        Solar Aspect Angle of the telescope for the observation.
-                    If not provided, it will be computed internally.
+        SAA:        A `galsim.Angle` representing the Solar Aspect Angle
+                    of the telescope for the observation. If not provided,
+                    it will be computed internally.
         date:       The date of the observation, as a python datetime object.  If None, then the
                     vernal equinox in 2025 will be used.  [default: None]
         PA_is_FPA:  If True, then the position angle that was provided was the PA of the focal
@@ -566,8 +568,9 @@ def allowedPos(world_pos, date, SAA=None):
         world_pos:      A galsim.CelestialCoord indicating the position at which the observer
                         wishes to look.
         date:           A python datetime object indicating the desired date of observation.
-        SAA:            Solar Aspect Angle of the telescope for the observation.
-                        If not provided, it will be computed internally.
+        SAA:            A `galsim.Angle` representing the Solar Aspect Angle
+                        of the telescope for the observation. If not provided,
+                        it will be computed internally.
 
     Returns:
         True or False, indicating whether it is permitted to look at this position on this date.
@@ -580,7 +583,7 @@ def allowedPos(world_pos, date, SAA=None):
     if SAA is None:
         angle_deg = abs(world_pos.distanceTo(sun)/coord.degrees)
     else:
-        angle_deg = SAA
+        angle_deg = SAA/coord.degrees
 
     # Check if it's within tolerance.
     min_ang = 90. - min_sun_angle/coord.degrees
@@ -602,8 +605,9 @@ def bestPA(world_pos, date, SAA=None):
         world_pos:      A galsim.CelestialCoord indicating the position at which the observer
                         wishes to look.
         date:           A python datetime object indicating the desired date of observation.
-        SAA:            Solar Aspect Angle of the telescope for the observation.
-                        If not provided, it will be computed internally.
+        SAA:            A `galsim.Angle` representing the Solar Aspect Angle
+                        of the telescope for the observation. If not provided,
+                        it will be computed internally.
 
     Returns:
         the best position angle for the observatory, as a galsim.Angle, or None if the position
