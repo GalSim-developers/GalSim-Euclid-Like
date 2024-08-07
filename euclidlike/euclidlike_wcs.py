@@ -85,7 +85,7 @@ theta_fpa = 0.*coord.degrees
 pv_filename = files('euclidlike.data').joinpath('pv_coeffs.dat')
 
 
-def getWCS(world_pos, PA=None, date=None, CCDs=None, PA_is_FPA=False):
+def getWCS(world_pos, PA=None, date=None, CCDs=None, PA_is_FPA=False, SSA=None):
     """
     This routine returns a dict containing a WCS for each of the Euclid CCDs.
     The Euclid CCDs are labeled 0-35, so these numbers are used as the keys in
@@ -133,13 +133,15 @@ def getWCS(world_pos, PA=None, date=None, CCDs=None, PA_is_FPA=False):
         CCDs:           A single number or iterable giving the CCDs for which
                         the WCS should be obtained.  If None, then the WCS is
                         calculated for all CCDs. [default: None]
+        SSA:            Solar Aspect Angle of the telescope for the observation.
+                        If not provided, it will be computed internally.
 
     Returns:
         A dict of WCS objects for each CCD.
     """
     # First just parse the input quantities.
     date, CCDs, pa_fpa, pa_obsy = _parse_WCS_inputs(
-        world_pos, PA, date, PA_is_FPA, CCDs
+        world_pos, PA, date, PA_is_FPA, CCDs, SSA,
     )
 
     # Note, this routine reads in the coeffs.  We don't use them until later, but read them in for
@@ -211,7 +213,7 @@ def getWCS(world_pos, PA=None, date=None, CCDs=None, PA_is_FPA=False):
     return wcs_dict
 
 
-def convertCenter(world_pos, CCD, PA=None, date=None, PA_is_FPA=False, tol=0.5*coord.arcsec):
+def convertCenter(world_pos, CCD, PA=None, date=None, SSA=None, PA_is_FPA=False, tol=0.5*coord.arcsec):
     """
     This is a simple helper routine that takes an input position ``world_pos`` that is meant to
     correspond to the position of the center of an CCD, and tells where the center of the focal
@@ -244,6 +246,8 @@ def convertCenter(world_pos, CCD, PA=None, date=None, PA_is_FPA=False, tol=0.5*c
                     orientation for the observatory.  Note that if a user supplies a ``PA`` value,
                     the routine does not check whether this orientation is actually allowed.
                     [default: None]
+        SSA:        Solar Aspect Angle of the telescope for the observation.
+                    If not provided, it will be computed internally.
         date:       The date of the observation, as a python datetime object.  If None, then the
                     vernal equinox in 2025 will be used.  [default: None]
         PA_is_FPA:  If True, then the position angle that was provided was the PA of the focal
@@ -260,7 +264,9 @@ def convertCenter(world_pos, CCD, PA=None, date=None, PA_is_FPA=False, tol=0.5*c
         raise TypeError("tol must be a galsim.Angle")
     use_CCD = CCD
     # Parse inputs appropriately.
-    _, _, pa_fpa, _ = _parse_WCS_inputs(world_pos, PA, date, PA_is_FPA, [CCD])
+    _, _, pa_fpa, _ = _parse_WCS_inputs(
+        world_pos, PA, date, PA_is_FPA, [CCD], SSA,
+    )
 
     # Now pretend world_pos was the FPA center and we want to find the location of this CCD:
     _, u, v = _get_ccd_center_pos(use_CCD, world_pos, pa_fpa)
@@ -500,7 +506,7 @@ def _parse_CCDs(CCDs):
     return CCDs
 
 
-def _parse_WCS_inputs(world_pos, PA, date, PA_is_FPA, CCDs):
+def _parse_WCS_inputs(world_pos, PA, date, PA_is_FPA, CCDs, SSA=None):
     """
     This routine parses the various input options to getWCS() and returns what the routine needs to
     do its job.  The reason to pull this out is so other helper routines can use it.
@@ -516,13 +522,13 @@ def _parse_WCS_inputs(world_pos, PA, date, PA_is_FPA, CCDs):
         date = datetime.datetime(2025, 3, 20, 9, 2, 0)
 
     # Are we allowed to look here?
-    if not allowedPos(world_pos, date):
+    if not allowedPos(world_pos, date, SSA):
         raise GalSimError("Error, Euclid cannot look at this position on this date!")
 
     # If position angle was not given, then get the optimal one:
     if PA is None:
         PA_is_FPA = False
-        PA = bestPA(world_pos, date)
+        PA = bestPA(world_pos, date, SSA)
     else:
         # Just enforce type
         if not isinstance(PA, coord.Angle):
@@ -542,7 +548,7 @@ def _parse_WCS_inputs(world_pos, PA, date, PA_is_FPA, CCDs):
     return date, CCDs, pa_fpa, pa_obsy
 
 
-def allowedPos(world_pos, date):
+def allowedPos(world_pos, date, SSA=None):
     """
     This routine can be used to check whether Euclid would be allowed to look at a particular
     position (``world_pos``) on a given ``date``.   This is determined by the angle of this position
@@ -560,6 +566,8 @@ def allowedPos(world_pos, date):
         world_pos:      A galsim.CelestialCoord indicating the position at which the observer
                         wishes to look.
         date:           A python datetime object indicating the desired date of observation.
+        SSA:            Solar Aspect Angle of the telescope for the observation.
+                        If not provided, it will be computed internally.
 
     Returns:
         True or False, indicating whether it is permitted to look at this position on this date.
@@ -569,7 +577,10 @@ def allowedPos(world_pos, date):
     sun = coord.CelestialCoord.from_ecliptic(lam, 0*coord.radians, date.year)
 
     # Find the angle between that and the supplied position
-    angle_deg = abs(world_pos.distanceTo(sun)/coord.degrees)
+    if SSA is None:
+        angle_deg = abs(world_pos.distanceTo(sun)/coord.degrees)
+    else:
+        angle_deg = SSA
 
     # Check if it's within tolerance.
     min_ang = 90. - min_sun_angle/coord.degrees
@@ -577,7 +588,7 @@ def allowedPos(world_pos, date):
     return min_ang <= angle_deg <= max_ang
 
 
-def bestPA(world_pos, date):
+def bestPA(world_pos, date, SSA=None):
     """
     This routine determines the best position angle for the observatory for a given observation date
     and position on the sky.
@@ -591,13 +602,15 @@ def bestPA(world_pos, date):
         world_pos:      A galsim.CelestialCoord indicating the position at which the observer
                         wishes to look.
         date:           A python datetime object indicating the desired date of observation.
+        SSA:            Solar Aspect Angle of the telescope for the observation.
+                        If not provided, it will be computed internally.
 
     Returns:
         the best position angle for the observatory, as a galsim.Angle, or None if the position
         is not observable.
     """
     # First check for observability.
-    if not allowedPos(world_pos, date):
+    if not allowedPos(world_pos, date, SSA):
         return None
 
     # Find the location of the sun on this date.  +X_observatory points out into the sky, towards
