@@ -72,7 +72,7 @@ class EuclidlikePSF(object):
                 # extra_aberrations=extra_aberrations,
             )
         else:
-            psf = euclidlike.getPSF_optical(
+            psf = euclidlike.getBrightPSF(
                 CCD,
                 bpass.name,
                 ccd_pos=CCD_pos,
