@@ -135,7 +135,7 @@ output:
         dir: /path/to/output/noise_images
         file_name:
             type: FormattedStr
-            format: "Euclidlike_WAS_truth_%s_%i_%i.noise.fits.fz"
+            format: "Euclidlike_WAS_truth_%s_%i_%i.noise.fits.gz"
             items:
                 - { type: ObSeqData, field: filter }
                 - { type: ObSeqData, field: visit }
@@ -145,7 +145,7 @@ output:
         dir: /path/to/output/sky_images
         file_name:
             type: FormattedStr
-            format: "Euclidlike_WAS_truth_%s_%i_%i.sky.fits.fz"
+            format: "Euclidlike_WAS_truth_%s_%i_%i.sky.fits.gz"
             items:
                 - { type: ObSeqData, field: filter }
                 - { type: ObSeqData, field: visit }
@@ -155,7 +155,7 @@ output:
         dir: /path/to/output/weight_images
         file_name:
             type: FormattedStr
-            format: "Euclidlike_WAS_truth_%s_%i_%i.weight.fits.fz"
+            format: "Euclidlike_WAS_truth_%s_%i_%i.weight.fits.gz"
             items:
                 - { type: ObSeqData, field: filter }
                 - { type: ObSeqData, field: visit }
