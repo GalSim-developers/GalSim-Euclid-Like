@@ -1,15 +1,15 @@
 import galsim
 import galsim.config
 from galsim.config import RegisterImageType
-from galsim.config import BuildStamps
-from galsim.config.image import FlattenNoiseVariance
 from galsim.config.image_scattered import ScatteredImageBuilder
+from galsim.errors import GalSimConfigValueError
 from galsim.image import Image
 from astropy.time import Time
 import numpy as np
 
 import euclidlike
-from euclidlike.instrument_params import gain, read_noise
+from euclidlike.instrument_params import gain
+from .noise import cfg_noise_key, parse_noise_config, get_noise
 
 
 class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
@@ -53,16 +53,8 @@ class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
         req = {"CCD": int, "filter": str, "mjd": float, "exptime": float}
         opt = {
             "draw_method": str,
-            "stray_light": bool,
-            "thermal_background": bool,
-            "reciprocity_failure": bool,
-            "dark_current": bool,
-            "nonlinearity": bool,
-            "ipc": bool,
-            "read_noise": bool,
-            "sky_subtract": bool,
-            "ignore_noise": bool,
         }
+        opt.update({key: bool for key in cfg_noise_key})
         params = galsim.config.GetAllParams(
             config, base, req=req, opt=opt, ignore=ignore + extra_ignore
         )[0]
@@ -73,16 +65,7 @@ class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
         self.mjd = params["mjd"]
         self.exptime = params["exptime"]
 
-        self.ignore_noise = params.get("ignore_noise", False)
-        # self.exptime = params.get('exptime', roman.exptime)  # Default is roman standard exposure time.
-        self.stray_light = params.get("stray_light", False)
-        self.thermal_background = params.get("thermal_background", False)
-        self.reciprocity_failure = params.get("reciprocity_failure", False)
-        self.dark_current = params.get("dark_current", False)
-        self.nonlinearity = params.get("nonlinearity", False)
-        self.ipc = params.get("ipc", False)
-        self.read_noise = params.get("read_noise", False)
-        self.sky_subtract = params.get("sky_subtract", False)
+        self.cfg_noise = parse_noise_config(params)
 
         # If draw_method isn't in image field, it may be in stamp.  Check.
         self.draw_method = params.get(
@@ -107,11 +90,6 @@ class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
             )
 
         return euclidlike.n_pix_col, euclidlike.n_pix_row
-
-    # def getBandpass(self, filter_name):
-    #     if not hasattr(self, 'all_roman_bp'):
-    #         self.all_roman_bp = roman.getBandpasses()
-    #     return self.all_roman_bp[filter_name]
 
     def buildImage(self, config, base, image_num, obj_num, logger):
         """Build an Image containing multiple objects placed at arbitrary locations.
@@ -206,10 +184,6 @@ class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
                 full_image[bounds] += stamps[k][bounds]
             stamps = None
 
-        # # Bring the image so far up to a flat noise variance
-        # current_var = FlattenNoiseVariance(
-        #         base, full_image, stamps, current_vars, logger)
-
         return full_image, None
 
     def addNoise(self, image, config, base, image_num, obj_num, current_var, logger):
@@ -225,88 +199,20 @@ class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
             logger:         If given, a logger object to log progress.
         """
         # check ignore noise
-        if self.ignore_noise:
+        if self.cfg_noise["ignore_noise"]:
             return
 
-        base["current_noise_image"] = base["current_image"]
-        wcs = base["wcs"]
-        bp = base["bandpass"]
-        rng = galsim.config.GetRNG(config, base)
-        logger.info(
-            "image %d: Start EuclidlikeCCD detector effects", base.get("image_num", 0)
-        )
+        if "noise_image" not in base.keys():
+            get_noise(self.cfg_noise, config, base, logger)
 
-        # Things that will eventually be subtracted (if sky_subtract) will have their expectation
-        # value added to sky_image.  So technically, this includes things that aren't just sky.
-        # E.g. includes dark_current and thermal backgrounds.
-        sky_image = image.copy()
-        sky_level = euclidlike.getSkyLevel(
-            bp,
-            world_pos=wcs.toWorld(image.true_center),
-            date=Time(self.mjd, format="mjd").datetime,
-        )
-        logger.debug("Adding sky_level = %s", sky_level)
-        if self.stray_light:
-            logger.debug("Stray light fraction = %s", stray_light_fraction)
-            sky_level *= 1.0 + stray_light_fraction
-        wcs.makeSkyImage(sky_image, sky_level)
-
-        # The other background is the expected thermal backgrounds in this band.
-        # These are provided in e-/pix/s, so we have to multiply by the exposure time.
-        # if self.thermal_background:
-        #     tb = roman.thermal_backgrounds[self.filter] * self.exptime
-        #     logger.debug('Adding thermal background: %s',tb)
-        #     sky_image += roman.thermal_backgrounds[self.filter] * self.exptime
-
-        # The image up to here is an expectation value.
-        # Realize it as an integer number of photons.
-        poisson_noise = galsim.noise.PoissonNoise(rng)
-        if self.draw_method == "phot":
-            logger.debug("Adding poisson noise to sky photons")
-            sky_image1 = sky_image.copy()
-            sky_image1.addNoise(poisson_noise)
-            image.quantize()  # In case any profiles used InterpolatedImage, in which case
-            # the image won't necessarily be integers.
-            image += sky_image1
-        else:
-            logger.debug("Adding poisson noise")
-            image += sky_image
-            image.addNoise(poisson_noise)
-
-        # Apply the detector effects here.  Not all of these are "noise" per se, but they
-        # happen interspersed with various noise effects, so apply them all in this step.
-
-        # Note: according to Gregory Mosby & Bernard J. Rauscher, the following effects all
-        # happen "simultaneously" in the photo diodes: dark current, persistence,
-        # reciprocity failure (aka CRNL), burn in, and nonlinearity (aka CNL).
-        # Right now, we just do them in some order, but this could potentially be improved.
-        # The order we chose is historical, matching previous recommendations, but Mosby and
-        # Rauscher don't seem to think those recommendations are well-motivated.
-
-        if self.dark_current:
-            dc = dark_current * self.exptime
-            logger.debug("Adding dark current: %s", dc)
-            sky_image += dc
-            dark_noise = galsim.noise.DeviateNoise(
-                galsim.random.PoissonDeviate(rng, dc)
-            )
-            image.addNoise(dark_noise)
-
-        if self.read_noise:
-            logger.debug("Adding read noise %s", read_noise)
-            image.addNoise(galsim.GaussianNoise(rng, sigma=read_noise))
-
-        logger.debug("Applying gain %s", gain)
+        # We first have to apply gain and quantize the image
         image /= gain
-
-        # Make integer ADU now.
         image.quantize()
 
-        if self.sky_subtract:
-            logger.debug("Subtracting sky image")
-            sky_image /= gain
-            sky_image.quantize()
-            image -= sky_image
+        image += base["noise_image"]
+
+        if self.cfg_noise["sky_subtract"]:
+            image -= base["sky_image"]
 
 
 # Register this as a valid type
