@@ -89,17 +89,6 @@ class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
             "draw_method", base.get("stamp", {}).get("draw_method", "auto")
         )
 
-        # pointing = CelestialCoord(ra=params['ra'], dec=params['dec'])
-        # wcs = roman.getWCS(world_pos        = pointing,
-        #                         PA          = params['pa']*galsim.degrees,
-        #                         date        = params['date'],
-        #                         SCAs        = self.sca,
-        #                         PA_is_FPA   = True
-        #                         )[self.sca]
-
-        # # GalSim expects a wcs in the image field.
-        # config['wcs'] = wcs
-
         # If user hasn't overridden the bandpass to use, get the standard one.
         if "bandpass" not in config:
             base["bandpass"] = galsim.config.BuildBandpass(
