@@ -86,18 +86,12 @@ class SkyCatalogInterface:
         )
         self._objects = None
 
-        # import os, psutil
-        # process = psutil.Process()
-        # print('skycat init',process.memory_info().rss)
-
     @property
     def objects(self):
         from skycatalogs import skyCatalogs
 
         if self._objects is None:
-            # import os, psutil
-            # process = psutil.Process()
-            # print('skycat obj 1',process.memory_info().rss)
+
             # Select objects from polygonal region bounded by CCD edges
             corners = (
                 (-self.edge_pix, -self.edge_pix),
@@ -118,10 +112,32 @@ class SkyCatalogInterface:
             )
             if not self._objects:
                 self.logger.warning("No objects found on image.")
-            # import os, psutil
-            # process = psutil.Process()
-            # print('skycat obj 2',process.memory_info().rss)
+            else:
+                self._build_dtype_dict()
         return self._objects
+
+    def _build_dtype_dict(self):
+        self._dtype_dict = {}
+        obj_types = []
+        for coll in self._objects.get_collections():
+            objects_type = coll._object_type_unique
+            if objects_type in obj_types:
+                continue
+            col_names = list(coll.native_columns)
+            for col_name in col_names:
+                try:
+                    # Some columns cannot be read in snana
+                    np_type = coll.get_native_attribute(col_name).dtype.type()
+                except Exception as e:
+                    self.logger.warning(
+                        f"The column {col_name} could not be read from skyCatalog."
+                    )
+                    continue
+                if np_type is None:
+                    py_type = str
+                else:
+                    py_type = type(np_type.astype(object))
+                self._dtype_dict[col_name] = py_type
 
     def get_ccd_center(self):
         """
@@ -160,6 +176,61 @@ class SkyCatalogInterface:
         ra, dec = skycat_obj.ra, skycat_obj.dec
         return galsim.CelestialCoord(ra * galsim.degrees, dec * galsim.degrees)
 
+    def getFlux(self, index, filter=None, mjd=None, exptime=None):
+
+        if filter is None:
+            filter = self.bandpass.name
+        if mjd is None:
+            mjd = self.mjd
+        if exptime is None:
+            exptime = self.exptime
+
+        skycat_obj = self.objects[index]
+        # We cache the SEDs for potential later use
+        self._seds = skycat_obj.get_observer_sed_components()
+        for i, sed in enumerate(self._seds.values()):
+            if i == 0:
+                sed_sum = sed
+            else:
+                sed_sum += sed
+        raw_flux = skycat_obj.get_euclid_flux(
+            filter,
+            sed_sum,
+            mjd=mjd,
+            cache=False
+        )
+        if hasattr(skycat_obj, "get_wl_params"):
+            _, _, mu = skycat_obj.get_wl_params()
+        else:
+            mu = 1.
+        # raw_flux = skycat_obj.get_euclid_flux(filter, mjd=mjd, cache=False)
+        flux = raw_flux * mu * exptime * euclidlike.collecting_area
+
+        return flux
+    def getValue(self, index, field):
+
+        skycat_obj = self.objects[index]
+
+        if field not in self._dtype_dict:
+            # We cannot raise an error because one could have a field for snana
+            # in the config and we don't want to crash because there are no SN
+            # in this particular image. We then default to False which might not
+            # be the right type for the required column but we have no way of knowing
+            # the correct type if the column do not exist.
+            self.logger.warning(f"The field {field} was not found in skyCatalog.")
+            return None
+        elif field not in skycat_obj.native_columns:
+            if self._dtype_dict[field] is int:
+                # There are no "special value" for integer so we default to
+                # hopefully something completely off
+                return -9999
+            elif self._dtype_dict[field] is float:
+                return np.nan
+            elif self._dtype_dict[field] is str:
+                return None
+        else:
+            return skycat_obj.get_native_attribute(field)
+
     def getObj(self, index, gsparams=None, rng=None, exptime=30):
         """
         Return the galsim object for the skyCatalog object
@@ -184,22 +255,9 @@ class SkyCatalogInterface:
         gsobjs = skycat_obj.get_gsobject_components(gsparams)
 
         # Compute the flux or get the cached value.
-        flux = (
-            skycat_obj.get_euclid_flux(self.bandpass.name, mjd=self.mjd)
-            * self.exptime
-            * euclidlike.collecting_area
-        )
+        flux = self.getFlux(index)
         if np.isnan(flux):
             return None
-
-        # if True and skycat_obj.object_type == 'galaxy':
-        #     # Apply DC2 dilation to the individual galaxy components.
-        #     for component, gsobj in gsobjs.items():
-        #         comp = component if component != 'knots' else 'disk'
-        #         a = skycat_obj.get_native_attribute(f'size_{comp}_true')
-        #         b = skycat_obj.get_native_attribute(f'size_minor_{comp}_true')
-        #         scale = np.sqrt(a/b)
-        #         gsobjs[component] = gsobj.dilate(scale)
 
         # Set up simple SED if too faint
         if flux < 40:
@@ -345,8 +403,46 @@ def SkyCatWorldPos(config, base, value_type):
     return pos, safe
 
 
+def SkyCatValue(config, base, value_type):
+
+    skycat = galsim.config.GetInputObj("sky_catalog", config, base, "SkyCatValue")
+
+    # Setup the indexing sequence if it hasn't been specified.  The
+    # normal thing with a catalog is to just use each object in order,
+    # so we don't require the user to specify that by hand.  We can do
+    # it for them.
+    galsim.config.SetDefaultIndex(config, skycat.getNObjects())
+
+    req = {"field": str, "index": int}
+    opt = {"obs_kind": str}
+    params, safe = galsim.config.GetAllParams(config, base, req=req, opt=opt)
+    field = params["field"]
+    index = params["index"]
+    obs_kind = params.get("obs_kind", None)
+
+    if field == "flux":
+        if obs_kind is None:
+            val = skycat.getFlux(index)
+        else:
+            pointing = galsim.config.GetInputObj("obseq_data", config, base, "OpSeqDataLoader")
+            filter = pointing.get("filter", obs_kind=obs_kind)
+            exptime = pointing.get("exptime", obs_kind=obs_kind)
+            mjd = pointing.get("mjd", obs_kind=obs_kind)
+            val = skycat.getFlux(index, filter=filter, exptime=exptime, mjd=mjd)
+    else:
+        val = skycat.getValue(index, field)
+
+    return val, safe
+
+
+
 RegisterInputType("sky_catalog", SkyCatalogLoader(SkyCatalogInterface, has_nobj=True))
 RegisterObjectType("SkyCatObj", SkyCatObj, input_type="sky_catalog")
 RegisterValueType(
     "SkyCatWorldPos", SkyCatWorldPos, [galsim.CelestialCoord], input_type="sky_catalog"
+)
+
+# Here we have to provide None as a type otherwise Galsim complains but I don't know why..
+RegisterValueType(
+    "SkyCatValue", SkyCatValue, [float, int, str, None]  # , input_type="sky_catalog"
 )
