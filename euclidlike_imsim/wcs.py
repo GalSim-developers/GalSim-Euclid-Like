@@ -18,6 +18,7 @@ class EuclidlikeWCS(WCSBuilder):
             "mjd": float,
         }
         opt = {
+            "saa": Angle,
             "min_sun_angle": float,
             "max_sun_angle": float,
             "force_cvz": bool,
@@ -39,6 +40,10 @@ class EuclidlikeWCS(WCSBuilder):
                 kwargs["max_sun_angle"] * galsim.degrees
             euclidlike.euclidlike_wcs.max_sun_angle = \
                 kwargs["max_sun_angle"] * galsim.degrees
+        if "saa" in kwargs:
+            SAA = kwargs["saa"]
+        else:
+            SAA = None
         pointing = CelestialCoord(ra=kwargs["ra"], dec=kwargs["dec"])
         wcs = euclidlike.getWCS(
             world_pos=pointing,
@@ -46,6 +51,7 @@ class EuclidlikeWCS(WCSBuilder):
             date=Time(kwargs["mjd"], format="mjd").datetime,
             CCDs=kwargs["CCD"],
             PA_is_FPA=True,
+            SAA=SAA,
         )[kwargs["CCD"]]
         return wcs
 
