@@ -40,10 +40,6 @@ sp3_x_pos = 70  # [mm]
 sp3_y_pos = -330  # [mm]
 
 
-def round_even(n):
-    return int(2 * np.round(n / 2))
-
-
 def make_EuclidLike_pupil_plane(N_pix=2048, do_filter=True, N_filter=3):
     # Build pupil plane
     pupil_plane = np.ones((N_pix, N_pix))
