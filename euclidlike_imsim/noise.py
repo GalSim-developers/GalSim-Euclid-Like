@@ -107,6 +107,18 @@ def get_noise(cfg_noise, cfg_image, base, logger):
 class NoiseImageBuilder(galsim.config.ExtraOutputBuilder):
 
     def initialize(self, data, scratch, config, base, logger):
+        """Do any initial setup for this builder at the start of a new output file.
+
+        The base class implementation saves two work space items into self.data and self.scratch
+        that can be used to safely communicate across multiple processes.
+
+        Parameters:
+            data:       An empty list of length nimages to use as work space.
+            scratch:    An empty dict that can be used as work space.
+            config:     The configuration field for this output object.
+            base:       The base configuration dict.
+            logger:     If given, a logger object to log progress. [default: None]
+        """
         req = {"CCD": int, "filter": str, "mjd": float, "exptime": float}
         opt = {key: bool for key in cfg_noise_key}
         ignore = galsim.config.image.image_ignore
@@ -137,7 +149,24 @@ class NoiseImageBuilder(galsim.config.ExtraOutputBuilder):
             )
 
     def processImage(self, index, obj_nums, config, base, logger):
+        """Perform any necessary processing at the end of each image construction.
 
+        This function will be called after each full image is built.
+
+        Compute the noise for the current image and add it to the image.
+        It will also create an independent noise image.
+        The code optionally subtract the background if requested.
+
+        Parameters:
+            index:      The index in self.data to use for this image.  This isn't the image_num
+                        (which can be accessed at base['image_num'] if needed), but rather
+                        an index that starts at 0 for the first image being worked on and
+                        goes up to nimages-1.
+            obj_nums:   The object numbers that were used for this image.
+            config:     The configuration field for this output object.
+            base:       The base configuration dict.
+            logger:     If given, a logger object to log progress. [default: None]
+        """
         if "noise_image" not in base.keys():
             get_noise(self.cfg_noise, config, base, logger)
 
@@ -166,7 +195,22 @@ class SkyImageBuilder(NoiseImageBuilder):
             )
 
     def processImage(self, index, obj_nums, config, base, logger):
+        """Perform any necessary processing at the end of each image construction.
 
+        This function will be called after each full image is built.
+
+        Compute the sky background and return it in an image.
+
+        Parameters:
+            index:      The index in self.data to use for this image.  This isn't the image_num
+                        (which can be accessed at base['image_num'] if needed), but rather
+                        an index that starts at 0 for the first image being worked on and
+                        goes up to nimages-1.
+            obj_nums:   The object numbers that were used for this image.
+            config:     The configuration field for this output object.
+            base:       The base configuration dict.
+            logger:     If given, a logger object to log progress. [default: None]
+        """
         if "noise_image" not in base.keys():
             get_noise(self.cfg_noise, config, base, logger)
 
@@ -183,7 +227,22 @@ class WeightImageBuilder(NoiseImageBuilder):
             )
 
     def processImage(self, index, obj_nums, config, base, logger):
+        """Perform any necessary processing at the end of each image construction.
 
+        This function will be called after each full image is built.
+
+        Compute the weight map from the noise image and return it in an image.
+
+        Parameters:
+            index:      The index in self.data to use for this image.  This isn't the image_num
+                        (which can be accessed at base['image_num'] if needed), but rather
+                        an index that starts at 0 for the first image being worked on and
+                        goes up to nimages-1.
+            obj_nums:   The object numbers that were used for this image.
+            config:     The configuration field for this output object.
+            base:       The base configuration dict.
+            logger:     If given, a logger object to log progress. [default: None]
+        """
         if "noise_image" not in base.keys():
             get_noise(self.cfg_noise, config, base, logger)
 
