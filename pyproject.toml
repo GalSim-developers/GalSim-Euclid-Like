@@ -19,7 +19,7 @@ dependencies = [
     "numpy>=1.17",
     # "galsim @ git+https://github.com/GalSim-developers/GalSim#1294_from_images",
     "astropy>=2.0",
-    "ngmix",
+    "ngmix @ git+https://github.com/esheldon/ngmix.git",
     "numba",
 ]
 
