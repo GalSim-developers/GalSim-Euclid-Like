@@ -206,6 +206,7 @@ class SkyCatalogInterface:
         flux = raw_flux * mu * exptime * euclidlike.collecting_area
 
         return flux
+
     def getValue(self, index, field):
 
         skycat_obj = self.objects[index]
