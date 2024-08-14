@@ -203,7 +203,6 @@ class SkyCatalogInterface:
             _, _, mu = skycat_obj.get_wl_params()
         else:
             mu = 1.
-        # raw_flux = skycat_obj.get_euclid_flux(filter, mjd=mjd, cache=False)
         flux = raw_flux * mu * exptime * euclidlike.collecting_area
 
         return flux
