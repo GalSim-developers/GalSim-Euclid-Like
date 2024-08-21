@@ -71,7 +71,7 @@ def get_noise(cfg_noise, cfg_image, base, logger):
     logger.debug("Adding poisson noise to sky photons")
     sky_image1 = sky_image.copy()
     sky_image1.addNoise(poisson_noise)
-    noise_img.quantize()  # In case any profiles used InterpolatedImage, in which case
+    noise_img.quantize()
     # the image won't necessarily be integers.
     noise_img += sky_image1
 
