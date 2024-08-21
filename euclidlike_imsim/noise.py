@@ -187,13 +187,6 @@ class SkyImageBuilder(NoiseImageBuilder):
                 " Either activate the noise or remove the output sky image."
             )
 
-        if self.cfg_noise["sky_subtract"]:
-            raise GalSimConfigError(
-                "You have requested the sky image but the sky will be subtracted,"
-                " it should then be zeroes."
-                " You should either not subtract the sky or remove the output sky image."
-            )
-
     def processImage(self, index, obj_nums, config, base, logger):
         """Perform any necessary processing at the end of each image construction.
 
