@@ -5,6 +5,12 @@ from astropy.time import Time
 
 import galsim
 from galsim.errors import GalSimConfigError
+from euclidlike.instrument_params import (
+    nisp_gain,
+    nisp_pixel_scale,
+    nisp_dark_current,
+    nisp_read_noise,
+)
 
 import ngmix
 
@@ -12,11 +18,6 @@ import euclidlike
 
 MIN_IMG_SIZE = 51
 MAX_IMG_SIZE = 501
-
-nisp_gain = 2  # https://arxiv.org/pdf/2405.13496 Sect 4.3.7
-nisp_pixel_scale = 0.3
-nisp_dark_current = 0.02  # e.s-1.pix-1 https://arxiv.org/pdf/2405.13493 Sect 4.1.2
-nisp_read_noise = 6.2  # e.pix-1 https://arxiv.org/pdf/2405.13496 Sect 4.3.5
 
 
 def get_good_img_size(gmix, scale):
