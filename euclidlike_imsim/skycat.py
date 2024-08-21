@@ -177,6 +177,29 @@ class SkyCatalogInterface:
         return galsim.CelestialCoord(ra * galsim.degrees, dec * galsim.degrees)
 
     def getFlux(self, index, filter=None, mjd=None, exptime=None):
+        """
+        Return the flux associated to an object.
+
+        Parameters
+        ----------
+        index : int
+            Index of the object in the self.objects catalog.
+        filter : str, optional
+            Name of the filter for which the flux is computed. If None, use the
+            filter provided during initialization. [Default: None]
+        mjd : float, optional
+            Date of the observation in MJD format. If None, use the
+            mjd provided during initialization. [Default: None]
+        exptime : int or float, optional
+            Exposure time of the observation. If None, use the
+            exptime provided during initialization. [Default: None]
+
+        Returns
+        -------
+        flux
+            Computer flux at the given date for the requested exposure time and
+            filter.
+        """
 
         if filter is None:
             filter = self.bandpass.name
@@ -208,6 +231,21 @@ class SkyCatalogInterface:
         return flux
 
     def getValue(self, index, field):
+        """
+        Return a skyCatalog value for the an object.
+
+        Parameters
+        ----------
+        index : int
+            Index of the object in the self.objects catalog.
+        field : str
+            Name of the field for which you want the value.
+
+        Returns
+        -------
+        int or float or str or None
+            The value associated to the field or None if the field do not exist.
+        """
 
         skycat_obj = self.objects[index]
 
@@ -404,6 +442,8 @@ def SkyCatWorldPos(config, base, value_type):
 
 
 def SkyCatValue(config, base, value_type):
+    """Return a value from the object part of the skyCatalog
+    """
 
     skycat = galsim.config.GetInputObj("sky_catalog", config, base, "SkyCatValue")
 

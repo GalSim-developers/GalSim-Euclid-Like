@@ -14,6 +14,13 @@ modules:
     # the globals dict it uses when evaluating Eval items, so we can tell it to import it here.
     - datetime
 
+# Variables used to request LSST flux in the output catalog
+eval_variables:
+    frubin_area:
+        type : Eval
+        str : '3.14159 * (418**2 - 255**2)'
+    frubin_exptime: 30
+
 # Define some other information about the images
 image:
 
@@ -159,3 +166,14 @@ output:
             flux: "@flux"
             mag: "@mag"
             obj_type: "@object_type"
+            gal_disk_hlr: { type: SkyCatValue, field: diskHalfLightRadiusArcsec }
+            gal_redshift: { type: SkyCatValue, field: redshift }
+            sn_host_id: { type: SkyCatValue, field: host_id }
+            lsst_flux_r:
+                type : Eval
+                fflux : { type: SkyCatValue, field: lsst_flux_r }
+                str : 'flux * rubin_exptime * rubin_area'
+            lsst_mag_r:
+                type : Eval
+                fflux : { type: SkyCatValue, field: lsst_flux_r }
+                str : "-2.5 * np.log10(@output.truth.columns.lsst_flux_r) + 28.36"
