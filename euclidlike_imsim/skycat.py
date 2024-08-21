@@ -89,18 +89,12 @@ class SkyCatalogInterface:
         )
         self._objects = None
 
-        # import os, psutil
-        # process = psutil.Process()
-        # print('skycat init',process.memory_info().rss)
-
     @property
     def objects(self):
         from skycatalogs import skyCatalogs
 
         if self._objects is None:
-            # import os, psutil
-            # process = psutil.Process()
-            # print('skycat obj 1',process.memory_info().rss)
+
             # Select objects from polygonal region bounded by CCD edges
             corners = (
                 (-self.edge_pix, -self.edge_pix),
@@ -121,9 +115,8 @@ class SkyCatalogInterface:
             )
             if not self._objects:
                 self.logger.warning("No objects found on image.")
-            # import os, psutil
-            # process = psutil.Process()
-            # print('skycat obj 2',process.memory_info().rss)
+            else:
+                self._build_dtype_dict()
         return self._objects
 
     def _build_dtype_dict(self):
@@ -389,22 +382,9 @@ class SkyCatalogInterface:
         gsobjs = skycat_obj.get_gsobject_components(gsparams)
 
         # Compute the flux or get the cached value.
-        flux = (
-            skycat_obj.get_euclid_flux(self.bandpass.name, mjd=self.mjd)
-            * self.exptime
-            * euclidlike.collecting_area
-        )
+        flux = self.getFlux(index)
         if np.isnan(flux):
             return None
-
-        # if True and skycat_obj.object_type == 'galaxy':
-        #     # Apply DC2 dilation to the individual galaxy components.
-        #     for component, gsobj in gsobjs.items():
-        #         comp = component if component != 'knots' else 'disk'
-        #         a = skycat_obj.get_native_attribute(f'size_{comp}_true')
-        #         b = skycat_obj.get_native_attribute(f'size_minor_{comp}_true')
-        #         scale = np.sqrt(a/b)
-        #         gsobjs[component] = gsobj.dilate(scale)
 
         # Set up simple SED if too faint
         if flux < 40:
