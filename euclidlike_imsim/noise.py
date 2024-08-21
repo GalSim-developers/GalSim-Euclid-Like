@@ -223,7 +223,7 @@ class WeightImageBuilder(NoiseImageBuilder):
         if self.cfg_noise["ignore_noise"]:
             raise GalSimConfigError(
                 "You cannot ignore the noise and request the weight image at the same time."
-                " Either active the noise or remove the output sky image."
+                " Either activate the noise or remove the output sky image."
             )
 
     def processImage(self, index, obj_nums, config, base, logger):
