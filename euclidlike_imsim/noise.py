@@ -184,7 +184,7 @@ class SkyImageBuilder(NoiseImageBuilder):
         if self.cfg_noise["ignore_noise"]:
             raise GalSimConfigError(
                 "You cannot ignore the noise and request the sky image at the same time."
-                " Either active the noise or remove the output sky image."
+                " Either activate the noise or remove the output sky image."
             )
 
         if self.cfg_noise["sky_subtract"]:
