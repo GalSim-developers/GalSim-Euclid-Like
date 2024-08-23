@@ -1,5 +1,5 @@
 ## Reference
-* `euclid_obseq.pkl` contains the observation sequence for Euclid in pandas DataFrame format. It makes use of MultiIndex system to access the 5 kinds of observation for each pointing. See (Scaramella et al.)[https://arxiv.org/pdf/2108.01201] Fig. 8 for an illustration of the observation sequence (the timing used here a slightly different). 
+* `euclid_obseq.pkl` contains the observation sequence for Euclid in pandas DataFrame format. It makes use of MultiIndex system to access the 5 kinds of observation for each pointing. See (Scaramella et al.)[https://arxiv.org/pdf/2108.01201] Fig. 8 for an illustration of the observation sequence (the timings used here are slightly different). 
 It looks like:
 ```python
                          date  exptime      ra     dec      pa     saa  filter   date_euclid  obs_id  pointing_id  patch_id  dither_id  line_obseq
