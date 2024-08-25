@@ -1,10 +1,11 @@
+import os
 import galsim
 import numpy as np
 from galsim import roman
 import astropy.io.fits as pyfits
 from importlib.resources import files
-
-from . import n_ccd, n_pix_col, n_pix_row, pixel_scale, diameter, obscuration
+from galsim.utilities import LRU_Cache
+from . import n_ccd, n_pix_col, n_pix_row, pixel_scale, diameter, obscuration, det2ccd
 from .bandpass import getBandpasses
 
 """
@@ -14,36 +15,53 @@ Part of the Euclid-like simulation module. This file includes routines needed
 to define a Euclid-like PSF.
 """
 
+script_dir = os.path.dirname(__file__)
+meta_dir = os.path.join(script_dir, 'data/monopsfs_euclidlike')
 effective_wave = 718.0867202226793  # in nm, potentially need to change
+#read wavelengths sampled for PSF
+wave_file = files("euclidlike.data").joinpath('psf_wavelengths.dat')
+wave_list = np.genfromtxt(wave_file)
 
 
-def get_euclid_wavelength_psf():
-    """ This function get the oversampled PSF image as a function of wavelength
-    from Lance as an input the Euclid-like simulation
-    """
-    # NOTE: We do not have PSF variation
-    psf_file = files("euclidlike.data").joinpath("monopsfs_6_6.fits.gz")
+
+def _make_psf_list(psf_file):
     image_array = pyfits.getdata(psf_file)
-    # get wavelengths directly from data
-    wave_data = pyfits.getdata(psf_file, 1)
-    # factor of 1e3 to convert from micrometer to nm
-    wave_list = np.hstack(wave_data)*1e3
-    # The following are the values for the data from Lance Miller
-    nsample = len(wave_list)
     scale = pixel_scale/3  # images are oversampled by a factor of 3
     im_list = []
+    nsample = len(image_array )
     for i in range(nsample):
         im_list.append(
             galsim.Image(image_array[i], scale=scale)
         )
-    return wave_list, im_list
+    return im_list
+
+def _get_quadrant_psf(ccd, psf_dir):
+    ccd_ID = det2ccd[ccd]
+    row, col = int(ccd_ID[0]), int(ccd_ID[2])
+    # get ccd quadrant IDs
+    lu = str(row*2 - 1) + '_' + str(col*2 -1)
+    ll = str(row*2 - 1) + '_' + str(col*2)
+    uu = str(row*2) + '_' + str(col*2 - 1)
+    ul = str(row*2 ) + '_' + str(col*2 )
+    quadrants = [ll, lu, ul, uu]
+    tags = ["ll", "lu", "ul", "uu"]
+    tag_idx = []
+    psf_images = {}
+    for tag, CCD_quad in tuple(zip(tags,quadrants)):
+        #psf_file = files("euclidlike.data").joinpath("monopsfs_euclidlike/monopsfs_"+ CCD_quad + ".fits.gz")
+        psf_file = os.path.join(psf_dir, "monopsfs_"+ CCD_quad + ".fits.gz")
+        psf_images[tag] = _make_psf_list(psf_file)
+    return psf_images
+
+    
+_get_quadrant_psf = LRU_Cache(_get_quadrant_psf)
 
 
 def getPSF(
         ccd, bandpass,
         ccd_pos=None, wcs=None,
         wavelength=None, gsparams=None,
-        logger=None
+        logger=None, psf_dir = None
 ):
     """Get a single PSF for Euclid like simulation.
 
@@ -53,6 +71,9 @@ def getPSF(
     some reflections in the spider pattern and possibly some boxiness at the
     outskirts of the PSF.  Using ``gsparams =
     GSParams(folding_threshold=1.e-4)`` generally provides good results.
+    Note that before using, the oversampled PSF images used to create the
+    PSF model need to be downloaded. This can be done using the terminal
+    comman `euclidlike_download_psf`.
 
     Args:
     ccd (int):  Single value specifying the ccd for which the PSF should be
@@ -75,6 +96,8 @@ def getPSF(
         effective wavelength of that bandpass. [default: None]
     gsparams:  An optional GSParams argument.  See the docstring for GSParams
         for details. [default: None]
+    psf_dir (str): Directory where sampled PSF images can be accessed. If not
+        given, look in ./data directory. [default: None] 
 
     Returns:
         A single PSF object (either an InterpolatedChromaticObject or an
@@ -95,9 +118,11 @@ def getPSF(
         raise TypeError(
             "wavelength should either be a Bandpass, float, or None."
         )
+    if psf_dir is None:
+        psf_dir = meta_dir
 
     # Now get psf model
-    psf = _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength, gsparams)
+    psf = _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength,psf_dir, gsparams)
     # Apply WCS.
     # The current version is in arcsec units, but oriented parallel to the
     # image coordinates. So to apply the right WCS, project to pixels using the
@@ -192,17 +217,23 @@ def getBrightPSF(
     return psf
 
 
-
-def _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength, gsparams):
+def _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength,psf_dir, gsparams):
     """
     Routine for making a single PSF.  This gets called by `getPSF` after it
     parses all the options that were passed in.  Users will not directly
     interact with this routine.
     """
 
-    wave_list, im_list = get_euclid_wavelength_psf()
+    psf_ims = _get_quadrant_psf(ccd, psf_dir)
+    quad_row = 'l'
+    quad_col = 'l'
+    if ccd_pos.y > n_pix_row/2:
+        quad_row = 'u'
+    if ccd_pos.x > n_pix_col/2:
+        quad_col = 'u'
+    quad_pos = quad_col + quad_row 
     # instantiate psf object from list of images and wavelengths
-    psf_obj = galsim.InterpolatedChromaticObject.from_images(im_list, wave_list, gsparams = gsparams)
+    psf_obj = galsim.InterpolatedChromaticObject.from_images(psf_ims[quad_pos], wave_list, gsparams = gsparams)
     if wavelength is not None:
         if isinstance(wavelength, galsim.Bandpass):
             wave = wavelength.effective_wavelength

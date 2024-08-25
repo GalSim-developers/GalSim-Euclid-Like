@@ -59,6 +59,12 @@ $ python
 >>> import euclidlike
 >>> euclidlike.getBandpasses()
 ```
+## Downloading relevant data
+The Euclid-like PSF is constructed from images sampled across position and wavelength. To use the PSF functions within `GalSim-Euclidlike`, the images must be downloaded by running:
+```
+euclidlike_download_psf
+```
+in the terminal after instalation of `GalSim-Euclidlike`. To install in an alternative directory to the default, use the `--dir` argument. 
 
 ## Getting started
 

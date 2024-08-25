@@ -20,20 +20,16 @@ class EuclidlikePSF(object):
     ):
 
         logger = galsim.config.LoggerWrapper(logger)
-
         if n_waves == -1:
-            if bpass.name == "W146":
-                n_waves = 10
-            else:
-                n_waves = 5
+            n_waves = 5
 
         corners = [
             galsim.PositionD(1, 1),
-            galsim.PositionD(1, euclidlike.n_pix_col),
-            galsim.PositionD(euclidlike.n_pix_row, 1),
-            galsim.PositionD(euclidlike.n_pix_row, euclidlike.n_pix_col),
+            galsim.PositionD(1, euclidlike.n_pix_row),
+            galsim.PositionD(euclidlike.n_pix_col, 1),
+            galsim.PositionD(euclidlike.n_pix_col, euclidlike.n_pix_row),
         ]
-        cc = galsim.PositionD(euclidlike.n_pix_row / 2, euclidlike.n_pix_col / 2)
+        cc = galsim.PositionD(euclidlike.n_pix_col / 2, euclidlike.n_pix_row/ 2)
         tags = ["ll", "lu", "ul", "uu"]
         self.PSF = {}
         pupil_bin = 8
@@ -108,33 +104,35 @@ class EuclidlikePSF(object):
     def getPSF(self, pupil_bin, pos):
         """
         Return a PSF to be convolved with sources.
+        PSF is sampled at 4 quadrants for each CCD. Returned PSF
+        corresponds to that of the quadrant of the CCD position.
 
         @param [in] what pupil binning to request.
         """
+        ## For now no interpolation is used
+        #wll = (euclidlike.n_pix_col - pos.x) * (euclidlike.n_pix_row - pos.y)
+        #wlu = (euclidlike.n_pix_col - pos.x) * (pos.y - 1)
+        #wul = (pos.x - 1) * (euclidlike.n_pix_row - pos.y)
+        #wuu = (pos.x - 1) * (pos.y - 1)
+        #return (
+        #    wll * psf["ll"] + wlu * psf["lu"] + wul * psf["ul"] + wuu * psf["uu"]
+        #) / ((euclidlike.n_pix_row - 1) * (euclidlike.n_pix_col - 1))
 
-        # temporary
-        # psf = self.PSF[pupil_bin]['ll']
-        # if ((pos.x-roman.n_pix)**2+(pos.y-roman.n_pix)**2)<((pos.x-1)**2+(pos.y-1)**2):
-        #     psf = self.PSF[pupil_bin]['uu']
-        # if ((pos.x-1)**2+(pos.y-roman.n_pix)**2)<((pos.x-roman.n_pix)**2+(pos.y-roman.n_pix)**2):
-        #     psf = self.PSF[pupil_bin]['lu']
-        # if ((pos.x-roman.n_pix)**2+(pos.y-1)**2)<((pos.x-1)**2+(pos.y-roman.n_pix)**2):
-        #     psf = self.PSF[pupil_bin]['ul']
-        # if ((pos.x-roman.n_pix/2)**2+(pos.y-roman.n_pix/2)**2)<((pos.x-roman.n_pix)**2+(pos.y-1)**2):
-        #     psf = self.PSF[pupil_bin]['cc']
-        # return psf
 
         psf = self.PSF[pupil_bin]
         if pupil_bin != 8:
             return psf
 
-        wll = (euclidlike.n_pix_col - pos.x) * (euclidlike.n_pix_row - pos.y)
-        wlu = (euclidlike.n_pix_col - pos.x) * (pos.y - 1)
-        wul = (pos.x - 1) * (euclidlike.n_pix_row - pos.y)
-        wuu = (pos.x - 1) * (pos.y - 1)
-        return (
-            wll * psf["ll"] + wlu * psf["lu"] + wul * psf["ul"] + wuu * psf["uu"]
-        ) / ((euclidlike.n_pix_row - 1) * (euclidlike.n_pix_col - 1))
+        quad_row = 'l'
+        quad_col = 'l'
+        if pos.y > euclidlike.n_pix_row/2:
+            quad_row = 'u'
+        if pos.x > euclidlike.n_pix_col/2:
+            quad_col = 'u'   
+        quad_pos = quad_col + quad_row
+        return psf[quad_pos]
+        
+
 
 
 class PSFLoader(InputLoader):

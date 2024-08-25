@@ -46,7 +46,7 @@ class ObSeqDataLoader(object):
         self.ob["ra"] = ob["ra"] * galsim.degrees
         self.ob["dec"] = ob["dec"] * galsim.degrees
         self.ob["pa"] = ob["pa"] * galsim.degrees
-        self.ob["saa"] = ob["saa"] * galsim.degrees
+        #self.ob["saa"] = ob["saa"] * galsim.degrees
         self.ob["date"] = Time(ob["date"], format="mjd").datetime
         self.ob["mjd"] = ob["date"]
         self.ob["filter"] = ob["filter"]
