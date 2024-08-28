@@ -122,8 +122,9 @@ gal:
 
 input:
     obseq_data:
-        file_name: euclidlike/data/euclid_obseq.fits
+        file_name: euclidlike_imsim/data/euclid_obseq.pkl
         visit: 10307
+        obs_kind: "VIS_LONG"
         CCD: '@image.CCD'
     euclidlike_psf:
         CCD: '@image.CCD'

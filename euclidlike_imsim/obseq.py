@@ -1,21 +1,36 @@
 from astropy.time import Time
-import fitsio as fio
+import pandas as pd
 import galsim
 import galsim.config
 from galsim.angle import Angle
 from galsim.config import InputLoader, RegisterValueType, RegisterInputType
+from galsim.errors import GalSimConfigValueError
 
+
+OBS_KIND = [
+    "VIS_LONG",
+    "VIS_SHORT",
+    "NISP_J",
+    "NISP_H",
+    "NISP_Y",
+]
 
 class ObSeqDataLoader(object):
     """Read the exposure information from the observation sequence."""
 
-    _req_params = {"file_name": str, "visit": int, "CCD": int}
+    _req_params = {"file_name": str, "visit": int, "obs_kind": str, "CCD": int}
 
-    def __init__(self, file_name, visit, CCD, logger=None):
+    def __init__(self, file_name, visit, obs_kind, CCD, logger=None):
         self.logger = galsim.config.LoggerWrapper(logger)
         self.file_name = file_name
         self.visit = visit
         self.ccd = CCD
+
+        if obs_kind not in OBS_KIND:
+            raise GalSimConfigValueError(
+                "Invalid obs_kind.", obs_kind, OBS_KIND
+            )
+        self.obs_kind = obs_kind
 
         # try:
         self.read_obseq()
@@ -38,34 +53,53 @@ class ObSeqDataLoader(object):
             "Reading info from obseq file %s for visit %s", self.file_name, self.visit
         )
 
-        ob = fio.FITS(self.file_name)[-1][self.visit]
+        ob = pd.read_pickle(self.file_name).loc[self.visit]
 
         self.ob = {}
-        self.ob["visit"] = self.visit
-        self.ob["ccd"] = self.ccd
-        self.ob["ra"] = ob["ra"] * galsim.degrees
-        self.ob["dec"] = ob["dec"] * galsim.degrees
-        self.ob["pa"] = ob["pa"] * galsim.degrees
-        self.ob["saa"] = ob["saa"] * galsim.degrees
-        self.ob["date"] = Time(ob["date"], format="mjd").datetime
-        self.ob["mjd"] = ob["date"]
-        self.ob["filter"] = ob["filter"]
-        self.ob["exptime"] = ob["exptime"]
+        for obs_kind in OBS_KIND:
+            _ob = {}
+            _ob["visit"] = self.visit
+            _ob["ccd"] = self.ccd
+            _ob["ra"] = ob.loc[obs_kind]["ra"] * galsim.degrees
+            _ob["dec"] = ob.loc[obs_kind]["dec"] * galsim.degrees
+            _ob["pa"] = ob.loc[obs_kind]["pa"] * galsim.degrees
+            _ob["saa"] = ob.loc[obs_kind]["saa"] * galsim.degrees
+            _ob["date"] = Time(ob.loc[obs_kind]["date"], format="mjd").datetime
+            _ob["mjd"] = ob.loc[obs_kind]["date"]
+            _ob["filter"] = ob.loc[obs_kind]["filter"]
+            _ob["exptime"] = ob.loc[obs_kind]["exptime"]
+            self.ob[obs_kind] = _ob
 
-    def get(self, field, default=None):
-        if field not in self.ob and default is None:
+    def get(self, field, default=None, obs_kind=None):
+
+        if obs_kind is None:
+            obs_kind = self.obs_kind
+        else:
+            if obs_kind not in OBS_KIND:
+                raise KeyError(
+                    f"OpsimData obs_kind {obs_kind} not present in ob, "
+                    f"must be in {OBS_KIND}."
+                )
+        ob = self.ob[obs_kind]
+
+        if field not in ob and default is None:
             raise KeyError("OpsimData field %s not present in ob" % field)
-        return self.ob.get(field, default)
+
+        return ob.get(field, default)
 
 
 def ObSeqData(config, base, value_type):
     """Returns the obseq data for a pointing."""
     pointing = galsim.config.GetInputObj("obseq_data", config, base, "OpSeqDataLoader")
-    req = {"field": str}
-    kwargs, safe = galsim.config.GetAllParams(config, base, req=req)
-    field = kwargs["field"]
 
-    val = value_type(pointing.get(field))
+    req = {"field": str}
+    opt = {"obs_kind": str}
+
+    kwargs, safe = galsim.config.GetAllParams(config, base, req=req, opt=opt)
+    field = kwargs["field"]
+    obs_kind = kwargs.get("obs_kind", None)
+
+    val = value_type(pointing.get(field, obs_kind=obs_kind))
     return val, safe
 
 
