@@ -107,15 +107,6 @@ stamp:
     #     -
     #         type: ChargeDiff
 
-# psf:
-#     type: euclidlike_psf
-#     # If omitted, it would figure this out automatically, because we are using the EuclidlikeCCD image
-#     # type.  But if we weren't, you'd have to tell it which CCD to build the PSF for.
-#     CCD: '@image.CCD'
-#     # n_waves defines how finely to sample the PSF profile over the bandpass.
-#     # Using 10 wavelengths usually gives decent accuracy.
-#     n_waves: 10
-
 # Define the galaxy type and positions to use
 gal:
     type: SkyCatObj
@@ -147,6 +138,36 @@ output:
             - { type: ObSeqData, field: filter }
             - { type: ObSeqData, field: visit }
             - '@image.CCD'
+
+    noise_image:
+        dir: /path/to/output/noise_images
+        file_name:
+            type: FormattedStr
+            format: "Euclidlike_WAS_truth_%s_%i_%i.noise.fits.gz"
+            items:
+                - { type: ObSeqData, field: filter }
+                - { type: ObSeqData, field: visit }
+                - '@image.CCD'
+
+    sky_image:
+        dir: /path/to/output/sky_images
+        file_name:
+            type: FormattedStr
+            format: "Euclidlike_WAS_truth_%s_%i_%i.sky.fits.gz"
+            items:
+                - { type: ObSeqData, field: filter }
+                - { type: ObSeqData, field: visit }
+                - '@image.CCD'
+
+    weight_image:
+        dir: /path/to/output/weight_images
+        file_name:
+            type: FormattedStr
+            format: "Euclidlike_WAS_truth_%s_%i_%i.weight.fits.gz"
+            items:
+                - { type: ObSeqData, field: filter }
+                - { type: ObSeqData, field: visit }
+                - '@image.CCD'
 
     truth:
         dir: /path/to/output/truth
