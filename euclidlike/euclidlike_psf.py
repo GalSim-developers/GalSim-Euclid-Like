@@ -35,26 +35,25 @@ def _make_psf_list(psf_file):
         )
     return im_list
 
-def _get_quadrant_psf(ccd, psf_dir):
+def __get_quadrant_psf(ccd, bandpass, psf_dir):
     ccd_ID = det2ccd[ccd]
-    row, col = int(ccd_ID[0]), int(ccd_ID[2])
+    col, row = int(ccd_ID[0]), int(ccd_ID[2])
     # get ccd quadrant IDs
-    lu = str(row*2 - 1) + '_' + str(col*2 -1)
-    ll = str(row*2 - 1) + '_' + str(col*2)
-    uu = str(row*2) + '_' + str(col*2 - 1)
-    ul = str(row*2 ) + '_' + str(col*2 )
+    lu = str(col*2 - 1) + '_' + str(row*2 -1)
+    ll = str(col*2 - 1) + '_' + str(row*2)
+    uu = str(col*2) + '_' + str(row*2 - 1)
+    ul = str(col*2 ) + '_' + str(row*2 )
     quadrants = [ll, lu, ul, uu]
-    tags = ["ll", "lu", "ul", "uu"]
+    tags = ["ll", "lu", "ul", "uu"] # ll = lower left, lu = top left, ul = lower right, uu = top right
     tag_idx = []
     psf_images = {}
     for tag, CCD_quad in tuple(zip(tags,quadrants)):
-        #psf_file = files("euclidlike.data").joinpath("monopsfs_euclidlike/monopsfs_"+ CCD_quad + ".fits.gz")
         psf_file = os.path.join(psf_dir, "monopsfs_"+ CCD_quad + ".fits.gz")
         psf_images[tag] = _make_psf_list(psf_file)
     return psf_images
 
     
-_get_quadrant_psf = LRU_Cache(_get_quadrant_psf)
+_get_quadrant_psf = LRU_Cache(__get_quadrant_psf)
 
 
 def getPSF(
@@ -71,13 +70,21 @@ def getPSF(
     some reflections in the spider pattern and possibly some boxiness at the
     outskirts of the PSF.  Using ``gsparams =
     GSParams(folding_threshold=1.e-4)`` generally provides good results.
+    
     Note that before using, the oversampled PSF images used to create the
     PSF model need to be downloaded. This can be done using the terminal
-    comman `euclidlike_download_psf`.
+    command `euclidlike_download_psf`. The images are sampled at the 4 quadrant
+    centers of each CCD and at 17 discrete wavelengths.
+    The `ccd` argument refers to the detector ID (integer between 0-35),
+    not the focal plane position (in format column-row). The sampled
+    PSF images are stored using the focal plane position format. Therefore,
+    we convert the CCD detector ID to the appropiate focal plane position
+    internally.
+    
 
     Args:
-    ccd (int):  Single value specifying the ccd for which the PSF should be
-        loaded.
+    ccd (int):  Single value specifying the ccd detector for which the PSF
+        should be loaded.
     bandpass (str): Single string specifying the bandpass to use when
         defining the pupil plane configuration and/or interpolation of
         chromatic PSFs.
@@ -224,7 +231,10 @@ def _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength,psf_dir, gsparams):
     interact with this routine.
     """
 
-    psf_ims = _get_quadrant_psf(ccd, psf_dir)
+    psf_ims = _get_quadrant_psf(ccd,bandpass, psf_dir)
+    # key: ll = lower left, lu = top left, ul = lower right, uu = top right
+    # if position lies within the dividing line between quadrants, default
+    # is to pick the quadrant center below and/or to the left of the boundary
     quad_row = 'l'
     quad_col = 'l'
     if ccd_pos.y > n_pix_row/2:

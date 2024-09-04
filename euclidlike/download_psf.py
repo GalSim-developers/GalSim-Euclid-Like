@@ -430,6 +430,12 @@ def download_psf(args, logger):
     # link_dir is the directory where this would normally have been unpacked.
     # unpack_dir is the directory that the tarball will unpack into.
 
+    # caution about storage and ask user if they want to proceed.
+    q = "You are about to download 4Gb, do you want to proceed?"
+    yn = query_yes_no(q, default='no')
+    if yn == 'no':
+        return
+
     url, target, target_dir, link_dir, unpack_dir, do_link = get_names(args, logger)
 
     meta = get_meta(url, args, logger)

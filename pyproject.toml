@@ -39,4 +39,5 @@ include-package-data = true
   "data/*.fits.gz",
 ]
 [project.scripts]
+
 euclidlike_download_psf = "euclidlike.download_psf:run_main"
