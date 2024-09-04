@@ -7,7 +7,7 @@ import shutil
 from unittest import mock
 import galsim
 import euclidlike
-import euclidlike.download_psf  # Not imported automatically
+import scripts.download_psf  # Not imported automatically
 from galsim.utilities import  timer
 from numpy.testing import assert_raises
 
