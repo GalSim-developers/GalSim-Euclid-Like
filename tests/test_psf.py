@@ -8,10 +8,10 @@ from euclidlike import (
 )
 
 
-script_dir = os.path.dirname(__file__)
-psf_dir = os.path.join(script_dir, 'psfs') # directory for psfs, monopsfs_6_6.fits.gz is real, the rest are symlinks to this one for testin
+#script_dir = os.path.dirname(__file__)
+#psf_dir = os.path.join(script_dir, 'psfs') # directory for psfs, monopsfs_6_6.fits.gz is real, the rest are symlinks to this one for testin
 
-
+psf_dir = 'psfs'
 def test_get_psf_function():
     euc_bp = euclidlike.getBandpasses()['VIS']
     euc_bp.red_limit = 910
