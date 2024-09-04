@@ -11,4 +11,3 @@ from .euclidlike_psf import (
    getPSF, getBrightPSF
 )
 from .backgrounds import getSkyLevel
-from . import download_psf
