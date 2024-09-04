@@ -15,8 +15,8 @@ from galsim.utilities import ensure_dir
 from galsim.main import make_logger
 
 script_name = 'euclidlike_download_psf'
-script_dir = os.path.dirname(__file__)
-share_dir = os.path.join(script_dir, 'data')
+data_dir = '../euclidlike/'
+share_dir = os.path.join(data_dir, 'data')
 
 def parse_args(command_args):
     """Handle the command line arguments using either argparse (if available) or optparse.
