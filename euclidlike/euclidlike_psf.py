@@ -7,6 +7,7 @@ from importlib.resources import files
 from galsim.utilities import LRU_Cache
 from . import n_ccd, n_pix_col, n_pix_row, pixel_scale, diameter, obscuration, det2ccd
 from .bandpass import getBandpasses
+from galsim.config import LoggerWrapper
 
 """
 @file euclidlike_psf.py
@@ -127,9 +128,18 @@ def getPSF(
         )
     if psf_dir is None:
         psf_dir = meta_dir
+        
+    #check if psf directory exists     
+    if not os.path.isdir(psf_dir):
+        raise FileNotFoundError(
+            "The directory %s does not exist. Make sure you have downloaded the PSF images. " 
+            "This can be done by running the command `euclidlike_download_psf` in the terminal." % psf_dir
+        )
 
+    logger = LoggerWrapper(logger)
+    logger.debug('Loading PSF images from: ' + psf_dir)
     # Now get psf model
-    psf = _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength,psf_dir, gsparams)
+    psf = _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength,psf_dir, gsparams, logger)
     # Apply WCS.
     # The current version is in arcsec units, but oriented parallel to the
     # image coordinates. So to apply the right WCS, project to pixels using the
@@ -224,7 +234,7 @@ def getBrightPSF(
     return psf
 
 
-def _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength,psf_dir, gsparams):
+def _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength,psf_dir, gsparams, logger):
     """
     Routine for making a single PSF.  This gets called by `getPSF` after it
     parses all the options that were passed in.  Users will not directly
@@ -242,6 +252,7 @@ def _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength,psf_dir, gsparams):
     if ccd_pos.x > n_pix_col/2:
         quad_col = 'u'
     quad_pos = quad_col + quad_row 
+    logger.debug('CCD position in quadrant ' + quad_pos)
     # instantiate psf object from list of images and wavelengths
     psf_obj = galsim.InterpolatedChromaticObject.from_images(psf_ims[quad_pos], wave_list, gsparams = gsparams)
     if wavelength is not None:

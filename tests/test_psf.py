@@ -8,10 +8,10 @@ from euclidlike import (
 )
 
 
-#script_dir = os.path.dirname(__file__)
-#psf_dir = os.path.join(script_dir, 'psfs') # directory for psfs, monopsfs_6_6.fits.gz is real, the rest are symlinks to this one for testin
+script_dir = os.path.dirname(__file__)
+psf_dir = os.path.join(script_dir, 'psfs') # directory for psfs, monopsfs_6_6.fits.gz is real, the rest are symlinks to this one for testin
 
-psf_dir = './psfs'
+#psf_dir = './psfs'
 def test_get_psf_function():
     euc_bp = euclidlike.getBandpasses()['VIS']
     euc_bp.red_limit = 910
@@ -20,7 +20,7 @@ def test_get_psf_function():
     
     wave_file = files("euclidlike.data").joinpath('psf_wavelengths.dat')
     wave_list = np.genfromtxt(wave_file)
-    psf_file = os.path.join(psf_dir, "monopsfs_6_6.fits.gz")
+    psf_file = os.path.join(psf_dir, "monopsfs_5_4.fits.gz")
     psfobjs = euclidlike.euclidlike_psf._make_psf_list(psf_file)
     wave = wave_list[9]  # random wavelength from oversampled images
     trueobj = psfobjs[9]
