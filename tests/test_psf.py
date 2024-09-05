@@ -6,6 +6,7 @@ from importlib.resources import files
 from euclidlike import (
       getPSF, getBrightPSF
 )
+import astropy.io.fits as pyfits
 
 
 script_dir = os.path.dirname(__file__)
@@ -24,8 +25,15 @@ def test_get_psf_function():
     psfobjs = euclidlike.euclidlike_psf._make_psf_list(psf_file)
     contents = os.listdir(psf_dir)
     print("Contents of directory:")
+    pyfits.getdata(psf_file)
     for item in contents:
-        print(item)
+        file_path = os.path.join(psf_dir, contents)
+        if os.path.exists(file_path):
+            print(f"The file '{file_path}' exists.")
+            content = pyfits.getdata(psf_file)
+        else:
+            print(f"The file '{file_path}' does not exist.")
+                #print(item)
     wave = wave_list[9]  # random wavelength from oversampled images
     trueobj = psfobjs[9]
     psfobj = getPSF(ccd=7, bandpass="VIS", wavelength=wave, psf_dir = psf_dir)
