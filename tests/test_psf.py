@@ -20,8 +20,12 @@ def test_get_psf_function():
     
     wave_file = files("euclidlike.data").joinpath('psf_wavelengths.dat')
     wave_list = np.genfromtxt(wave_file)
-    psf_file = os.path.join(psf_dir, "monopsfs_6_7.fits.gz")
+    psf_file = os.path.join(psf_dir, "monopsfs_6_6.fits.gz")
     psfobjs = euclidlike.euclidlike_psf._make_psf_list(psf_file)
+    contents = os.listdir(psf_dir)
+    print("Contents of directory:")
+    for item in contents:
+        print(item)
     wave = wave_list[9]  # random wavelength from oversampled images
     trueobj = psfobjs[9]
     psfobj = getPSF(ccd=7, bandpass="VIS", wavelength=wave, psf_dir = psf_dir)
