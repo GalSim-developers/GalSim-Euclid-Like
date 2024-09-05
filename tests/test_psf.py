@@ -27,7 +27,7 @@ def test_get_psf_function():
     print("Contents of directory:")
     pyfits.getdata(psf_file)
     for item in contents:
-        file_path = os.path.join(psf_dir, contents)
+        file_path = os.path.join(psf_dir, item)
         if os.path.exists(file_path):
             print(f"The file '{file_path}' exists.")
             content = pyfits.getdata(psf_file)
