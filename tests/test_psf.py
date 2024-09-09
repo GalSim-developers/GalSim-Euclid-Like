@@ -25,8 +25,8 @@ def test_get_psf_function():
     psfobjs = euclidlike.euclidlike_psf._make_psf_list(psf_file)
 
     ## testing symlink failure
-    #os.symlink(target_file, symlink_file)
-    psfobjs = euclidlike.euclidlike_psf._make_psf_list("psfs/monopsfs_6_6.fits.gz")
+    os.symlink(psf_file, "psfs/monopsfs_6_5.fits.gz")
+    psfobjs = euclidlike.euclidlike_psf._make_psf_list("psfs/monopsfs_6_5.fits.gz")
     contents = os.listdir(psf_dir)
     print("Contents of directory:")
     pyfits.getdata(psf_file)
