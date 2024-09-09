@@ -7,7 +7,7 @@ import shutil
 from unittest import mock
 import galsim
 import euclidlike
-import scripts.download_psf  # Not imported automatically
+import scripts.download_psf as download_psf  # Not imported automatically
 from galsim.utilities import  timer
 from numpy.testing import assert_raises
 
@@ -20,10 +20,10 @@ def test_args():
     # -h prints description and exits
     print('This should print the description...')  # Can only check by inspection, not assert
     with assert_raises(SystemExit):
-        args = euclidlike.download_psf.parse_args(['-h'])
+        args = download_psf.parse_args(['-h'])
 
     # Check defaults:
-    args = euclidlike.download_psf.parse_args([])
+    args = download_psf.parse_args([])
     assert args.verbosity == 2
     assert args.force is False
     assert args.quiet is False
@@ -33,25 +33,25 @@ def test_args():
     assert args.nolink is False
 
     # Check setting each of those to be something else
-    args = euclidlike.download_psf.parse_args(['-v', '3'])
+    args = download_psf.parse_args(['-v', '3'])
     assert args.verbosity == 3
-    args = euclidlike.download_psf.parse_args(['-v', '0'])
+    args = download_psf.parse_args(['-v', '0'])
     assert args.verbosity == 0
 
-    args = euclidlike.download_psf.parse_args(['-f'])
+    args = download_psf.parse_args(['-f'])
     assert args.force is True
 
-    args = euclidlike.download_psf.parse_args(['-q'])
+    args = download_psf.parse_args(['-q'])
     assert args.quiet is True
 
-    args = euclidlike.download_psf.parse_args(['-u'])
+    args = download_psf.parse_args(['-u'])
     assert args.unpack is True
 
-    args = euclidlike.download_psf.parse_args(['--save'])
+    args = download_psf.parse_args(['--save'])
     assert args.save is True
 
 
-    args = euclidlike.download_psf.parse_args(['--nolink'])
+    args = download_psf.parse_args(['--nolink'])
     assert args.nolink is True
 
     # Some invalid parameters
@@ -59,9 +59,9 @@ def test_args():
     sys_stderr = sys.stderr
     sys.stderr = sys.stdout
     with assert_raises(SystemExit):
-        euclidlike.download_psf.parse_args(['-v', '-1'])
+        download_psf.parse_args(['-v', '-1'])
     with assert_raises(SystemExit):
-        euclidlike.download_psf.parse_args(['-v', '4'])
+        download_psf.parse_args(['-v', '4'])
     sys.stderr = sys_stderr
 
 # global for the bleh and delay functions
@@ -73,7 +73,7 @@ def test_query():
 
     Need to mock the input function for this
     """
-    from euclidlike.download_psf import query_yes_no
+    from download_psf import query_yes_no
 
     def bleh():
         global count
@@ -90,45 +90,45 @@ def test_query():
         count += 1
         return 'n' if count % 5 == 0 else ''
 
-    with mock.patch('euclidlike.download_psf.get_input', return_value='y'):
+    with mock.patch('download_psf.get_input', return_value='y'):
         assert query_yes_no('', 'yes') == 'yes'
-    with mock.patch('euclidlike.download_psf.get_input', return_value='yes'):
+    with mock.patch('download_psf.get_input', return_value='yes'):
         assert query_yes_no('', 'yes') == 'yes'
-    with mock.patch('euclidlike.download_psf.get_input', return_value='n'):
+    with mock.patch('download_psf.get_input', return_value='n'):
         assert query_yes_no('', 'yes') == 'no'
-    with mock.patch('euclidlike.download_psf.get_input', return_value='no'):
+    with mock.patch('download_psf.get_input', return_value='no'):
         assert query_yes_no('', 'yes') == 'no'
-    with mock.patch('euclidlike.download_psf.get_input', return_value=''):
+    with mock.patch('download_psf.get_input', return_value=''):
         assert query_yes_no('', 'yes') == 'yes'
-    with mock.patch('euclidlike.download_psf.get_input', bleh):
+    with mock.patch('download_psf.get_input', bleh):
         assert query_yes_no('', 'yes') == 'yes'
 
-    with mock.patch('euclidlike.download_psf.get_input', return_value='y'):
+    with mock.patch('download_psf.get_input', return_value='y'):
         assert query_yes_no('', 'no') == 'yes'
-    with mock.patch('euclidlike.download_psf.get_input', return_value='yes'):
+    with mock.patch('download_psf.get_input', return_value='yes'):
         assert query_yes_no('', 'no') == 'yes'
-    with mock.patch('euclidlike.download_psf.get_input', return_value='n'):
+    with mock.patch('download_psf.get_input', return_value='n'):
         assert query_yes_no('', 'no') == 'no'
-    with mock.patch('euclidlike.download_psf.get_input', return_value='no'):
+    with mock.patch('download_psf.get_input', return_value='no'):
         assert query_yes_no('', 'no') == 'no'
-    with mock.patch('euclidlike.download_psf.get_input', return_value=''):
+    with mock.patch('download_psf.get_input', return_value=''):
         assert query_yes_no('', 'no') == 'no'
-    with mock.patch('euclidlike.download_psf.get_input', bleh):
+    with mock.patch('download_psf.get_input', bleh):
         assert query_yes_no('', 'yes') == 'yes'
 
-    with mock.patch('euclidlike.download_psf.get_input', return_value='y'):
+    with mock.patch('download_psf.get_input', return_value='y'):
         assert query_yes_no('', None) == 'yes'
-    with mock.patch('euclidlike.download_psf.get_input', return_value='yes'):
+    with mock.patch('download_psf.get_input', return_value='yes'):
         assert query_yes_no('', None) == 'yes'
-    with mock.patch('euclidlike.download_psf.get_input', return_value='n'):
+    with mock.patch('download_psf.get_input', return_value='n'):
         assert query_yes_no('', None) == 'no'
-    with mock.patch('euclidlike.download_psf.get_input', return_value='no'):
+    with mock.patch('download_psf.get_input', return_value='no'):
         assert query_yes_no('', None) == 'no'
-    with mock.patch('euclidlike.download_psf.get_input', delay_n):
+    with mock.patch('download_psf.get_input', delay_n):
         assert query_yes_no('', None) == 'no'
-    with mock.patch('euclidlike.download_psf.get_input', delay_y):
+    with mock.patch('download_psf.get_input', delay_y):
         assert query_yes_no('', None) == 'yes'
-    with mock.patch('euclidlike.download_psf.get_input', bleh):
+    with mock.patch('download_psf.get_input', bleh):
         assert query_yes_no('', None) == 'yes'
 
     with assert_raises(ValueError):
@@ -144,11 +144,11 @@ def remove_handler():
 def test_names():
     """Test the get_names function
     """
-    from euclidlike.download_psf import get_names
+    from download_psf import get_names
 
-    args =euclidlike.download_psf.parse_args([])
+    args =download_psf.parse_args([])
     remove_handler()
-    logger = euclidlike.download_psf.make_logger(args)
+    logger = download_psf.make_logger(args)
     url, target, target_dir, link_dir, unpack_dir, do_link = get_names(args, logger)
     assert url == 'https://cosmo.vera.psc.edu/Euclid-like-PSFs/monopsfs_euclidlike.zip'
 
