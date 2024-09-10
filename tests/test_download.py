@@ -73,7 +73,7 @@ def test_query():
 
     Need to mock the input function for this
     """
-    from download_psf import query_yes_no
+    from scripts.download_psf import query_yes_no
 
     def bleh():
         global count
