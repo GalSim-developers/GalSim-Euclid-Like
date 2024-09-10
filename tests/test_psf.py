@@ -23,28 +23,6 @@ def test_get_psf_function():
     wave_list = np.genfromtxt(wave_file)
     psf_file = os.path.join(psf_dir, "monopsfs_6_6.fits.gz")
     psfobjs = euclidlike.euclidlike_psf._make_psf_list(psf_file)
-
-    ## testing symlink failure
-    #psf_file_link = os.path.join(psf_dir, "monopsfs_6_5.fits.gz")
-    #os.symlink(psf_file, psf_file_link)
-    #psfobjs = euclidlike.euclidlike_psf._make_psf_list("tests/psfs/monopsfs_6_6.fits.gz")
-    contents = os.listdir(psf_dir)
-    print("Contents of directory:")
-    pyfits.getdata(psf_file)
-    for item in contents:
-        file_path = os.path.join(psf_dir, item)
-        if os.path.islink(file_path):
-            print(f"Symlink {file_path} points to {os.readlink(file_path)}")
-        #if os.path.exists(file_path):
-        #    print(f"The file '{file_path}' exists.")
-        #    content = pyfits.getdata(psf_file)
-        #else:
-        #    print(f"The file '{file_path}' does not exist.")
-                #print(item)
-
-    ##
-
-    
     wave = wave_list[9]  # random wavelength from oversampled images
     trueobj = psfobjs[9]
     psfobj = getPSF(ccd=7, bandpass="VIS", wavelength=wave, psf_dir = psf_dir)

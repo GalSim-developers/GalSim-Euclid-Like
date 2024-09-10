@@ -144,7 +144,7 @@ def remove_handler():
 def test_names():
     """Test the get_names function
     """
-    from download_psf import get_names
+    from scripts.download_psf import get_names
 
     args =download_psf.parse_args([])
     remove_handler()
