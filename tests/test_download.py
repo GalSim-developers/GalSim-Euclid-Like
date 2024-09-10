@@ -90,45 +90,45 @@ def test_query():
         count += 1
         return 'n' if count % 5 == 0 else ''
 
-    with mock.patch('download_psf.get_input', return_value='y'):
+    with mock.patch('scripts.download_psf.get_input', return_value='y'):
         assert query_yes_no('', 'yes') == 'yes'
-    with mock.patch('download_psf.get_input', return_value='yes'):
+    with mock.patch('scripts.download_psf.get_input', return_value='yes'):
         assert query_yes_no('', 'yes') == 'yes'
-    with mock.patch('download_psf.get_input', return_value='n'):
+    with mock.patch('scripts.download_psf.get_input', return_value='n'):
         assert query_yes_no('', 'yes') == 'no'
-    with mock.patch('download_psf.get_input', return_value='no'):
+    with mock.patch('scripts.download_psf.get_input', return_value='no'):
         assert query_yes_no('', 'yes') == 'no'
-    with mock.patch('download_psf.get_input', return_value=''):
+    with mock.patch('scripts.download_psf.get_input', return_value=''):
         assert query_yes_no('', 'yes') == 'yes'
-    with mock.patch('download_psf.get_input', bleh):
+    with mock.patch('scripts.download_psf.get_input', bleh):
         assert query_yes_no('', 'yes') == 'yes'
 
-    with mock.patch('download_psf.get_input', return_value='y'):
+    with mock.patch('scripts.download_psf.get_input', return_value='y'):
         assert query_yes_no('', 'no') == 'yes'
-    with mock.patch('download_psf.get_input', return_value='yes'):
+    with mock.patch('scripts.download_psf.get_input', return_value='yes'):
         assert query_yes_no('', 'no') == 'yes'
-    with mock.patch('download_psf.get_input', return_value='n'):
+    with mock.patch('scripts.download_psf.get_input', return_value='n'):
         assert query_yes_no('', 'no') == 'no'
-    with mock.patch('download_psf.get_input', return_value='no'):
+    with mock.patch('scripts.download_psf.get_input', return_value='no'):
         assert query_yes_no('', 'no') == 'no'
-    with mock.patch('download_psf.get_input', return_value=''):
+    with mock.patch('scripts.download_psf.get_input', return_value=''):
         assert query_yes_no('', 'no') == 'no'
-    with mock.patch('download_psf.get_input', bleh):
+    with mock.patch('scripts.download_psf.get_input', bleh):
         assert query_yes_no('', 'yes') == 'yes'
 
-    with mock.patch('download_psf.get_input', return_value='y'):
+    with mock.patch('scripts.download_psf.get_input', return_value='y'):
         assert query_yes_no('', None) == 'yes'
-    with mock.patch('download_psf.get_input', return_value='yes'):
+    with mock.patch('scripts.download_psf.get_input', return_value='yes'):
         assert query_yes_no('', None) == 'yes'
-    with mock.patch('download_psf.get_input', return_value='n'):
+    with mock.patch('scripts.download_psf.get_input', return_value='n'):
         assert query_yes_no('', None) == 'no'
-    with mock.patch('download_psf.get_input', return_value='no'):
+    with mock.patch('scripts.download_psf.get_input', return_value='no'):
         assert query_yes_no('', None) == 'no'
-    with mock.patch('download_psf.get_input', delay_n):
+    with mock.patch('scripts.download_psf.get_input', delay_n):
         assert query_yes_no('', None) == 'no'
-    with mock.patch('download_psf.get_input', delay_y):
+    with mock.patch('scripts.download_psf.get_input', delay_y):
         assert query_yes_no('', None) == 'yes'
-    with mock.patch('download_psf.get_input', bleh):
+    with mock.patch('scripts.download_psf.get_input', bleh):
         assert query_yes_no('', None) == 'yes'
 
     with assert_raises(ValueError):
