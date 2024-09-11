@@ -87,7 +87,7 @@ def getSkyLevel(bandpass, world_pos=None, exptime=None, epoch=2025, date=None):
 
 def getZodiBackground(ecl_lat, ecl_dlon, lambda_min, lambda_max, Tlambda, T):
     """
-    This helper routine comes from Chris Hirata's Exposure Time Calculator and enables the
+    This helper routine is used with permission from Chris Hirata's Exposure Time Calculator and enables the
     calculation of the zodiacal light in photons/m^2/arcsec^2/sec. The ETC may be found here:
 
     http://www.tapir.caltech.edu/~chirata/web/software/space-etc/
