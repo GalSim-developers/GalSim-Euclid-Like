@@ -1,6 +1,6 @@
 
 """
-A program to download the the Euclid-like PSF sampled accross the focal plane for discrete wavelengths.
+A program to download the Euclid-like PSF sampled across the focal plane for discrete wavelengths.
 The code below was adapted from: https://github.com/GalSim-developers/GalSim/blob/releases/2.5/galsim/download_cosmos.py
 """
 
