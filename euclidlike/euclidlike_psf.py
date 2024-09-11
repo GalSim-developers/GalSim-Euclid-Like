@@ -11,32 +11,11 @@ from .bandpass import getBandpasses
 @file euclidlike_psf.py
 
 Part of the Euclid-like simulation module. This file includes routines needed
-to define a Euclid-like PSF.
+to define a Euclid-like PSF.  All PSF creation routines are quite approximate, and their limitations
+are specified in the routine's docstring.
 """
 
 effective_wave = 718.0867202226793  # in nm, potentially need to change
-
-
-def get_euclid_wavelength_psf():
-    """ This function get the oversampled PSF image as a function of wavelength
-    from Lance as an input the Euclid-like simulation
-    """
-    # NOTE: We do not have PSF variation
-    psf_file = files("euclidlike.data").joinpath("monopsfs_6_6.fits.gz")
-    image_array = pyfits.getdata(psf_file)
-    # get wavelengths directly from data
-    wave_data = pyfits.getdata(psf_file, 1)
-    # factor of 1e3 to convert from micrometer to nm
-    wave_list = np.hstack(wave_data)*1e3
-    # The following are the values for the data from Lance Miller
-    nsample = len(wave_list)
-    scale = pixel_scale/3  # images are oversampled by a factor of 3
-    im_list = []
-    for i in range(nsample):
-        im_list.append(
-            galsim.Image(image_array[i], scale=scale)
-        )
-    return wave_list, im_list
 
 
 def getPSF(
@@ -45,24 +24,43 @@ def getPSF(
         wavelength=None, gsparams=None,
         logger=None
 ):
-    """Get a single PSF for Euclid like simulation.
+    """Get a single PSF for a Euclid-like simulation.
 
-    For applications that require very high accuracy in the modeling of the
-    PSF, with very limited aliasing, you may want to lower the
-    folding_threshold in the gsparams.  Otherwise very bright stars will show
-    some reflections in the spider pattern and possibly some boxiness at the
-    outskirts of the PSF.  Using ``gsparams =
+    These PSFs are based on precomputed, oversampled (by 3x) PSF images on a grid in wavelength and
+    focal plane position.  These images were provided by Lance Miller and Chris Duncan.  They are
+    meant to provide an approximately correct description of the PSF size and shape without the
+    level of accuracy needed for precision tests of weak lensing shear inference.  The precomputed
+    images are combined in a way that accounts for the bandpass and (if provided) SED.  The effects
+    of detector linear charge diffusion, a simplified model for guiding errors, and wavefront error
+    due to measured surface figure errors are incorporated in the precomputed images.  The telescope
+    focus is set to a value from September 2023, and is therefore within a realistic range but does
+    not reflect variation over time for any particular observation.
+
+    Several important effects were omitted in these images, including the following:
+    * the effect of the dichroic;
+    * polarization aberrations; 
+    * non-linear detector effects such as charge-transfer inefficiency, the brighter-fatter effect,
+      and readout nonlinearity;
+    * the effects of decontamination by ice.
+
+    Functionally the lack of non-linear detector effects means the images produced should be thought
+    of as post-instrument signature removal (assuming the ISR process is carried out perfectly).
+
+    For applications that require very high accuracy in the modeling of the PSF, with very limited
+    aliasing, you may want to lower the `folding_threshold` in the gsparams.  Otherwise very bright
+    stars will show some reflections in the spider pattern and possibly some boxiness at the
+    outskirts of the PSF due to the size of the precomputed images.  Using ``gsparams =
     GSParams(folding_threshold=1.e-4)`` generally provides good results.
 
     Args:
-    ccd (int):  Single value specifying the ccd for which the PSF should be
+    ccd (int):  Single value specifying the CCD for which the PSF should be
         loaded.
     bandpass (str): Single string specifying the bandpass to use when
         defining the pupil plane configuration and/or interpolation of
         chromatic PSFs.
-    ccd_pos:  Single galsim.PositionD indicating the position within the ccd
+    ccd_pos:  Single galsim.PositionD indicating the position within the CCD
         for which the PSF should be created. If None, the exact center of the
-        ccd is chosen. [default: None]
+        CCD is chosen. [default: None]
     wcs:  The WCS to use to project the PSF into world coordinates. [default:
         galsim.PixelScale(euclid_like.roman.pixel_scale)]
     wavelength (float):  An option to get an achromatic PSF for a single
@@ -121,19 +119,19 @@ def getBrightPSF(
     gsparams=None,
     logger=None,
 ):
-    """Get a fake optical PSF for really bright objects in Euclidlike simulations.
-    Depending on the inputs, returns a chromatic or achromatic PSF using the
+    """Get a fake optical PSF for very bright objects in Euclid-like simulations.
+    Depending on the inputs, this routine returns a chromatic or achromatic PSF using the
     Euclid telescope diameter and Euclid-like aperture.
     
     Args:
-    ccd (int):  Single value specifying the ccd for which the PSF should be
+    ccd (int):  Single value specifying the CCD for which the PSF should be
         loaded.
     bandpass (str): Single string specifying the bandpass to use when
         defining the pupil plane configuration and/or interpolation of
         chromatic PSFs.
-    ccd_pos:  Single galsim.PositionD indicating the position within the ccd
+    ccd_pos:  Single galsim.PositionD indicating the position within the CCD
         for which the PSF should be created. If None, the exact center of the
-        ccd is chosen. [default: None]
+        CCD is chosen. [default: None]
     wcs:  The WCS to use to project the PSF into world coordinates. [default:
         galsim.PixelScale(euclidlike.pixel_scale)]
     n_waves (int): Number of wavelengths to use for setting up interpolation of the
@@ -191,6 +189,26 @@ def getBrightPSF(
 
     return psf
 
+def get_euclid_wavelength_psf():
+    """ This function gets the oversampled precomputed PSF image as a function of wavelength
+    as an input to the Euclid-like simulation.
+    """
+    # NOTE: We do not have PSF variation
+    psf_file = files("euclidlike.data").joinpath("monopsfs_6_6.fits.gz")
+    image_array = pyfits.getdata(psf_file)
+    # get wavelengths directly from data
+    wave_data = pyfits.getdata(psf_file, 1)
+    # factor of 1e3 to convert from microns to nm
+    wave_list = np.hstack(wave_data)*1e3
+    # The following are the wavelength values for the precomputed data
+    nsample = len(wave_list)
+    scale = pixel_scale/3  # images are oversampled by a factor of 3
+    im_list = []
+    for i in range(nsample):
+        im_list.append(
+            galsim.Image(image_array[i], scale=scale)
+        )
+    return wave_list, im_list
 
 
 def _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength, gsparams):
