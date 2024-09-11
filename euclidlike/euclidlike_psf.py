@@ -85,7 +85,7 @@ def getPSF(
     
 
     Args:
-    ccd (int):  Single value specifying the ccd detector for which the PSF
+    ccd (int):  Single value specifying the CCD for which the PSF
         should be loaded.
     bandpass (str): Single string specifying the bandpass to use when
         defining the pupil plane configuration and/or interpolation of
