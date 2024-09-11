@@ -17,7 +17,7 @@ Part of the Euclid-like simulation module. This file includes routines needed
 to define a Euclid-like PSF.
 """
 
-meta_dir = files("euclidlike.data.monopsfs_euclidlike")
+meta_dir = files("euclidlike.data")
 effective_wave = 718.0867202226793  # in nm, potentially need to change
 #read wavelengths sampled for PSF
 wave_file = files("euclidlike.data").joinpath('psf_wavelengths.dat')
@@ -128,7 +128,7 @@ def getPSF(
         )
     
     if psf_dir is None:
-        psf_dir = meta_dir
+        psf_dir = meta_dir.joinpath("monopsfs_euclidlike")
     elif isinstance(psf_dir, str):
         psf_dir = pathlib.Path(psf_dir)
     else:
