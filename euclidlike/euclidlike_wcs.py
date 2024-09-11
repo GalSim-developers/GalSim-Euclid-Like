@@ -91,10 +91,11 @@ def getWCS(world_pos, PA=None, date=None, CCDs=None, PA_is_FPA=False, SAA=None):
     The Euclid CCDs are labeled 0-35, so these numbers are used as the keys in
     the dict.  Alternatively the user can request a subset of the CCDs using
     the ``CCDs`` option.  The basic instrument parameters used to create the
-    WCS correspond to those in ERO data and are likely to change in the future.
+    WCS correspond to those in Early Release Observations (ERO) data and are 
+    likely to change in the future.
 
     The user must specify a position for observation, at which the center of
-    the focal plane array will point. This must be supplied as aCelestialCoord
+    the focal plane array will point. This must be supplied as a CelestialCoord
     ``world_pos``.  In general, only certain positions are observable on
     certain dates, and for a given position there is an optimal position angle
     for the observatory (with the solar panels pointed as directly towards the
@@ -102,11 +103,6 @@ def getWCS(world_pos, PA=None, date=None, CCDs=None, PA_is_FPA=False, SAA=None):
     choose to supply a position angle as ``PA``, either for the observatory or
     for the focal plane (using ``PA_is_FPA`` to indicate this).  But otherwise,
     the routine will simply choose the optimal position angle for a given date.
-
-    TODO: update this part
-    To fully understand all possible inputs and outputs to this routine, users
-    may wish to consult the diagram on the GalSim wiki,
-    https://github.com/GalSim-developers/GalSim/wiki/GalSim-Roman-module-diagrams
 
     Parameters:
         world_pos:      A `galsim.CelestialCoord` indicating the position to
@@ -228,11 +224,6 @@ def convertCenter(world_pos, CCD, PA=None, date=None, SAA=None, PA_is_FPA=False,
     Because of distortions varying across the focal plane, this routine has to iteratively correct
     its initial result based on empirical tests.  The ``tol`` kwarg can be used to adjust how
     careful it will be, but it always does at least one iteration.
-
-    TODO: update thiis part
-    To fully understand all possible inputs and outputs to this routine, users may wish to consult
-    the diagram on the GalSim wiki,
-    https://github.com/GalSim-developers/GalSim/wiki/GalSim-Roman-module-diagrams
 
     Parameters:
         world_pos:  A galsim.CelestialCoord indicating the position to observe at the center of the
