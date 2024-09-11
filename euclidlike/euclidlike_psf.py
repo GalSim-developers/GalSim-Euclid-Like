@@ -18,7 +18,8 @@ to define a Euclid-like PSF.
 """
 
 meta_dir = files("euclidlike.data")
-effective_wave = 718.0867202226793  # in nm, potentially need to change
+# hard coded effective wavelength. Calculate from bandpass object using `bandpass.effective_wavelength`
+effective_wave = {'VIS': 718.0867202226793 }
 #read wavelengths sampled for PSF
 wave_file = files("euclidlike.data").joinpath('psf_wavelengths.dat')
 wave_list = np.genfromtxt(wave_file)
@@ -286,7 +287,7 @@ def _get_single_bright_psf_obj(
     """
 
     if wavelength is None:
-        wave = effective_wave
+        wave = effective_wave[bandpass]
     elif isinstance(wavelength, galsim.Bandpass):
         wave = wavelength = wavelength.effective_wavelength
     else:
@@ -298,7 +299,7 @@ def _get_single_bright_psf_obj(
     # Now set up the PSF, including the option to interpolate over waves
     if wavelength is None:
         PSF = galsim.ChromaticOpticalPSF(
-            lam=effective_wave,
+            lam=wave,
             diam=diameter,
             aper=aper,
             gsparams=gsparams
@@ -310,7 +311,7 @@ def _get_single_bright_psf_obj(
             PSF = PSF.interpolate(waves=np.linspace(bp.blue_limit, bp.red_limit, n_waves),
                                   oversample_fac=1.5)
     else:
-        PSF = galsim.OpticalPSF(lam=wavelength, diam=diameter,
+        PSF = galsim.OpticalPSF(lam=wave, diam=diameter,
                          aper=aper, gsparams=gsparams)
 
     return PSF

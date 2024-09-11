@@ -20,6 +20,8 @@ class EuclidlikePSF(object):
     ):
 
         logger = galsim.config.LoggerWrapper(logger)
+        # n_waves parameter is only used for treatment of bright objects. In here we use n_waves = 5
+        # to speed up computation of the ChromaticOpticalPSF used for bright objects. 
         if n_waves == -1:
             n_waves = 5
 
