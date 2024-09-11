@@ -64,7 +64,7 @@ The Euclid-like PSF is constructed from precomputed oversampled images on a grid
 ```
 euclidlike_download_psf
 ```
-in the terminal after instalation of `GalSim-Euclidlike`. To install in an alternative directory to the default, use the `--dir` argument. 
+in the terminal after installation of `GalSim-Euclidlike`. To install in an alternative directory to the default, use the `--dir` argument. 
 
 ## Getting started
 
