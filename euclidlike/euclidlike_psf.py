@@ -8,6 +8,7 @@ from galsim.utilities import LRU_Cache
 from . import n_ccd, n_pix_col, n_pix_row, pixel_scale, diameter, obscuration, det2ccd
 from .bandpass import getBandpasses
 from galsim.config import LoggerWrapper
+import pathlib
 
 """
 @file euclidlike_psf.py
@@ -16,8 +17,7 @@ Part of the Euclid-like simulation module. This file includes routines needed
 to define a Euclid-like PSF.
 """
 
-script_dir = os.path.dirname(__file__)
-meta_dir = os.path.join(script_dir, 'data/monopsfs_euclidlike')
+meta_dir = files("euclidlike.data.monopsfs_euclidlike")
 effective_wave = 718.0867202226793  # in nm, potentially need to change
 #read wavelengths sampled for PSF
 wave_file = files("euclidlike.data").joinpath('psf_wavelengths.dat')
@@ -40,16 +40,16 @@ def __get_quadrant_psf(ccd, bandpass, psf_dir):
     ccd_ID = det2ccd[ccd]
     col, row = int(ccd_ID[0]), int(ccd_ID[2])
     # get ccd quadrant IDs
-    lu = str(col*2 - 1) + '_' + str(row*2 -1)
+    ul = str(col*2 - 1) + '_' + str(row*2 -1)
     ll = str(col*2 - 1) + '_' + str(row*2)
-    uu = str(col*2) + '_' + str(row*2 - 1)
-    ul = str(col*2 ) + '_' + str(row*2 )
-    quadrants = [ll, lu, ul, uu]
-    tags = ["ll", "lu", "ul", "uu"] # ll = lower left, lu = top left, ul = lower right, uu = top right
+    ur = str(col*2) + '_' + str(row*2 - 1)
+    lr = str(col*2 ) + '_' + str(row*2 )
+    quadrants = [ll, ul, lr, ur]
+    tags = ["ll", "ul", "lr", "ur"] # ll = lower left, ul = upper left, lr = lower right, ur = upper right
     tag_idx = []
     psf_images = {}
     for tag, CCD_quad in tuple(zip(tags,quadrants)):
-        psf_file = os.path.join(psf_dir, "monopsfs_"+ CCD_quad + ".fits.gz")
+        psf_file =psf_dir.joinpath("monopsfs_"+ CCD_quad + ".fits.gz")
         psf_images[tag] = _make_psf_list(psf_file)
     return psf_images
 
@@ -126,20 +126,24 @@ def getPSF(
         raise TypeError(
             "wavelength should either be a Bandpass, float, or None."
         )
+    
     if psf_dir is None:
         psf_dir = meta_dir
+    elif isinstance(psf_dir, str):
+        psf_dir = pathlib.Path(psf_dir)
+    else:
+        raise ValueError("psf_dir must be a string.")
         
-    #check if psf directory exists     
-    if not os.path.isdir(psf_dir):
+    #check if psf directory exists 
+    if not psf_dir.is_dir():
         raise FileNotFoundError(
             "The directory %s does not exist. Make sure you have downloaded the PSF images. " 
             "This can be done by running the command `euclidlike_download_psf` in the terminal." % psf_dir
         )
-
     logger = LoggerWrapper(logger)
-    logger.debug('Loading PSF images from: ' + psf_dir)
+    logger.debug('Loading PSF images from: ' + str(psf_dir))
     # Now get psf model
-    psf = _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength,psf_dir, gsparams, logger)
+    psf = _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength, psf_dir, gsparams, logger)
     # Apply WCS.
     # The current version is in arcsec units, but oriented parallel to the
     # image coordinates. So to apply the right WCS, project to pixels using the
@@ -234,7 +238,7 @@ def getBrightPSF(
     return psf
 
 
-def _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength,psf_dir, gsparams, logger):
+def _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength, psf_dir, gsparams, logger):
     """
     Routine for making a single PSF.  This gets called by `getPSF` after it
     parses all the options that were passed in.  Users will not directly
@@ -248,7 +252,7 @@ def _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength,psf_dir, gsparams, lo
     quad_row = 'l'
     quad_col = 'l'
     if ccd_pos.y > n_pix_row/2:
-        quad_row = 'u'
+        quad_row = 'r'
     if ccd_pos.x > n_pix_col/2:
         quad_col = 'u'
     quad_pos = quad_col + quad_row 

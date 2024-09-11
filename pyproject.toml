@@ -29,6 +29,7 @@ dependencies = [
 packages = [
   "euclidlike",
   "euclidlike_imsim",
+  "scripts",
 ]
 include-package-data = true
 
