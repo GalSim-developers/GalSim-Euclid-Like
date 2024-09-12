@@ -105,7 +105,7 @@ def test_get_bright_psf_function():
     img_mom = galsim.hsm.FindAdaptiveMom(img)
     img_bright_mom = galsim.hsm.FindAdaptiveMom(img_bright)
     np.testing.assert_allclose(img_bright_mom.moments_sigma, img_mom.moments_sigma, rtol = size_rtol,
-            err_msg = 'Bright chromatic PSF has size at least 5% larger than getPSF()')
+            err_msg = 'Bright chromatic PSF has size at least %f%% larger than getPSF()'%(100* size_rtol))
     
     # check size of achromatic bright PSF is reasonable in comparison with euclid-like PSF
     bright_psf = getBrightPSF(ccd=1, bandpass="VIS", wavelength = euc_bp.effective_wavelength)
@@ -113,7 +113,7 @@ def test_get_bright_psf_function():
     img_bright =  star_bright.drawImage(euc_bp, nx=160, ny=160, scale= scale, method = 'auto')
     img_bright_mom = galsim.hsm.FindAdaptiveMom(img_bright)
     np.testing.assert_allclose(img_bright_mom.moments_sigma, img_mom.moments_sigma, rtol = size_rtol,
-            err_msg = 'Bright ahcromatic PSF, at effective wavelength, has size at least 5% larger than getPSF()')
+            err_msg = 'Bright ahcromatic PSF, at effective wavelength, has size at least %f%% larger than getPSF()'%(100* size_rtol))
     
     # Check nwaves implementation works correctly
     n_waves = 3
