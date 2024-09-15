@@ -28,16 +28,16 @@ wave_list = np.genfromtxt(wave_file)
 
 def _make_psf_list(psf_file):
     image_array = pyfits.getdata(psf_file)
-
-    # Normalize PSF
-    image_array /= image_array.sum()
-
     scale = pixel_scale/3  # images are oversampled by a factor of 3
     im_list = []
     nsample = len(image_array )
     for i in range(nsample):
+        # Normalize PSF
+        img_ = image_array[i]
+        img_ /= img_.sum()
+
         im_list.append(
-            galsim.Image(image_array[i], scale=scale)
+            galsim.Image(img_, scale=scale)
         )
     return im_list
 
