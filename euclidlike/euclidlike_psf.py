@@ -259,6 +259,8 @@ def _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength, psf_dir, gsparams, l
     quad_pos = quad_col + quad_row 
     logger.debug('CCD position in quadrant ' + quad_pos)
     # instantiate psf object from list of images and wavelengths
+    psf_im = psf_ims[quad_pos]
+    psf_im /= psf_im.sum()
     psf_obj = galsim.InterpolatedChromaticObject.from_images(psf_ims[quad_pos], wave_list, gsparams = gsparams)
     if wavelength is not None:
         if isinstance(wavelength, galsim.Bandpass):
