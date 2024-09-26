@@ -14,7 +14,7 @@ applications requiring high precision such as weak lensing, the higher fidelity 
 available within the Euclid Consortium should be used.
 
 The repository includes two distinct packages:
-* `euclidlike` has basic observatory, intrumentation, and survey information for Euclid.
+* `euclidlike` has basic observatory, instrumentation, and survey information for Euclid.
 This package can be used on its own along with GalSim to produce Euclid-like simulations.
 * `euclidlike_imsim` has configuration scripts to produce large-scale Euclid-like simulation runs
 based on the information in `euclidlike`.  It is based heavily on [`roman_imsim`](https://github.com/matroxel/roman_imsim).
