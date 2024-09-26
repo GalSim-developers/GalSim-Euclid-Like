@@ -29,12 +29,17 @@ dependencies = [
 packages = [
   "euclidlike",
   "euclidlike_imsim",
+  "scripts",
 ]
 include-package-data = true
 
 [tool.setuptools.package-data]
 "*" = [
   "data/*.dat",
+  "data/*.pkl",
   "data/*.fits",
   "data/*.fits.gz",
 ]
+
+[project.scripts]
+euclidlike_download_psf = "scripts.download_psf:run_main"
