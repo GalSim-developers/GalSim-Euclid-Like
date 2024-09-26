@@ -18,7 +18,7 @@ from galsim import Bandpass, LookupTable, galsim_warn
 from importlib.resources import files
 from . import vis_red_limit, vis_blue_limit
 
-def getBandpasses(AB_zeropoint=True, default_thin_trunc=True, **kwargs):
+def getBandpasses(AB_zeropoint=True, default_thin_trunc=True, full_bandpass=False, **kwargs):
     """
     Function to get the bandpass information for the Euclid VIS band and the three Euclid NISP passbands.
 
@@ -44,6 +44,8 @@ def getBandpasses(AB_zeropoint=True, default_thin_trunc=True, **kwargs):
     Args:
     AB_zeropoint (bool) : If True, set the zeropoint of the bandpass to the AB magnitude system. [default: True]
     default_thin_trunc (bool) : If True, use the default thinning and truncation parameters. [default: True]
+    full_bandpass (bool): if True, use the full bandpass without red/blue limits needed for PSF
+                          calculations. [default: False]
     kwargs : Additional keyword arguments to pass to either `Bandpass.thin` or `Bandpass.truncate`.
     """
     # Read in the bandpass files, using a dict to distinguish the different filters
@@ -101,7 +103,7 @@ def getBandpasses(AB_zeropoint=True, default_thin_trunc=True, **kwargs):
     for index, bp_name in enumerate(all_bands):
         # Create the bandpass object
         bp = Bandpass(LookupTable(wave[bp_name], data[bp_name]), wave_type='Angstrom')
-        if bp_name == "VIS":
+        if bp_name == "VIS" and not full_bandpass:
             bp.blue_limit = vis_blue_limit
             bp.red_limit = vis_red_limit
 
