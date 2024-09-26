@@ -37,9 +37,10 @@ def test_get_psf_function():
     np.testing.assert_allclose(psfobj.image.array, trueobj.array, atol = 0,
         err_msg = 'getPSF() fails to initialize input images correctly')
 
-    # check sum of PSF image pixels is within 1% of 1.
+    # check sum of PSF image pixels after normalizing by obsucration is within 1% of 1.
+    # It won't add to exactly 1 since PSF includes vignetting and baffle effects.
     for i in range(len(psfobjs)):
-          np.testing.assert_allclose(np.sum(psfobjs[i].image.array), 1.0, atol = 0.01,
+          np.testing.assert_allclose(np.sum(psfobjs[i].array), 1.0, atol = 0.01,
               err_msg = 'Sum of PSF pixels != 1 by more than 1%') 
       
     # check different ccd works
