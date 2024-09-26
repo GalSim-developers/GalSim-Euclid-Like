@@ -16,7 +16,7 @@ import numpy as np
 import os
 from galsim import Bandpass, LookupTable, galsim_warn
 from importlib.resources import files
-
+from . import vis_red_limit, vis_blue_limit
 
 def getBandpasses(AB_zeropoint=True, default_thin_trunc=True, **kwargs):
     """
@@ -27,6 +27,19 @@ def getBandpasses(AB_zeropoint=True, default_thin_trunc=True, **kwargs):
     euclidlike.data directory. The routine then creates a Bandpass object
     using the LookupTable class from the GalSim package, and returns a dict with bandpasses for the
     keys.
+
+    The bandpasses are publicly available from IPAC:
+    http://svo2.cab.inta-csic.es/svo/theory/fps3/index.php?mode=browse&gname=Euclid&gname2=VIS&asttype=.
+    https://euclid.esac.esa.int/msp/refdata/nisp/NISP-PHOTO-PASSBANDS-V1
+
+    These are relatively old files that do not include the latest estimates of system response.
+    They correspond to end-of-life estimates, with some expected degradation of the QE and filter
+    transmission over time.  This can lead to flux estimates that are suppressed by 5-10% from
+    beginning-of-life flux estimates.
+
+    The VIS bandpass red and blue limits are set not by the transmission curve but by the range of
+    wavelengths over which we have tabulated PSF images.  The wavelength range is read in from the
+    instrument parameter file.
 
     Args:
     AB_zeropoint (bool) : If True, set the zeropoint of the bandpass to the AB magnitude system. [default: True]
@@ -88,6 +101,9 @@ def getBandpasses(AB_zeropoint=True, default_thin_trunc=True, **kwargs):
     for index, bp_name in enumerate(all_bands):
         # Create the bandpass object
         bp = Bandpass(LookupTable(wave[bp_name], data[bp_name]), wave_type='Angstrom')
+        if bp_name == "VIS":
+            bp.blue_limit = vis_blue_limit
+            bp.red_limit = vis_red_limit
 
         # Use any arguments related to truncation, thinning, etc.
         if len(tmp_truncate_dict) > 0 or default_thin_trunc:
