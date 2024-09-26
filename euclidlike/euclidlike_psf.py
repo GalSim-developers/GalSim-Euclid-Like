@@ -5,7 +5,7 @@ from galsim import roman
 import astropy.io.fits as pyfits
 from importlib.resources import files
 from galsim.utilities import LRU_Cache
-from . import n_ccd, n_pix_col, n_pix_row, pixel_scale, diameter, obscuration, det2ccd
+from . import n_ccd, n_pix_col, n_pix_row, pixel_scale, diameter, obscuration, det2ccd, collecting_area
 from .bandpass import getBandpasses
 from galsim.config import LoggerWrapper
 import pathlib
@@ -31,13 +31,14 @@ def _make_psf_list(psf_file):
     scale = pixel_scale/3  # images are oversampled by a factor of 3
     im_list = []
     nsample = len(image_array )
+    # Provided PSF is normalized such that it includes the effects of obscuration; we want to remove it as obscuration is internally handled by Galsim by using the effective collecting area to compute the measured flux.
+    # Diameter is in meters, collecting area in cm^2, need to convert diameter to cm
+    m2cm_conv = 1e2
+    obscuration_norm = collecting_area / ((m2cm_conv*diameter/2)**2*np.pi)
     for i in range(nsample):
-        # Normalize PSF
-        img_ = image_array[i]
-        img_ /= img_.sum()
-
+        psf_arr = image_array[i]/obscuration_norm
         im_list.append(
-            galsim.Image(img_, scale=scale)
+            galsim.Image(psf_arr, scale=scale)
         )
     return im_list
 
@@ -86,6 +87,11 @@ def getPSF(
     PSF images are stored using the focal plane position format. Therefore,
     we convert the CCD detector ID to the appropiate focal plane position
     internally.
+
+    In addition, the provided PSF images are normalized for obscuration, 
+    vignetting and baffle effects. However, GalSim internally handles the 
+    obscuration, so we remove this part of the normalization by dividing the
+    PSF images by collecting_area / ((diameter/2)**2*np.pi).  As a result, the sum of the pixel values in the renormalized PSF images is very close to 1.
     
 
     Args:
