@@ -89,7 +89,7 @@ class Euclidlike_stamp(StampBuilder):
             gal_achrom = gal.evaluateAtWavelength(bandpass.effective_wavelength)
             if (hasattr(gal_achrom, 'original') and isinstance(gal_achrom.original, galsim.DeltaFunction)):
                 # For bright stars, set the following stamp size limits
-                if self.flux < 1e6:
+                if self.flux < 8e5:
                     image_size = 500
                     self.pupil_bin = 8
                 elif self.flux < 6e6:
