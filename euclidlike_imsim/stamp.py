@@ -6,6 +6,10 @@ from galsim.config import RegisterStampType, StampBuilder
 # import os, psutil
 # process = psutil.Process()
 
+# Parameter below determines the flux at which we switch from using Euclid-like PSF to the bright star PSF
+# This is done to avoid visual artifacts from using the Euclid-like PSF for very bright objects.
+# Tests to determine this value can be found here: https://github.com/GalSim-developers/GalSim-Euclid-Like/issues/46
+psf_switch_limit = 8e5
 
 class Euclidlike_stamp(StampBuilder):
     """This performs the tasks necessary for building the stamp for a single object.
@@ -89,7 +93,7 @@ class Euclidlike_stamp(StampBuilder):
             gal_achrom = gal.evaluateAtWavelength(bandpass.effective_wavelength)
             if (hasattr(gal_achrom, 'original') and isinstance(gal_achrom.original, galsim.DeltaFunction)):
                 # For bright stars, set the following stamp size limits
-                if self.flux < 8e5:
+                if self.flux < psf_switch_limit:
                     image_size = 500
                     self.pupil_bin = 8
                 elif self.flux < 6e6:
