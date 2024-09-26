@@ -5,7 +5,7 @@ from galsim import roman
 import astropy.io.fits as pyfits
 from importlib.resources import files
 from galsim.utilities import LRU_Cache
-from . import n_ccd, n_pix_col, n_pix_row, pixel_scale, diameter, obscuration, det2ccd
+from . import n_ccd, n_pix_col, n_pix_row, pixel_scale, diameter, obscuration, det2ccd, collecting_area
 from .bandpass import getBandpasses
 from galsim.config import LoggerWrapper
 import pathlib
@@ -31,9 +31,12 @@ def _make_psf_list(psf_file):
     scale = pixel_scale/3  # images are oversampled by a factor of 3
     im_list = []
     nsample = len(image_array )
+    m2cm_conv = 1e2
+    obscuration_norm = collecting_area / ((m2cm_conv*diameter/2)**2*np.pi)
     for i in range(nsample):
+        psf_arr = image_array[i]/obscuration_norm
         im_list.append(
-            galsim.Image(image_array[i], scale=scale)
+            galsim.Image(psf_arr, scale=scale)
         )
     return im_list
 
