@@ -29,6 +29,7 @@ dependencies = [
 packages = [
   "euclidlike",
   "euclidlike_imsim",
+  "scripts",
 ]
 include-package-data = true
 
@@ -39,3 +40,6 @@ include-package-data = true
   "data/*.fits",
   "data/*.fits.gz",
 ]
+
+[project.scripts]
+euclidlike_download_psf = "scripts.download_psf:run_main"
