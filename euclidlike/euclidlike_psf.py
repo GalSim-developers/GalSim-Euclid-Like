@@ -31,6 +31,8 @@ def _make_psf_list(psf_file):
     scale = pixel_scale/3  # images are oversampled by a factor of 3
     im_list = []
     nsample = len(image_array )
+    # Provided PSF already has obscuration, we want to remove it as obscuration is internally handled by Galsim
+    # Diameter is in meters, collecting area in cm^2, need to convert diameter to cm
     m2cm_conv = 1e2
     obscuration_norm = collecting_area / ((m2cm_conv*diameter/2)**2*np.pi)
     for i in range(nsample):
@@ -85,6 +87,11 @@ def getPSF(
     PSF images are stored using the focal plane position format. Therefore,
     we convert the CCD detector ID to the appropiate focal plane position
     internally.
+
+    In addition, the provided PSF images are normalized for obscuration, 
+    vignetting and baffle effects. However, GalSim internally handles the 
+    obscuration, so we remove this part of the normalization by dividing the
+    PSF images by collecting_area / ((diameter/2)**2*np.pi).
     
 
     Args:
