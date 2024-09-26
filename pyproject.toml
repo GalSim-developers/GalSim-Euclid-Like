@@ -17,7 +17,7 @@ classifiers = [
 ]
 dependencies = [
     "numpy>=1.17",
-    # "galsim @ git+https://github.com/GalSim-developers/GalSim#1294_from_images",
+    "galsim>=2.6",
     "astropy>=2.0",
 ]
 
