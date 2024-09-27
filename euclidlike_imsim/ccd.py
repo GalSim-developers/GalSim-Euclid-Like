@@ -199,9 +199,10 @@ class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
         image.quantize()
 
         image += base["noise_image"]
+        
         # Apply saturation
         saturation_ADU = saturation/gain
-        image[image > saturation_ADU] = saturation_ADU
+        image.array[image.array > saturation_ADU] = saturation_ADU
         
         if self.cfg_noise["sky_subtract"]:
             image -= base["sky_image"]
