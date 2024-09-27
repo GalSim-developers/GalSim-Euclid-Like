@@ -35,7 +35,7 @@ Attribution for software and data used by particular routines in this library is
 Installation
 ==================
 
-GalSim-Euclid-Like requires ``python>3.10`` and the following dependencies::
+GalSim-Euclid-Like requires ``python>=3.10`` and the following dependencies::
 
     numpy>=1.17,
     galsim>=2.6,
