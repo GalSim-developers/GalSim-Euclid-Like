@@ -19,6 +19,8 @@ dependencies = [
     "numpy>=1.17",
     "galsim>=2.6",
     "astropy>=2.0",
+    "ngmix @ git+https://github.com/esheldon/ngmix.git",
+    "numba",
 ]
 
 [project.urls]
