@@ -202,6 +202,7 @@ class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
         
         # Apply saturation
         saturation_ADU = np.round(saturation/gain)
+        base["saturation_mask"] = image.array > saturation_ADU
         image.array[image.array > saturation_ADU] = saturation_ADU
         
         if self.cfg_noise["sky_subtract"]:
