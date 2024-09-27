@@ -26,6 +26,14 @@ def test_euclid_bandpass():
         assert nozp_bp[key].zeropoint is None
     return
 
+    # Test the option to get the full VIS bandpass without the red/blue limits needed for PSF work.
+    bp_full = euclidlike.getBandpasses(AB_zeropoint=True, full_bandpass=True)
+    for band in euclidlike.vis_bands:
+        assert bp_full[band].blue_limit < bp[band].blue_limit
+        assert bp_full[band].red_limit > bp[band].red_limit
+    for band in euclidlike.nisp_bands:
+        assert bp_full[band] == bp[band]
+
 if __name__ == "__main__":
     testfns = [v for k, v in vars().items() if k[:5] == 'test_' and callable(v)]
     for testfn in testfns:

@@ -26,9 +26,6 @@ class EuclidlikeBandpassBuilder(BandpassBuilder):
         name = kwargs['name']
         # Hard set the limit due to PSF definition
         bandpass = euclidlike.getBandpasses()[name]
-        if name == "VIS":
-            bandpass.blue_limit = 540
-            bandpass.red_limit = 910
 
         return bandpass, safe
 

@@ -115,6 +115,11 @@ max_sun_angle = 20.0 * galsim.degrees
 vis_bands = ['VIS']
 nisp_bands = ['NISP_Y', 'NISP_J', 'NISP_H']
 
+# Define variables that set bandpass red and blue limits that are needed for consistency with the
+# wavelength range covered by our tabulated PSF images.
+vis_blue_limit = 540
+vis_red_limit = 910
+
 # Items to potentially do later; part of the galsim.roman setup that currently has no correspondence
 # here.
 #   dark_current

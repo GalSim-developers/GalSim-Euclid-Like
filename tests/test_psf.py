@@ -22,8 +22,6 @@ size_rtol = 0.05
 
 def test_get_psf_function():
     euc_bp = euclidlike.getBandpasses()['VIS']
-    euc_bp.red_limit = 910
-    euc_bp.blue_limit = 540
     scale = euclidlike.pixel_scale/3
     
     wave_file = files("euclidlike.data").joinpath('psf_wavelengths.dat')
@@ -88,8 +86,6 @@ def test_get_psf_function():
 
 def test_get_bright_psf_function():
     euc_bp = euclidlike.getBandpasses()['VIS']
-    euc_bp.red_limit = 910
-    euc_bp.blue_limit = 540
     # check optical PSF wavelength at bandpass effective wavelength
     bright_psf = getBrightPSF(1, "VIS", wavelength = 800.)
     np.testing.assert_allclose(
