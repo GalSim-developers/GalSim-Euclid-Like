@@ -2,16 +2,22 @@
 
 Helper functions to generate simulations of Euclid-like images using GalSim.
 
-This package contains information about the Euclid space telescope and survey that is needed to
+This repository contains information about the Euclid space telescope and survey that is needed to
 produce simulations using [GalSim](https://github.com/GalSim-developers/GalSim).  Some of the
 information provided is approximate, aimed towards fast simulations rather than full accuracy in
 representation of Euclid images.  Places where the information is only approximate are flagged and
-fully described in the docstring, and we particularly highlight that the PSF is only approximate;
+described in the docstring, and we particularly highlight that the PSF is only approximate;
 for details, see the docstring of the `getPSF()` method.  This library should enable generation of
 Euclid-like images of sufficient fidelity for preliminary exploration of object detection,
-photometry, deblending, and joint analysis with ground-based observatories.  However, for
+photometry, deblending, and joint analysis with ground-based observatories.  For
 applications requiring high precision such as weak lensing, the higher fidelity simulations
-available within the Euclid consortium should be used.
+available within the Euclid Consortium should be used.
+
+The repository includes two distinct packages:
+* `euclidlike` has basic observatory, instrumentation, and survey information for Euclid.
+This package can be used on its own along with GalSim to produce Euclid-like simulations.
+* `euclidlike_imsim` has configuration scripts to produce large-scale Euclid-like simulation runs
+based on the information in `euclidlike`.  It is based heavily on [`roman_imsim`](https://github.com/matroxel/roman_imsim).
 
 ## References
 
@@ -32,7 +38,7 @@ astropy>=2.0,
 ```
 
 NOTE:
-At the moment `GalSim` has to be installed manually to have acces to chromatic PSF interpollation that we need (see [here](https://github.com/GalSim-developers/GalSim/pull/1296)).  
+At the moment `GalSim` has to be installed manually to have access to chromatic PSF interpolation that we need (see [here](https://github.com/GalSim-developers/GalSim/pull/1296)).  
 To install GalSim:
 ```
 git clone git@github.com:GalSim-developers/GalSim.git
@@ -41,11 +47,11 @@ git checkout 1294_from_images
 pip install .
 ```
 
-The source code has not been published to pypi. To install from source code:
+The source code for GalSim-Euclid-Like has not been published to pypi. To install from source code:
 ```
 git clone git@github.com:GalSim-developers/GalSim-Euclid-Like.git
 ```
-and install by 
+and install by running
 ```
 conda create -n euclidlike python=3.10
 cd GalSim-Euclid-Like
@@ -53,7 +59,7 @@ conda activate euclidlike
 pip install -e .
 ```
 
-To make sure installation is successful
+To make sure the installation is successful, do the following:
 ```
 $ python
 >>> import euclidlike
