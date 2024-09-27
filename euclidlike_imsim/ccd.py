@@ -8,7 +8,7 @@ from astropy.time import Time
 import numpy as np
 
 import euclidlike
-from euclidlike.instrument_params import gain
+from euclidlike.instrument_params import gain, saturation
 from .noise import cfg_noise_key, parse_noise_config, get_noise
 
 
@@ -199,7 +199,10 @@ class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
         image.quantize()
 
         image += base["noise_image"]
-
+        # Apply saturation
+        saturation_ADU = saturation/gain
+        image[image > saturation_ADU] = saturation_ADU
+        
         if self.cfg_noise["sky_subtract"]:
             image -= base["sky_image"]
 
