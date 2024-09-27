@@ -107,6 +107,7 @@ class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
         full_image.header["MJD-OBS"] = self.mjd
         full_image.header["DATE-OBS"] = str(Time(self.mjd, format="mjd").datetime)
         full_image.header["FILTER"] = self.filter
+        full_image.header["GAIN"] = gain
         full_image.header["ZPTMAG"] = 2.5 * np.log10(
             self.exptime * euclidlike.collecting_area
         )
