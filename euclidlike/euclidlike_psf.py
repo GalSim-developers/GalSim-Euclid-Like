@@ -176,10 +176,6 @@ def getPSF(
         )
         psf_dir = test_dir.joinpath("psfs")
         ccd = default_ccd
-        #raise FileNotFoundError(
-        #    "The directory %s does not exist. Make sure you have downloaded the PSF images. " 
-        #    "This can be done by running the command `euclidlike_download_psf` in the terminal." % psf_dir
-        #)
     logger = LoggerWrapper(logger)
     logger.debug('Loading PSF images from: ' + str(psf_dir))
     # Now get psf model
