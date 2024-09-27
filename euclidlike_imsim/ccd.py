@@ -202,7 +202,6 @@ class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
         
         # Apply saturation
         saturation_ADU = np.round(saturation/gain)
-        base["saturation_mask"] = image.array > saturation_ADU
         mask_saturated = image.array > saturation_ADU
         base["saturated_mask"] = mask_saturated
         image.array[mask_saturated] = saturation_ADU
