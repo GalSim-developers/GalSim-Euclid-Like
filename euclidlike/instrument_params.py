@@ -18,6 +18,7 @@ long_exptime = 566  # s (for the longer exposures used for VIS images)
 short_exptime_nisp = 112  # s (for the shorter NISP imaging exposures)
 short_exptime_vis = 95 # s (for the shorter exposures with VIS taken in parallel with NISP imaging)
 read_noise = 4.4  # e-, https://www.euclid-ec.org/public/mission/vis/
+saturation = 1e5 # in e-, placeholder value for VIS
 n_dithers = 4
 n_ccd = 36
 n_ccd_row = 6
