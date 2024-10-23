@@ -9,6 +9,7 @@ from . import n_ccd, n_pix_col, n_pix_row, pixel_scale, diameter, obscuration, d
 from .bandpass import getBandpasses
 from galsim.config import LoggerWrapper
 import pathlib
+import warnings
 
 """
 @file euclidlike_psf.py
@@ -19,13 +20,15 @@ are specified in the routine's docstring.
 """
 
 meta_dir = files("euclidlike.data")
+test_dir = files("euclidlike").joinpath('../tests')
 # hard coded effective wavelength. Calculate from bandpass object using `bandpass.effective_wavelength`
 effective_wave = {'VIS': 718.0867202226793 }
 #read wavelengths sampled for PSF
 wave_file = files("euclidlike.data").joinpath('psf_wavelengths.dat')
 wave_list = np.genfromtxt(wave_file)
 
-
+# if PSF data is not downloaded, the code defaults to use the PSF for a single quadrant of CCD = 7, stored in tests directory.
+default_ccd=7
 
 def _make_psf_list(psf_file):
     image_array = pyfits.getdata(psf_file)
@@ -97,10 +100,12 @@ def getPSF(
     outskirts of the PSF due to the size of the precomputed images.  Using ``gsparams =
     GSParams(folding_threshold=1.e-4)`` generally provides good results.
     
-    Note that before using, the oversampled PSF images used to create the
-    PSF model need to be downloaded. This can be done using the terminal
+    The PSF model is constructed from oversampled images accross the focal plane.
+    Therefore, in order to use allow for a spatially varying PSF, the images must be downloaded
+    before using this function. This can be done using the terminal
     command `euclidlike_download_psf`. The images are sampled at the 4 quadrant
-    centers of each CCD and at 17 discrete wavelengths.
+    centers of each CCD and at 17 discrete wavelengths. If the images are not
+    downloaded, the function will default to use the PSF from a default CCD quadrant, without any spatial variation.
     The `ccd` argument refers to the detector ID (integer between 0-35),
     not the focal plane position (in format column-row). The sampled
     PSF images are stored using the focal plane position format. Therefore,
@@ -166,10 +171,13 @@ def getPSF(
         
     #check if psf directory exists 
     if not psf_dir.is_dir():
-        raise FileNotFoundError(
-            "The directory %s does not exist. Make sure you have downloaded the PSF images. " 
-            "This can be done by running the command `euclidlike_download_psf` in the terminal." % psf_dir
+        warnings.warn(
+            "Unable to use PSF images for full field of view because directory %s does not exist. "
+            "Defaulting to use PSF from single quadrant in CCD = %d . All PSF images can be downloaded " 
+            "by running the command `euclidlike_download_psf` in the terminal." % (psf_dir, default_ccd)
         )
+        psf_dir = test_dir.joinpath("psfs")
+        ccd = default_ccd
     logger = LoggerWrapper(logger)
     logger.debug('Loading PSF images from: ' + str(psf_dir))
     # Now get psf model
