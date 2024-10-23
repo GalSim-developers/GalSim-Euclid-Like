@@ -105,7 +105,7 @@ def getPSF(
     before using this function. This can be done using the terminal
     command `euclidlike_download_psf`. The images are sampled at the 4 quadrant
     centers of each CCD and at 17 discrete wavelengths. If the images are not
-    downloaded, the function will default to use the PSF from a default CCD quadrant.
+    downloaded, the function will default to use the PSF from a default CCD quadrant, without any spatial variation.
     The `ccd` argument refers to the detector ID (integer between 0-35),
     not the focal plane position (in format column-row). The sampled
     PSF images are stored using the focal plane position format. Therefore,
