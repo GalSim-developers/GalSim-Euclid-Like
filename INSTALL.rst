@@ -1,6 +1,6 @@
 Installation Instructions
 ==================
-GalSim-Euclid-Like is a python module implemented mainly in Python. It currently supports Python versions 3.10 and above.
+The GalSim-Euclid-Like repository contains two python libraries and currently supports Python versions 3.10 and above.
 
 System requirements: Given the heavy dependance on GalSim, GalSim-Euclid-Like currently only supports Linux and Mac OSX. For 
 further details on system requirements for GalSim see `GalSim Installation <https://github.com/GalSim-developers/GalSim/blob/main/INSTALL.rst>`_.
