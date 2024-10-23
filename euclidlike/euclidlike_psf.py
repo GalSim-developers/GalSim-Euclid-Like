@@ -100,10 +100,12 @@ def getPSF(
     outskirts of the PSF due to the size of the precomputed images.  Using ``gsparams =
     GSParams(folding_threshold=1.e-4)`` generally provides good results.
     
-    Note that before using, the oversampled PSF images used to create the
-    PSF model need to be downloaded. This can be done using the terminal
+    The PSF model is constructed from oversampled images accross the focal plane.
+    Therefore, in order to use allow for a spatially varying PSF, the images must be downloaded
+    before using this function. This can be done using the terminal
     command `euclidlike_download_psf`. The images are sampled at the 4 quadrant
-    centers of each CCD and at 17 discrete wavelengths.
+    centers of each CCD and at 17 discrete wavelengths. If the images are not
+    downloaded, the function will default to use the PSF from a default CCD quadrant.
     The `ccd` argument refers to the detector ID (integer between 0-35),
     not the focal plane position (in format column-row). The sampled
     PSF images are stored using the focal plane position format. Therefore,
