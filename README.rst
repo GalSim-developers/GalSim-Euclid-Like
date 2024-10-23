@@ -35,37 +35,15 @@ Attribution for software and data used by particular routines in this library is
 Installation
 ==================
 
-GalSim-Euclid-Like requires ``python>=3.10`` and the following dependencies::
-
-    numpy>=1.17,
-    galsim>=2.6,
-    astropy>=2.0,
-
-                                                                              
-The source code for GalSim-Euclid-Like has not been published to pypi. To install from source code::
-
-    git clone git@github.com:GalSim-developers/GalSim-Euclid-Like.git
-
-and install by running::
-
-    conda create -n euclidlike python=3.10
-    cd GalSim-Euclid-Like
-    conda activate euclidlike
-    pip install .
-
-To make sure the installation is successful, do the following::
-
-    $ python
-    >>> import euclidlike
-    >>> euclidlike.getBandpasses()
+Please view the `installation instructions <INSTALL.rst>`_ for details on how to install GalSim-Euclid-Like.
 
 Downloading relevant data
 ==================                                                                              
-The Euclid-like PSF is constructed from precomputed oversampled images on a grid in focal plane position and wavelength. To use the full FOV PSF within ``GalSim-Euclid-Like``, the images must be downloaded by running::
+The Euclid-like PSF is constructed from precomputed oversampled images on a grid in focal plane position and wavelength. To use the full FOV PSF within GalSim-Euclid-Like, the images must be downloaded by running::
 
     $ euclidlike_download_psf
 
-in the terminal after installation of ``GalSim-Euclid-Like``. To install in an alternative directory to the default, use the ``--dir`` argument. Refer to the ``getPSF`` documentation for further details about the PSF. 
+in the terminal after installation of GalSim-Euclid-Like. To install in an alternative directory to the default, use the ``--dir`` argument. Refer to the ``getPSF`` documentation for further details about the PSF. 
 
 Getting started
 ==================                                                                             
