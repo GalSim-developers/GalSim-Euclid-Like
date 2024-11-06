@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>GalSim-Euclid-Like &#8212; GalSim-Euclid-Like 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=686e5160" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <script src="_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="galsim-euclid-like">
+<h1>GalSim-Euclid-Like<a class="headerlink" href="#galsim-euclid-like" title="Link to this heading">¶</a></h1>
+<p>Helper functions to generate simulations of Euclid-like images using GalSim.</p>
+<p>This repository contains information about the Euclid space telescope and survey that is needed to
+produce simulations using <a class="reference external" href="https://github.com/GalSim-developers/GalSim">GalSim</a>.  Some of the
+information provided is approximate, aimed towards fast simulations rather than full accuracy in
+representation of Euclid images.  Places where the information is only approximate are flagged and
+described in the docstring, and we particularly highlight that the PSF is only approximate;
+for details, see the docstring of the <code class="docutils literal notranslate"><span class="pre">getPSF()</span></code> method.  This library should enable generation of
+Euclid-like images of sufficient fidelity for preliminary exploration of object detection,
+photometry, deblending, and joint analysis with ground-based observatories.  For
+applications requiring high precision such as weak lensing, the higher fidelity simulations
+available within the Euclid Consortium should be used.</p>
+<p>This repository includes two distinct packages:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">euclidlike</span></code>: has basic observatory, instrumentation, and survey information for Euclid.
+This package can be used on its own along with GalSim to produce Euclid-like simulations.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">euclidlike_imsim</span></code>: has configuration scripts to produce large-scale Euclid-like simulation runs
+based on the information in <code class="docutils literal notranslate"><span class="pre">euclidlike</span></code>. It is based heavily on <a class="reference external" href="https://github.com/matroxel/roman_imsim">roman_imsim</a>.</p></li>
+</ul>
+</section>
+<section id="references">
+<h1>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h1>
+<p>For more information about <a class="reference external" href="https://github.com/GalSim-developers/GalSim">GalSim</a>, please see its README and documentation.</p>
+<p>For more information about Euclid, please see the <a class="reference external" href="https://www.euclid-ec.org/">Euclid Consortium website</a> and papers linked from there.</p>
+<p>Attribution for software and data used by particular routines in this library is given in the docstring for the relevant routine.</p>
+</section>
+<section id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h1>
+<p>Please view the <a class="reference external" href="INSTALL.rst">installation instructions</a> for details on how to install GalSim-Euclid-Like.</p>
+</section>
+<section id="downloading-relevant-data">
+<h1>Downloading relevant data<a class="headerlink" href="#downloading-relevant-data" title="Link to this heading">¶</a></h1>
+<p>The Euclid-like PSF is constructed from precomputed oversampled images on a grid in focal plane position and wavelength. To use the full FOV PSF within GalSim-Euclid-Like, the images must be downloaded by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ euclidlike_download_psf
+</pre></div>
+</div>
+<p>in the terminal after installation of GalSim-Euclid-Like. To install in an alternative directory to the default, use the <code class="docutils literal notranslate"><span class="pre">--dir</span></code> argument. Refer to the <code class="docutils literal notranslate"><span class="pre">getPSF</span></code> documentation for further details about the PSF.</p>
+</section>
+<section id="getting-started">
+<h1>Getting started<a class="headerlink" href="#getting-started" title="Link to this heading">¶</a></h1>
+<p>Please see the examples/ directory for demos illustrating the use of this code.</p>
+</section>
+<section id="communicating-with-the-developers">
+<h1>Communicating with the developers<a class="headerlink" href="#communicating-with-the-developers" title="Link to this heading">¶</a></h1>
+<p>Feel free to <a class="reference external" href="https://github.com/GalSim-developers/GalSim-Euclid-Like/issues">open a GitHub issue</a> to reach the developers with questions, comments, and bug reports.  New contributors are also welcome and can indicate their interest in developing this code base through the Issues.</p>
+</section>
+<section id="attribution">
+<h1>Attribution<a class="headerlink" href="#attribution" title="Link to this heading">¶</a></h1>
+<p>This software is open source and may be used according to the terms of its <a class="reference external" href="LICENSE">license</a>.</p>
+<p>When using this software, please provide the URL to the repository in the resulting paper or note.  Once there is a Zenodo DOI or journal article, this README will be updated and we will ask those using the code in their research to cite the relevant journal article.</p>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">GalSim-Euclid-Like</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Rachel Mandelbaum, Axel Guinot, Federico Berlfein, Andy Park, Xiangchong Li, Michael Troxel, Tianqing Zhang.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.1.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
