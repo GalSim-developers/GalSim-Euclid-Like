@@ -152,7 +152,6 @@ def main(argv):
 
     # The output of this routine is a dict of WCS objects, one for each CCD. We then take the WCS
     # for the CCD that we are using.
-    # TODO : uncomment the line below when the getWCS routine is implemented in the Euclid-like module
     wcs_dict = euclidlike.getWCS(world_pos=targ_pos, CCDs=use_CCD, date=date)
     wcs = wcs_dict[use_CCD]
 
@@ -172,7 +171,6 @@ def main(argv):
         # We are ignoring the position-dependence of the PSF within each CCD, just using the PSF
         # at the center of the sensor.
         logger.info('Building PSF for CCD %d, filter %s.'%(use_CCD, filter_name))
-        # TODO : uncomment the line below when the getPSF routine is implemented in the Euclid-like module
         psf = euclidlike.getPSF(use_CCD, filter_name, wcs=wcs)
         lam = 700     # nm
         diam = 1.2    # meters
