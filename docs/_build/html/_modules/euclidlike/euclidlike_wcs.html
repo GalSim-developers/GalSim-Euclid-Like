@@ -119,7 +119,7 @@
 
 
 <div class="viewcode-block" id="getWCS">
-<a class="viewcode-back" href="../../euclidlike.html#euclidlike.euclidlike_wcs.getWCS">[docs]</a>
+<a class="viewcode-back" href="../../euclidlike.html#euclidlike.getWCS">[docs]</a>
 <span class="k">def</span> <span class="nf">getWCS</span><span class="p">(</span><span class="n">world_pos</span><span class="p">,</span> <span class="n">PA</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">CCDs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">PA_is_FPA</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">SAA</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This routine returns a dict containing a WCS for each of the Euclid CCDs.</span>
@@ -246,8 +246,6 @@
 
 
 
-<div class="viewcode-block" id="convertCenter">
-<a class="viewcode-back" href="../../euclidlike.html#euclidlike.euclidlike_wcs.convertCenter">[docs]</a>
 <span class="k">def</span> <span class="nf">convertCenter</span><span class="p">(</span><span class="n">world_pos</span><span class="p">,</span> <span class="n">CCD</span><span class="p">,</span> <span class="n">PA</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">SAA</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">PA_is_FPA</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">0.5</span><span class="o">*</span><span class="n">coord</span><span class="o">.</span><span class="n">arcsec</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This is a simple helper routine that takes an input position ``world_pos`` that is meant to</span>
@@ -316,12 +314,11 @@
         <span class="n">shift_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">world_pos</span><span class="o">.</span><span class="n">distanceTo</span><span class="p">(</span><span class="n">test_sca_pos</span><span class="p">)</span><span class="o">/</span><span class="n">coord</span><span class="o">.</span><span class="n">arcsec</span><span class="p">)</span>
         <span class="n">fpa_cent</span> <span class="o">=</span> <span class="n">coord</span><span class="o">.</span><span class="n">CelestialCoord</span><span class="p">(</span><span class="n">fpa_cent</span><span class="o">.</span><span class="n">ra</span> <span class="o">+</span> <span class="n">delta_ra</span><span class="p">,</span> <span class="n">fpa_cent</span><span class="o">.</span><span class="n">dec</span> <span class="o">+</span> <span class="n">delta_dec</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">fpa_cent</span></div>
-
+    <span class="k">return</span> <span class="n">fpa_cent</span>
 
 
 <div class="viewcode-block" id="findCCD">
-<a class="viewcode-back" href="../../euclidlike.html#euclidlike.euclidlike_wcs.findCCD">[docs]</a>
+<a class="viewcode-back" href="../../euclidlike.html#euclidlike.findCCD">[docs]</a>
 <span class="k">def</span> <span class="nf">findCCD</span><span class="p">(</span><span class="n">wcs_dict</span><span class="p">,</span> <span class="n">world_pos</span><span class="p">,</span> <span class="n">include_border</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This is a subroutine to take a dict of WCS (one per CCD) from euclidlike.getWCS() and query</span>
@@ -583,8 +580,6 @@
     <span class="k">return</span> <span class="n">date</span><span class="p">,</span> <span class="n">CCDs</span><span class="p">,</span> <span class="n">pa_fpa</span><span class="p">,</span> <span class="n">pa_obsy</span>
 
 
-<div class="viewcode-block" id="allowedPos">
-<a class="viewcode-back" href="../../euclidlike.html#euclidlike.euclidlike_wcs.allowedPos">[docs]</a>
 <span class="k">def</span> <span class="nf">allowedPos</span><span class="p">(</span><span class="n">world_pos</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">SAA</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This routine can be used to check whether Euclid would be allowed to look at a particular</span>
@@ -623,12 +618,9 @@
     <span class="c1"># Check if it&#39;s within tolerance.</span>
     <span class="n">min_ang</span> <span class="o">=</span> <span class="mf">90.</span> <span class="o">-</span> <span class="n">min_sun_angle</span><span class="o">/</span><span class="n">coord</span><span class="o">.</span><span class="n">degrees</span>
     <span class="n">max_ang</span> <span class="o">=</span> <span class="mf">90.</span> <span class="o">+</span> <span class="n">max_sun_angle</span><span class="o">/</span><span class="n">coord</span><span class="o">.</span><span class="n">degrees</span>
-    <span class="k">return</span> <span class="n">min_ang</span> <span class="o">&lt;=</span> <span class="n">angle_deg</span> <span class="o">&lt;=</span> <span class="n">max_ang</span></div>
+    <span class="k">return</span> <span class="n">min_ang</span> <span class="o">&lt;=</span> <span class="n">angle_deg</span> <span class="o">&lt;=</span> <span class="n">max_ang</span>
 
 
-
-<div class="viewcode-block" id="bestPA">
-<a class="viewcode-back" href="../../euclidlike.html#euclidlike.euclidlike_wcs.bestPA">[docs]</a>
 <span class="k">def</span> <span class="nf">bestPA</span><span class="p">(</span><span class="n">world_pos</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">SAA</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This routine determines the best position angle for the observatory for a given observation date</span>
@@ -671,8 +663,7 @@
     <span class="c1"># celestial north pole.  It is defined as position angle east of north.</span>
     <span class="n">north</span> <span class="o">=</span> <span class="n">coord</span><span class="o">.</span><span class="n">CelestialCoord</span><span class="p">(</span><span class="n">y_obs</span><span class="o">.</span><span class="n">ra</span><span class="p">,</span> <span class="mf">90.</span><span class="o">*</span><span class="n">coord</span><span class="o">.</span><span class="n">degrees</span><span class="p">)</span>
     <span class="n">obs_pa</span> <span class="o">=</span> <span class="n">world_pos</span><span class="o">.</span><span class="n">angleBetween</span><span class="p">(</span><span class="n">y_obs</span><span class="p">,</span> <span class="n">north</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">obs_pa</span></div>
-
+    <span class="k">return</span> <span class="n">obs_pa</span>
 </pre></div>
 
           </div>
@@ -700,6 +691,14 @@
     </div>
 </search>
 <script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../euclidlike.html">The Euclid-like Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../euclidlike_imsim.html">The Euclid-like ImSim Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">Revision History</a></li>
+</ul>
 
 <div class="relations">
 <h3>Related Topics</h3>

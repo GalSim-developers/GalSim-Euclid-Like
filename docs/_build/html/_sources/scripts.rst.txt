@@ -1,6 +1,11 @@
 scripts package
 ===============
 
+.. automodule:: scripts
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Submodules
 ----------
 
@@ -16,14 +21,6 @@ scripts.make\_euclidlike\_pupil\_plane module
 ---------------------------------------------
 
 .. automodule:: scripts.make_euclidlike_pupil_plane
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: scripts
    :members:
    :undoc-members:
    :show-inheritance:

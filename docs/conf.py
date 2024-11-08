@@ -10,6 +10,9 @@ import os
 import sys
 sys.path.insert(0,os.path.abspath('.'))
 
+import euclidlike
+import euclidlike_imsim
+
 project = 'GalSim-Euclid-Like'
 copyright = '2024, Rachel Mandelbaum, Axel Guinot, Federico Berlfein, Andy Park, Xiangchong Li, Michael Troxel, Tianqing Zhang'
 author = 'Rachel Mandelbaum, Axel Guinot, Federico Berlfein, Andy Park, Xiangchong Li, Michael Troxel, Tianqing Zhang'
@@ -21,7 +24,7 @@ release = '0.0.1'
 extensions = []
 
 templates_path = ['_templates']
-exclude_patterns = []
+exclude_patterns = ['**/.ipynb_checkpoints']
 
 
 

@@ -1,6 +1,3 @@
-GalSim-Euclid-Like
-==================
-
 .. toctree::
    :maxdepth: 4
 

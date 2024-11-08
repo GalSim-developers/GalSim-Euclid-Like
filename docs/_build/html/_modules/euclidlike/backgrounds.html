@@ -38,7 +38,7 @@
 <span class="kn">import</span> <span class="nn">galsim</span>
 
 <div class="viewcode-block" id="getSkyLevel">
-<a class="viewcode-back" href="../../euclidlike.html#euclidlike.backgrounds.getSkyLevel">[docs]</a>
+<a class="viewcode-back" href="../../euclidlike.html#euclidlike.getSkyLevel">[docs]</a>
 <span class="k">def</span> <span class="nf">getSkyLevel</span><span class="p">(</span><span class="n">bandpass</span><span class="p">,</span> <span class="n">world_pos</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exptime</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">epoch</span><span class="o">=</span><span class="mi">2025</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the expected sky level for a Euclid observation due to zodiacal light for this bandpass</span>
@@ -121,8 +121,6 @@
     <span class="k">return</span> <span class="n">sky_val</span>  </div>
 
 
-<div class="viewcode-block" id="getZodiBackground">
-<a class="viewcode-back" href="../../euclidlike.html#euclidlike.backgrounds.getZodiBackground">[docs]</a>
 <span class="k">def</span> <span class="nf">getZodiBackground</span><span class="p">(</span><span class="n">ecl_lat</span><span class="p">,</span> <span class="n">ecl_dlon</span><span class="p">,</span> <span class="n">lambda_min</span><span class="p">,</span> <span class="n">lambda_max</span><span class="p">,</span> <span class="n">Tlambda</span><span class="p">,</span> <span class="n">T</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This helper routine is used with permission from Chris Hirata&#39;s Exposure Time Calculator and enables the</span>
@@ -258,8 +256,7 @@
             <span class="mf">5.03411747e10</span><span class="o">*</span><span class="n">lambda_</span><span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">lambda_</span><span class="p">,</span><span class="n">Tlambda</span><span class="p">,</span><span class="n">T</span><span class="p">)</span>
 
     <span class="c1"># We now have the zodi level in photons/m^2/sr/sec. Convert to photons/m^2/arcsec^2/sec.</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">zodi_tot</span> <span class="o">/</span> <span class="mf">4.2545170296152206e10</span><span class="p">)</span></div>
-
+    <span class="k">return</span> <span class="p">(</span><span class="n">zodi_tot</span> <span class="o">/</span> <span class="mf">4.2545170296152206e10</span><span class="p">)</span>
 
 </pre></div>
 
@@ -288,6 +285,14 @@
     </div>
 </search>
 <script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../euclidlike.html">The Euclid-like Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../euclidlike_imsim.html">The Euclid-like ImSim Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">Revision History</a></li>
+</ul>
 
 <div class="relations">
 <h3>Related Topics</h3>

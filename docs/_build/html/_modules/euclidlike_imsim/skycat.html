@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>euclidlike_imsim.skycat &#8212; GalSim-Euclid-Like 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=686e5160" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
+    <script src="../../_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for euclidlike_imsim.skycat</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Interface to obtain objects from skyCatalogs.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">galsim</span>
+<span class="kn">from</span> <span class="nn">galsim.config</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">InputLoader</span><span class="p">,</span>
+    <span class="n">RegisterInputType</span><span class="p">,</span>
+    <span class="n">RegisterValueType</span><span class="p">,</span>
+    <span class="n">RegisterObjectType</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">euclidlike</span>
+
+
+<div class="viewcode-block" id="SkyCatalogInterface">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.skycat.SkyCatalogInterface">[docs]</a>
+<span class="k">class</span> <span class="nc">SkyCatalogInterface</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Interface to skyCatalogs package.&quot;&quot;&quot;</span>
+
+    <span class="n">_trivial_sed</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">SED</span><span class="p">(</span>
+        <span class="n">galsim</span><span class="o">.</span><span class="n">LookupTable</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mi">2600</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">interpolant</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">),</span>
+        <span class="n">wave_type</span><span class="o">=</span><span class="s2">&quot;nm&quot;</span><span class="p">,</span>
+        <span class="n">flux_type</span><span class="o">=</span><span class="s2">&quot;fphotons&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">file_name</span><span class="p">,</span>
+        <span class="n">exptime</span><span class="p">,</span>
+        <span class="n">wcs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">mjd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">bandpass</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">xsize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">ysize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">obj_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">edge_pix</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+        <span class="n">max_flux</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        file_name : str</span>
+<span class="sd">            Name of skyCatalogs yaml config file.</span>
+<span class="sd">        wcs : galsim.WCS</span>
+<span class="sd">            WCS of the image to render.</span>
+<span class="sd">        mjd : float</span>
+<span class="sd">            MJD of the midpoint of the exposure.</span>
+<span class="sd">        exptime : float</span>
+<span class="sd">            Exposure time.</span>
+<span class="sd">        xsize : int</span>
+<span class="sd">            Size in pixels of CCD in x-direction.</span>
+<span class="sd">        ysize : int</span>
+<span class="sd">            Size in pixels of CCD in y-direction.</span>
+<span class="sd">        obj_types : list-like [None]</span>
+<span class="sd">            List or tuple of object types to render, e.g., (&#39;star&#39;, &#39;galaxy&#39;).</span>
+<span class="sd">            If None, then consider all object types.</span>
+<span class="sd">        edge_pix : float [100]</span>
+<span class="sd">            Size in pixels of the buffer region around nominal image</span>
+<span class="sd">            to consider objects.</span>
+<span class="sd">        logger : logging.Logger [None]</span>
+<span class="sd">            Logger object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wcs</span> <span class="o">=</span> <span class="n">wcs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mjd</span> <span class="o">=</span> <span class="n">mjd</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exptime</span> <span class="o">=</span> <span class="n">exptime</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bandpass</span> <span class="o">=</span> <span class="n">bandpass</span>
+        <span class="k">if</span> <span class="n">xsize</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">xsize</span> <span class="o">=</span> <span class="n">xsize</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">xsize</span> <span class="o">=</span> <span class="n">euclidlike</span><span class="o">.</span><span class="n">n_pix_col</span>
+        <span class="k">if</span> <span class="n">ysize</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ysize</span> <span class="o">=</span> <span class="n">ysize</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ysize</span> <span class="o">=</span> <span class="n">euclidlike</span><span class="o">.</span><span class="n">n_pix_row</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obj_types</span> <span class="o">=</span> <span class="n">obj_types</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edge_pix</span> <span class="o">=</span> <span class="n">edge_pix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">LoggerWrapper</span><span class="p">(</span><span class="n">logger</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">obj_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Object types restricted to </span><span class="si">{</span><span class="n">obj_types</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ccd_center</span> <span class="o">=</span> <span class="n">wcs</span><span class="o">.</span><span class="n">toWorld</span><span class="p">(</span>
+            <span class="n">galsim</span><span class="o">.</span><span class="n">PositionD</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xsize</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ysize</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_objects</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">skycatalogs</span> <span class="kn">import</span> <span class="n">skyCatalogs</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_objects</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+
+            <span class="c1"># Select objects from polygonal region bounded by CCD edges</span>
+            <span class="n">corners</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_pix</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_pix</span><span class="p">),</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xsize</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_pix</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_pix</span><span class="p">),</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xsize</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_pix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ysize</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_pix</span><span class="p">),</span>
+                <span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_pix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ysize</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_pix</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="n">vertices</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">corners</span><span class="p">:</span>
+                <span class="n">sky_coord</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wcs</span><span class="o">.</span><span class="n">toWorld</span><span class="p">(</span><span class="n">galsim</span><span class="o">.</span><span class="n">PositionD</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+                <span class="n">vertices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">(</span><span class="n">sky_coord</span><span class="o">.</span><span class="n">ra</span> <span class="o">/</span> <span class="n">galsim</span><span class="o">.</span><span class="n">degrees</span><span class="p">,</span> <span class="n">sky_coord</span><span class="o">.</span><span class="n">dec</span> <span class="o">/</span> <span class="n">galsim</span><span class="o">.</span><span class="n">degrees</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="n">region</span> <span class="o">=</span> <span class="n">skyCatalogs</span><span class="o">.</span><span class="n">PolygonalRegion</span><span class="p">(</span><span class="n">vertices</span><span class="p">)</span>
+            <span class="n">sky_cat</span> <span class="o">=</span> <span class="n">skyCatalogs</span><span class="o">.</span><span class="n">open_catalog</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_objects</span> <span class="o">=</span> <span class="n">sky_cat</span><span class="o">.</span><span class="n">get_objects_by_region</span><span class="p">(</span>
+                <span class="n">region</span><span class="p">,</span> <span class="n">obj_type_set</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">obj_types</span><span class="p">,</span> <span class="n">mjd</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mjd</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_objects</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No objects found on image.&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_build_dtype_dict</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_objects</span>
+
+    <span class="k">def</span> <span class="nf">_build_dtype_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dtype_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">obj_types</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">coll</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_objects</span><span class="o">.</span><span class="n">get_collections</span><span class="p">():</span>
+            <span class="n">objects_type</span> <span class="o">=</span> <span class="n">coll</span><span class="o">.</span><span class="n">_object_type_unique</span>
+            <span class="k">if</span> <span class="n">objects_type</span> <span class="ow">in</span> <span class="n">obj_types</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">col_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">coll</span><span class="o">.</span><span class="n">native_columns</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">col_name</span> <span class="ow">in</span> <span class="n">col_names</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="c1"># Some columns cannot be read in snana</span>
+                    <span class="n">np_type</span> <span class="o">=</span> <span class="n">coll</span><span class="o">.</span><span class="n">get_native_attribute</span><span class="p">(</span><span class="n">col_name</span><span class="p">)</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">type</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;The column </span><span class="si">{</span><span class="n">col_name</span><span class="si">}</span><span class="s2"> could not be read from skyCatalog.&quot;</span>
+                    <span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">np_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">py_type</span> <span class="o">=</span> <span class="nb">str</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">py_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">np_type</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">object</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_dtype_dict</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">py_type</span>
+
+<div class="viewcode-block" id="SkyCatalogInterface.get_ccd_center">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.skycat.SkyCatalogInterface.get_ccd_center">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_ccd_center</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the CCD center.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ccd_center</span></div>
+
+
+<div class="viewcode-block" id="SkyCatalogInterface.getNObjects">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.skycat.SkyCatalogInterface.getNObjects">[docs]</a>
+    <span class="k">def</span> <span class="nf">getNObjects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the number of GSObjects to render</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">objects</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SkyCatalogInterface.getApproxNObjects">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.skycat.SkyCatalogInterface.getApproxNObjects">[docs]</a>
+    <span class="k">def</span> <span class="nf">getApproxNObjects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the approximate number of GSObjects to render, as set in</span>
+<span class="sd">        the class initializer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getNObjects</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="SkyCatalogInterface.getWorldPos">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.skycat.SkyCatalogInterface.getWorldPos">[docs]</a>
+    <span class="k">def</span> <span class="nf">getWorldPos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the sky coordinates of the skyCatalog object</span>
+<span class="sd">        corresponding to the specified index.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        index : int</span>
+<span class="sd">            Index of the (object_index, subcomponent) combination.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        galsim.CelestialCoord</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">skycat_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">objects</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+        <span class="n">ra</span><span class="p">,</span> <span class="n">dec</span> <span class="o">=</span> <span class="n">skycat_obj</span><span class="o">.</span><span class="n">ra</span><span class="p">,</span> <span class="n">skycat_obj</span><span class="o">.</span><span class="n">dec</span>
+        <span class="k">return</span> <span class="n">galsim</span><span class="o">.</span><span class="n">CelestialCoord</span><span class="p">(</span><span class="n">ra</span> <span class="o">*</span> <span class="n">galsim</span><span class="o">.</span><span class="n">degrees</span><span class="p">,</span> <span class="n">dec</span> <span class="o">*</span> <span class="n">galsim</span><span class="o">.</span><span class="n">degrees</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SkyCatalogInterface.getFlux">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.skycat.SkyCatalogInterface.getFlux">[docs]</a>
+    <span class="k">def</span> <span class="nf">getFlux</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mjd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exptime</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the flux associated to an object.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        index : int</span>
+<span class="sd">            Index of the object in the self.objects catalog.</span>
+<span class="sd">        filter : str, optional</span>
+<span class="sd">            Name of the filter for which the flux is computed. If None, use the</span>
+<span class="sd">            filter provided during initialization. [Default: None]</span>
+<span class="sd">        mjd : float, optional</span>
+<span class="sd">            Date of the observation in MJD format. If None, use the</span>
+<span class="sd">            mjd provided during initialization. [Default: None]</span>
+<span class="sd">        exptime : int or float, optional</span>
+<span class="sd">            Exposure time of the observation. If None, use the</span>
+<span class="sd">            exptime provided during initialization. [Default: None]</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        flux</span>
+<span class="sd">            Computer flux at the given date for the requested exposure time and</span>
+<span class="sd">            filter.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">filter</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">filter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bandpass</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">if</span> <span class="n">mjd</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">mjd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mjd</span>
+        <span class="k">if</span> <span class="n">exptime</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">exptime</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exptime</span>
+
+        <span class="n">skycat_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">objects</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+        <span class="c1"># We cache the SEDs for potential later use</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_seds</span> <span class="o">=</span> <span class="n">skycat_obj</span><span class="o">.</span><span class="n">get_observer_sed_components</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">sed</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_seds</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">sed_sum</span> <span class="o">=</span> <span class="n">sed</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sed_sum</span> <span class="o">+=</span> <span class="n">sed</span>
+        <span class="n">raw_flux</span> <span class="o">=</span> <span class="n">skycat_obj</span><span class="o">.</span><span class="n">get_euclid_flux</span><span class="p">(</span>
+            <span class="nb">filter</span><span class="p">,</span>
+            <span class="n">sed_sum</span><span class="p">,</span>
+            <span class="n">mjd</span><span class="o">=</span><span class="n">mjd</span><span class="p">,</span>
+            <span class="n">cache</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">skycat_obj</span><span class="p">,</span> <span class="s2">&quot;get_wl_params&quot;</span><span class="p">):</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">mu</span> <span class="o">=</span> <span class="n">skycat_obj</span><span class="o">.</span><span class="n">get_wl_params</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mu</span> <span class="o">=</span> <span class="mf">1.</span>
+        <span class="n">flux</span> <span class="o">=</span> <span class="n">raw_flux</span> <span class="o">*</span> <span class="n">mu</span> <span class="o">*</span> <span class="n">exptime</span> <span class="o">*</span> <span class="n">euclidlike</span><span class="o">.</span><span class="n">collecting_area</span>
+
+        <span class="k">return</span> <span class="n">flux</span></div>
+
+
+<div class="viewcode-block" id="SkyCatalogInterface.getValue">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.skycat.SkyCatalogInterface.getValue">[docs]</a>
+    <span class="k">def</span> <span class="nf">getValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">field</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a skyCatalog value for the an object.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        index : int</span>
+<span class="sd">            Index of the object in the self.objects catalog.</span>
+<span class="sd">        field : str</span>
+<span class="sd">            Name of the field for which you want the value.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int or float or str or None</span>
+<span class="sd">            The value associated to the field or None if the field do not exist.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">skycat_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">objects</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">field</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dtype_dict</span><span class="p">:</span>
+            <span class="c1"># We cannot raise an error because one could have a field for snana</span>
+            <span class="c1"># in the config and we don&#39;t want to crash because there are no SN</span>
+            <span class="c1"># in this particular image. We then default to False which might not</span>
+            <span class="c1"># be the right type for the required column but we have no way of knowing</span>
+            <span class="c1"># the correct type if the column do not exist.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The field </span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s2"> was not found in skyCatalog.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">field</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">skycat_obj</span><span class="o">.</span><span class="n">native_columns</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dtype_dict</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="ow">is</span> <span class="nb">int</span><span class="p">:</span>
+                <span class="c1"># There are no &quot;special value&quot; for integer so we default to</span>
+                <span class="c1"># hopefully something completely off</span>
+                <span class="k">return</span> <span class="o">-</span><span class="mi">9999</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dtype_dict</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="ow">is</span> <span class="nb">float</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dtype_dict</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">skycat_obj</span><span class="o">.</span><span class="n">get_native_attribute</span><span class="p">(</span><span class="n">field</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SkyCatalogInterface.getObj">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.skycat.SkyCatalogInterface.getObj">[docs]</a>
+    <span class="k">def</span> <span class="nf">getObj</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">gsparams</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exptime</span><span class="o">=</span><span class="mi">30</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the galsim object for the skyCatalog object</span>
+<span class="sd">        corresponding to the specified index.  If the skyCatalog</span>
+<span class="sd">        object is a galaxy, the returned galsim object will be</span>
+<span class="sd">        a galsim.Sum.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        index : int</span>
+<span class="sd">            Index of the object in the self.objects catalog.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        galsim.GSObject</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">objects</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Trying to get an object from an empty sky catalog&quot;</span><span class="p">)</span>
+
+        <span class="n">faint</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">skycat_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">objects</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+        <span class="n">gsobjs</span> <span class="o">=</span> <span class="n">skycat_obj</span><span class="o">.</span><span class="n">get_gsobject_components</span><span class="p">(</span><span class="n">gsparams</span><span class="p">)</span>
+
+        <span class="c1"># Compute the flux or get the cached value.</span>
+        <span class="n">flux</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getFlux</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">flux</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># Set up simple SED if too faint</span>
+        <span class="k">if</span> <span class="n">flux</span> <span class="o">&lt;</span> <span class="mi">40</span><span class="p">:</span>
+            <span class="n">faint</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">faint</span><span class="p">:</span>
+            <span class="n">seds</span> <span class="o">=</span> <span class="n">skycat_obj</span><span class="o">.</span><span class="n">get_observer_sed_components</span><span class="p">(</span><span class="n">mjd</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mjd</span><span class="p">)</span>
+
+        <span class="n">gs_obj_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="n">gsobjs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">faint</span><span class="p">:</span>
+                <span class="n">gsobjs</span><span class="p">[</span><span class="n">component</span><span class="p">]</span> <span class="o">=</span> <span class="n">gsobjs</span><span class="p">[</span><span class="n">component</span><span class="p">]</span><span class="o">.</span><span class="n">evaluateAtWavelength</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">bandpass</span>
+                <span class="p">)</span>
+                <span class="n">gs_obj_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">gsobjs</span><span class="p">[</span><span class="n">component</span><span class="p">]</span>
+                    <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trivial_sed</span>
+                    <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">exptime</span>
+                    <span class="o">*</span> <span class="n">euclidlike</span><span class="o">.</span><span class="n">collecting_area</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">component</span> <span class="ow">in</span> <span class="n">seds</span><span class="p">:</span>
+                    <span class="n">gs_obj_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="n">gsobjs</span><span class="p">[</span><span class="n">component</span><span class="p">]</span>
+                        <span class="o">*</span> <span class="n">seds</span><span class="p">[</span><span class="n">component</span><span class="p">]</span>
+                        <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">exptime</span>
+                        <span class="o">*</span> <span class="n">euclidlike</span><span class="o">.</span><span class="n">collecting_area</span>
+                    <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">gs_obj_list</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">gs_obj_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">gs_object</span> <span class="o">=</span> <span class="n">gs_obj_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">gs_object</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="n">gs_obj_list</span><span class="p">)</span>
+
+        <span class="c1"># Give the object the right flux</span>
+        <span class="n">gs_object</span><span class="o">.</span><span class="n">flux</span> <span class="o">=</span> <span class="n">flux</span>
+        <span class="n">gs_object</span><span class="o">.</span><span class="n">withFlux</span><span class="p">(</span><span class="n">gs_object</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bandpass</span><span class="p">)</span>
+
+        <span class="c1"># Get the object type</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">skycat_obj</span><span class="o">.</span><span class="n">object_type</span> <span class="o">==</span> <span class="s2">&quot;diffsky_galaxy&quot;</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span>
+            <span class="n">skycat_obj</span><span class="o">.</span><span class="n">object_type</span> <span class="o">==</span> <span class="s2">&quot;galaxy&quot;</span>
+        <span class="p">):</span>
+            <span class="n">gs_object</span><span class="o">.</span><span class="n">object_type</span> <span class="o">=</span> <span class="s2">&quot;galaxy&quot;</span>
+        <span class="k">if</span> <span class="n">skycat_obj</span><span class="o">.</span><span class="n">object_type</span> <span class="o">==</span> <span class="s2">&quot;star&quot;</span><span class="p">:</span>
+            <span class="n">gs_object</span><span class="o">.</span><span class="n">object_type</span> <span class="o">=</span> <span class="s2">&quot;star&quot;</span>
+        <span class="k">if</span> <span class="n">skycat_obj</span><span class="o">.</span><span class="n">object_type</span> <span class="o">==</span> <span class="s2">&quot;snana&quot;</span><span class="p">:</span>
+            <span class="n">gs_object</span><span class="o">.</span><span class="n">object_type</span> <span class="o">=</span> <span class="s2">&quot;transient&quot;</span>
+
+        <span class="k">return</span> <span class="n">gs_object</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SkyCatalogLoader">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.skycat.SkyCatalogLoader">[docs]</a>
+<span class="k">class</span> <span class="nc">SkyCatalogLoader</span><span class="p">(</span><span class="n">InputLoader</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class to load SkyCatalogInterface object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SkyCatalogLoader.getKwargs">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.skycat.SkyCatalogLoader.getKwargs">[docs]</a>
+    <span class="k">def</span> <span class="nf">getKwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+        <span class="n">req</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;file_name&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;exptime&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">}</span>
+        <span class="n">opt</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;edge_pix&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+            <span class="s2">&quot;obj_types&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+            <span class="s2">&quot;mjd&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">kwargs</span><span class="p">,</span> <span class="n">safe</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">GetAllParams</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">req</span><span class="o">=</span><span class="n">req</span><span class="p">,</span> <span class="n">opt</span><span class="o">=</span><span class="n">opt</span><span class="p">)</span>
+        <span class="n">wcs</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">BuildWCS</span><span class="p">(</span><span class="n">base</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">],</span> <span class="s2">&quot;wcs&quot;</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;wcs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">wcs</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;logger&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">logger</span>
+
+        <span class="k">if</span> <span class="s2">&quot;bandpass&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="n">base</span><span class="p">[</span><span class="s2">&quot;bandpass&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">BuildBandpass</span><span class="p">(</span>
+                <span class="n">base</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">],</span> <span class="s2">&quot;bandpass&quot;</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span>
+            <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;bandpass&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">base</span><span class="p">[</span><span class="s2">&quot;bandpass&quot;</span><span class="p">]</span>
+        <span class="c1"># Sky catalog object lists are created per CCD, so they are</span>
+        <span class="c1"># not safe to reuse.</span>
+        <span class="n">safe</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">safe</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SkyCatObj">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.skycat.SkyCatObj">[docs]</a>
+<span class="k">def</span> <span class="nf">SkyCatObj</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">ignore</span><span class="p">,</span> <span class="n">gsparams</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build an object according to info in the sky catalog.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">skycat</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">GetInputObj</span><span class="p">(</span><span class="s2">&quot;sky_catalog&quot;</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="s2">&quot;SkyCatObj&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Ensure that this sky catalog matches the CCD being simulated by</span>
+    <span class="c1"># comparing center locations on the sky.</span>
+    <span class="n">world_center</span> <span class="o">=</span> <span class="n">base</span><span class="p">[</span><span class="s2">&quot;world_center&quot;</span><span class="p">]</span>
+    <span class="n">ccd_center</span> <span class="o">=</span> <span class="n">skycat</span><span class="o">.</span><span class="n">get_ccd_center</span><span class="p">()</span>
+    <span class="n">sep</span> <span class="o">=</span> <span class="n">ccd_center</span><span class="o">.</span><span class="n">distanceTo</span><span class="p">(</span><span class="n">base</span><span class="p">[</span><span class="s2">&quot;world_center&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="n">galsim</span><span class="o">.</span><span class="n">arcsec</span>
+    <span class="c1"># Centers must agree to within at least 1 arcsec:</span>
+    <span class="k">if</span> <span class="n">sep</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;skyCatalogs selection and CCD center do not agree: </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;skycat.ccd_center: &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ccd_center</span><span class="o">.</span><span class="n">ra</span><span class="o">/</span><span class="n">galsim</span><span class="o">.</span><span class="n">degrees</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2">, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ccd_center</span><span class="o">.</span><span class="n">dec</span><span class="o">/</span><span class="n">galsim</span><span class="o">.</span><span class="n">degrees</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;world_center: &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">world_center</span><span class="o">.</span><span class="n">ra</span><span class="o">/</span><span class="n">galsim</span><span class="o">.</span><span class="n">degrees</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2">, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">world_center</span><span class="o">.</span><span class="n">dec</span><span class="o">/</span><span class="n">galsim</span><span class="o">.</span><span class="n">degrees</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Separation: </span><span class="si">{</span><span class="n">sep</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2"> arcsec&quot;</span>
+        <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+
+    <span class="c1"># Setup the indexing sequence if it hasn&#39;t been specified.  The</span>
+    <span class="c1"># normal thing with a catalog is to just use each object in order,</span>
+    <span class="c1"># so we don&#39;t require the user to specify that by hand.  We can do</span>
+    <span class="c1"># it for them.</span>
+    <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">SetDefaultIndex</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">skycat</span><span class="o">.</span><span class="n">getNObjects</span><span class="p">())</span>
+
+    <span class="n">req</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">}</span>
+    <span class="n">opt</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;num&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">}</span>
+    <span class="n">kwargs</span><span class="p">,</span> <span class="n">safe</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">GetAllParams</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">req</span><span class="o">=</span><span class="n">req</span><span class="p">,</span> <span class="n">opt</span><span class="o">=</span><span class="n">opt</span><span class="p">)</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">]</span>
+
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">GetRNG</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="s2">&quot;SkyCatObj&quot;</span><span class="p">)</span>
+
+    <span class="n">obj</span> <span class="o">=</span> <span class="n">skycat</span><span class="o">.</span><span class="n">getObj</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">gsparams</span><span class="o">=</span><span class="n">gsparams</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+    <span class="n">base</span><span class="p">[</span><span class="s2">&quot;object_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">skycat</span><span class="o">.</span><span class="n">objects</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">id</span>
+
+    <span class="k">return</span> <span class="n">obj</span><span class="p">,</span> <span class="n">safe</span></div>
+
+
+
+<div class="viewcode-block" id="SkyCatWorldPos">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.skycat.SkyCatWorldPos">[docs]</a>
+<span class="k">def</span> <span class="nf">SkyCatWorldPos</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">value_type</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a value from the object part of the skyCatalog&quot;&quot;&quot;</span>
+    <span class="n">skycat</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">GetInputObj</span><span class="p">(</span><span class="s2">&quot;sky_catalog&quot;</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="s2">&quot;SkyCatWorldPos&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Setup the indexing sequence if it hasn&#39;t been specified.  The</span>
+    <span class="c1"># normal thing with a catalog is to just use each object in order,</span>
+    <span class="c1"># so we don&#39;t require the user to specify that by hand.  We can do</span>
+    <span class="c1"># it for them.</span>
+    <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">SetDefaultIndex</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">skycat</span><span class="o">.</span><span class="n">getNObjects</span><span class="p">())</span>
+
+    <span class="n">req</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">}</span>
+    <span class="n">opt</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;num&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">}</span>
+    <span class="n">kwargs</span><span class="p">,</span> <span class="n">safe</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">GetAllParams</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">req</span><span class="o">=</span><span class="n">req</span><span class="p">,</span> <span class="n">opt</span><span class="o">=</span><span class="n">opt</span><span class="p">)</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">]</span>
+
+    <span class="n">pos</span> <span class="o">=</span> <span class="n">skycat</span><span class="o">.</span><span class="n">getWorldPos</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pos</span><span class="p">,</span> <span class="n">safe</span></div>
+
+
+
+<div class="viewcode-block" id="SkyCatValue">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.skycat.SkyCatValue">[docs]</a>
+<span class="k">def</span> <span class="nf">SkyCatValue</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">value_type</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a value from the object part of the skyCatalog</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">skycat</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">GetInputObj</span><span class="p">(</span><span class="s2">&quot;sky_catalog&quot;</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="s2">&quot;SkyCatValue&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Setup the indexing sequence if it hasn&#39;t been specified.  The</span>
+    <span class="c1"># normal thing with a catalog is to just use each object in order,</span>
+    <span class="c1"># so we don&#39;t require the user to specify that by hand.  We can do</span>
+    <span class="c1"># it for them.</span>
+    <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">SetDefaultIndex</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">skycat</span><span class="o">.</span><span class="n">getNObjects</span><span class="p">())</span>
+
+    <span class="n">req</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;field&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">}</span>
+    <span class="n">opt</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;obs_kind&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">}</span>
+    <span class="n">params</span><span class="p">,</span> <span class="n">safe</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">GetAllParams</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">req</span><span class="o">=</span><span class="n">req</span><span class="p">,</span> <span class="n">opt</span><span class="o">=</span><span class="n">opt</span><span class="p">)</span>
+    <span class="n">field</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;field&quot;</span><span class="p">]</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">]</span>
+    <span class="n">obs_kind</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;obs_kind&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">field</span> <span class="o">==</span> <span class="s2">&quot;flux&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">obs_kind</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">skycat</span><span class="o">.</span><span class="n">getFlux</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pointing</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">GetInputObj</span><span class="p">(</span><span class="s2">&quot;obseq_data&quot;</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="s2">&quot;OpSeqDataLoader&quot;</span><span class="p">)</span>
+            <span class="nb">filter</span> <span class="o">=</span> <span class="n">pointing</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;filter&quot;</span><span class="p">,</span> <span class="n">obs_kind</span><span class="o">=</span><span class="n">obs_kind</span><span class="p">)</span>
+            <span class="n">exptime</span> <span class="o">=</span> <span class="n">pointing</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;exptime&quot;</span><span class="p">,</span> <span class="n">obs_kind</span><span class="o">=</span><span class="n">obs_kind</span><span class="p">)</span>
+            <span class="n">mjd</span> <span class="o">=</span> <span class="n">pointing</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mjd&quot;</span><span class="p">,</span> <span class="n">obs_kind</span><span class="o">=</span><span class="n">obs_kind</span><span class="p">)</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">skycat</span><span class="o">.</span><span class="n">getFlux</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="nb">filter</span><span class="p">,</span> <span class="n">exptime</span><span class="o">=</span><span class="n">exptime</span><span class="p">,</span> <span class="n">mjd</span><span class="o">=</span><span class="n">mjd</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">skycat</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">val</span><span class="p">,</span> <span class="n">safe</span></div>
+
+
+
+
+<span class="n">RegisterInputType</span><span class="p">(</span><span class="s2">&quot;sky_catalog&quot;</span><span class="p">,</span> <span class="n">SkyCatalogLoader</span><span class="p">(</span><span class="n">SkyCatalogInterface</span><span class="p">,</span> <span class="n">has_nobj</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="n">RegisterObjectType</span><span class="p">(</span><span class="s2">&quot;SkyCatObj&quot;</span><span class="p">,</span> <span class="n">SkyCatObj</span><span class="p">,</span> <span class="n">input_type</span><span class="o">=</span><span class="s2">&quot;sky_catalog&quot;</span><span class="p">)</span>
+<span class="n">RegisterValueType</span><span class="p">(</span>
+    <span class="s2">&quot;SkyCatWorldPos&quot;</span><span class="p">,</span> <span class="n">SkyCatWorldPos</span><span class="p">,</span> <span class="p">[</span><span class="n">galsim</span><span class="o">.</span><span class="n">CelestialCoord</span><span class="p">],</span> <span class="n">input_type</span><span class="o">=</span><span class="s2">&quot;sky_catalog&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># Here we have to provide None as a type otherwise Galsim complains but I don&#39;t know why..</span>
+<span class="n">RegisterValueType</span><span class="p">(</span>
+    <span class="s2">&quot;SkyCatValue&quot;</span><span class="p">,</span> <span class="n">SkyCatValue</span><span class="p">,</span> <span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>  <span class="c1"># , input_type=&quot;sky_catalog&quot;</span>
+<span class="p">)</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">GalSim-Euclid-Like</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../euclidlike.html">The Euclid-like Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../euclidlike_imsim.html">The Euclid-like ImSim Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">Revision History</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Rachel Mandelbaum, Axel Guinot, Federico Berlfein, Andy Park, Xiangchong Li, Michael Troxel, Tianqing Zhang.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.1.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
