@@ -11,7 +11,7 @@ from .euclidlike_wcs import getWCS, findCCD, allowedPos, bestPA, convertCenter
 from .euclidlike_psf import (
    getPSF, getBrightPSF
 )
-from .backgrounds import getSkyLevel
+from .backgrounds import getSkyLevel, getZodiBackground
 
 from ._version import __version__, __version_info__
 version = __version__

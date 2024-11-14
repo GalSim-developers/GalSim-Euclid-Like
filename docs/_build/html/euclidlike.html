@@ -50,6 +50,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#euclid-like-functions">Euclid-like Functions</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#euclidlike.getBandpasses"><code class="docutils literal notranslate"><span class="pre">getBandpasses()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#euclidlike.getSkyLevel"><code class="docutils literal notranslate"><span class="pre">getSkyLevel()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#euclidlike.getZodiBackground"><code class="docutils literal notranslate"><span class="pre">getZodiBackground()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#euclidlike.getPSF"><code class="docutils literal notranslate"><span class="pre">getPSF()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#euclidlike.getBrightPSF"><code class="docutils literal notranslate"><span class="pre">getBrightPSF()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#euclidlike.getWCS"><code class="docutils literal notranslate"><span class="pre">getWCS()</span></code></a></li>
@@ -162,9 +163,6 @@ PSF images, in nm.</p>
 </dd>
 </dl>
 <p>For example, to get the gain value, use euclidlike.gain.</p>
-<p>#.. automodule:: euclidlike.instrument_params
-#   :members:
-#   :undoc-members:</p>
 </section>
 <section id="euclid-like-functions">
 <h2>Euclid-like Functions<a class="headerlink" href="#euclid-like-functions" title="Link to this heading"></a></h2>
@@ -177,7 +175,7 @@ the GalSim zeropoint convention (see <a class="reference internal" href="#euclid
 <dt><a class="reference internal" href="#euclidlike.getSkyLevel" title="euclidlike.getSkyLevel"><code class="xref any py py-func docutils literal notranslate"><span class="pre">euclidlike.getSkyLevel</span></code></a></dt><dd><p>A utility to find the expected sky level due to zodiacal light at a given
 position, in a given band.</p>
 </dd>
-<dt><code class="xref any docutils literal notranslate"><span class="pre">euclidlike.getZodiBackground</span></code></dt><dd><p>This helper routine is enables the calculation of the zodiacal light, in photons/m^2/arcsec^2/sec</p>
+<dt><a class="reference internal" href="#euclidlike.getZodiBackground" title="euclidlike.getZodiBackground"><code class="xref any py py-func docutils literal notranslate"><span class="pre">euclidlike.getZodiBackground</span></code></a></dt><dd><p>This helper routine is enables the calculation of the zodiacal light, in photons/m^2/arcsec^2/sec</p>
 </dd>
 <dt><a class="reference internal" href="#euclidlike.getPSF" title="euclidlike.getPSF"><code class="xref any py py-func docutils literal notranslate"><span class="pre">euclidlike.getPSF</span></code></a></dt><dd><p>A routine to get a chromatic representation of the PSF in a single CCD.
 PSFs are based on precomputed, oversampled (by 3x) PSF images on a grid in wavelength and
@@ -210,14 +208,20 @@ beginning-of-life flux estimates.</p>
 <p>The VIS bandpass red and blue limits are set not by the transmission curve but by the range of
 wavelengths over which we have tabulated PSF images.  The wavelength range is read in from the
 instrument parameter file.</p>
-<p>Args:
-AB_zeropoint (bool) : If True, set the zeropoint of the bandpass to the AB magnitude system. [default: True]
-default_thin_trunc (bool) : If True, use the default thinning and truncation parameters. [default: True]
-full_bandpass (bool): if True, use the full bandpass without red/blue limits needed for PSF</p>
-<blockquote>
-<div><p>calculations. [default: False]</p>
-</div></blockquote>
-<p>kwargs : Additional keyword arguments to pass to either <code class="xref any docutils literal notranslate"><span class="pre">Bandpass.thin</span></code> or <code class="xref any docutils literal notranslate"><span class="pre">Bandpass.truncate</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>AB_zeropoint</strong> (<em>bool</em>) – If True, set the zeropoint of the bandpass to the AB magnitude system. [default: True]</p></li>
+<li><p><strong>default_thin_trunc</strong> (<em>bool</em>) – If True, use the default thinning and truncation parameters. [default: True]</p></li>
+<li><p><strong>full_bandpass</strong> (<em>bool</em>) – if True, use the full bandpass without red/blue limits needed for PSF
+calculations. [default: False]</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments to pass to either <code class="xref any docutils literal notranslate"><span class="pre">Bandpass.thin</span></code> or <code class="xref any docutils literal notranslate"><span class="pre">Bandpass.truncate</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dict with bandpasses for the keys.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -263,6 +267,33 @@ coordinates of (0,0), as it is at the vernal equinox. [default: None]</p></li>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="euclidlike.getZodiBackground">
+<span class="sig-prename descclassname"><span class="pre">euclidlike.</span></span><span class="sig-name descname"><span class="pre">getZodiBackground</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ecl_lat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ecl_dlon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_min</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_max</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Tlambda</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike/backgrounds.html#getZodiBackground"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike.getZodiBackground" title="Link to this definition"></a></dt>
+<dd><p>This helper routine is used with permission from Chris Hirata’s Exposure Time Calculator and enables the
+calculation of the zodiacal light in photons/m^2/arcsec^2/sec. The ETC may be found here:</p>
+<p><a class="reference external" href="http://www.tapir.caltech.edu/~chirata/web/software/space-etc/">http://www.tapir.caltech.edu/~chirata/web/software/space-etc/</a></p>
+<p>The code was ported from C to python by Michael Troxel (matroxel on GitHub).  The units are
+exactly as in the original C code, and we convert to any other needed units outside of this
+routine, in user-facing code.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ecl_lat</strong> – Ecliptic latitude (degrees)</p></li>
+<li><p><strong>ecl_dlon</strong> – Ecliptic longitude (degrees)</p></li>
+<li><p><strong>lambda_min</strong> – Minimum wavelength for the bandpass (microns)</p></li>
+<li><p><strong>lambda_max</strong> – Maximum wavelength for the bandpass (microns)</p></li>
+<li><p><strong>Tlambda</strong> – Numpy array containing a grid of wavelength values for the bandpass (microns)</p></li>
+<li><p><strong>T</strong> – Numpy array containing the throughput (normalized to be between 0-1) for the
+bandpass</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A floating point value for the zodiacal light in photons/m^2/arcsec^2/sec</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="euclidlike.getPSF">
 <span class="sig-prename descclassname"><span class="pre">euclidlike.</span></span><span class="sig-name descname"><span class="pre">getPSF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ccd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bandpass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ccd_pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wcs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gsparams</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psf_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike/euclidlike_psf.html#getPSF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike.getPSF" title="Link to this definition"></a></dt>
 <dd><p>Get a single PSF for a Euclid-like simulation.</p>
@@ -275,14 +306,12 @@ of detector linear charge diffusion, a simplified model for guiding errors, and 
 due to measured surface figure errors are incorporated in the precomputed images.  The telescope
 focus is set to a value from September 2023, and is therefore within a realistic range but does
 not reflect variation over time for any particular observation.</p>
-<p>Several important effects were omitted in these images, including the following:
-* the effect of the dichroic;
-* polarization aberrations;
-* non-linear detector effects such as charge-transfer inefficiency, the brighter-fatter effect,</p>
-<blockquote>
-<div><p>and readout nonlinearity;</p>
-</div></blockquote>
+<p>Several important effects were omitted in these images, including the following:</p>
 <ul class="simple">
+<li><p>the effect of the dichroic;</p></li>
+<li><p>polarization aberrations;</p></li>
+<li><p>non-linear detector effects such as charge-transfer inefficiency, the brighter-fatter effect,
+and readout nonlinearity;</p></li>
 <li><p>the effects of decontamination by ice.</p></li>
 </ul>
 <p>Functionally the lack of non-linear detector effects means the images produced should be thought
@@ -307,36 +336,35 @@ internally.</p>
 vignetting and baffle effects. However, GalSim internally handles the
 obscuration, so we remove this part of the normalization by dividing the
 PSF images by collecting_area / ((diameter/2)**2*np.pi).  As a result, the sum of the pixel values in the renormalized PSF images is very close to 1.</p>
-<p>Args:
-ccd (int):  Single value specifying the CCD for which the PSF</p>
-<blockquote>
-<div><p>should be loaded.</p>
-</div></blockquote>
-<dl class="simple">
-<dt>bandpass (str): Single string specifying the bandpass to use when</dt><dd><p>defining the pupil plane configuration and/or interpolation of
-chromatic PSFs.</p>
-</dd>
-<dt>ccd_pos:  Single galsim.PositionD indicating the position within the CCD</dt><dd><p>for which the PSF should be created. If None, the exact center of the
-CCD is chosen. [default: None]</p>
-</dd>
-<dt>wcs:  The WCS to use to project the PSF into world coordinates. [default:</dt><dd><p>galsim.PixelScale(euclid_like.roman.pixel_scale)]</p>
-</dd>
-<dt>wavelength (float):  An option to get an achromatic PSF for a single</dt><dd><p>wavelength, for users who do not care about chromaticity of the PSF. If
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ccd</strong> (<em>int</em>) – Single value specifying the CCD for which the PSF
+should be loaded.</p></li>
+<li><p><strong>bandpass</strong> (<em>str</em>) – Single string specifying the bandpass to use when
+defining the pupil plane configuration and/or interpolation of
+chromatic PSFs.</p></li>
+<li><p><strong>ccd_pos</strong> – Single galsim.PositionD indicating the position within the CCD
+for which the PSF should be created. If None, the exact center of the
+CCD is chosen. [default: None]</p></li>
+<li><p><strong>wcs</strong> – The WCS to use to project the PSF into world coordinates. [default:
+galsim.PixelScale(euclid_like.roman.pixel_scale)]</p></li>
+<li><p><strong>wavelength</strong> (<em>float</em>) – An option to get an achromatic PSF for a single
+wavelength, for users who do not care about chromaticity of the PSF. If
 None, then the fully chromatic PSF is returned as an
 InterpolatedChromaticObject. Alternatively the user should supply
 either (a) a wavelength in nanometers, and they will get an
 InterpolatedImage object for that wavelength, or (b) a bandpass object,
 in which case they will get an InterpolatedImage objects defined at the
-effective wavelength of that bandpass. [default: None]</p>
+effective wavelength of that bandpass. [default: None]</p></li>
+<li><p><strong>gsparams</strong> – An optional GSParams argument.  See the docstring for GSParams
+for details. [default: None]</p></li>
+<li><p><strong>psf_dir</strong> (<em>str</em>) – Directory where sampled PSF images can be accessed. If not
+given, look in ./data directory. [default: None]</p></li>
+</ul>
 </dd>
-<dt>gsparams:  An optional GSParams argument.  See the docstring for GSParams</dt><dd><p>for details. [default: None]</p>
-</dd>
-<dt>psf_dir (str): Directory where sampled PSF images can be accessed. If not</dt><dd><p>given, look in ./data directory. [default: None]</p>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A single PSF object (either an InterpolatedChromaticObject or an
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A single PSF object (either an InterpolatedChromaticObject or an
 InterpolatedImage depending on the inputs).</p>
 </dd>
 </dl>
@@ -348,40 +376,39 @@ InterpolatedImage depending on the inputs).</p>
 <dd><p>Get a fake optical PSF for very bright objects in Euclid-like simulations.
 Depending on the inputs, this routine returns a chromatic or achromatic PSF using the
 Euclid telescope diameter and Euclid-like aperture.</p>
-<p>Args:
-ccd (int):  Single value specifying the CCD for which the PSF should be</p>
-<blockquote>
-<div><p>loaded.</p>
-</div></blockquote>
-<dl class="simple">
-<dt>bandpass (str): Single string specifying the bandpass to use when</dt><dd><p>defining the pupil plane configuration and/or interpolation of
-chromatic PSFs.</p>
-</dd>
-<dt>ccd_pos:  Single galsim.PositionD indicating the position within the CCD</dt><dd><p>for which the PSF should be created. If None, the exact center of the
-CCD is chosen. [default: None]</p>
-</dd>
-<dt>wcs:  The WCS to use to project the PSF into world coordinates. [default:</dt><dd><p>galsim.PixelScale(euclidlike.pixel_scale)]</p>
-</dd>
-<dt>n_waves (int): Number of wavelengths to use for setting up interpolation of the</dt><dd><p>chromatic PSF objects, which can lead to much faster image
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ccd</strong> (<em>int</em>) – Single value specifying the CCD for which the PSF should be
+loaded.</p></li>
+<li><p><strong>bandpass</strong> (<em>str</em>) – Single string specifying the bandpass to use when
+defining the pupil plane configuration and/or interpolation of
+chromatic PSFs.</p></li>
+<li><p><strong>ccd_pos</strong> – Single galsim.PositionD indicating the position within the CCD
+for which the PSF should be created. If None, the exact center of the
+CCD is chosen. [default: None]</p></li>
+<li><p><strong>wcs</strong> – The WCS to use to project the PSF into world coordinates. [default:
+galsim.PixelScale(euclidlike.pixel_scale)]</p></li>
+<li><p><strong>n_waves</strong> (<em>int</em>) – Number of wavelengths to use for setting up interpolation of the
+chromatic PSF objects, which can lead to much faster image
 rendering.  If None, then no interpolation is used. Note that
 users who want to interpolate can always set up the interpolation
 later on even if they do not do so when calling <a class="reference internal" href="#euclidlike.getPSF" title="euclidlike.getPSF"><code class="xref any py py-func docutils literal notranslate"><span class="pre">getPSF</span></code></a>.
-[default: None]</p>
-</dd>
-<dt>wavelength (float):  An option to get an achromatic PSF for a single</dt><dd><p>wavelength, for users who do not care about chromaticity of the PSF. If
+[default: None]</p></li>
+<li><p><strong>wavelength</strong> (<em>float</em>) – An option to get an achromatic PSF for a single
+wavelength, for users who do not care about chromaticity of the PSF. If
 None, then the fully chromatic PSF is returned as an
 InterpolatedChromaticObject. Alternatively the user should supply
 either (a) a wavelength in nanometers, and they will get an
 InterpolatedImage object for that wavelength, or (b) a bandpass object,
 in which case they will get an InterpolatedImage objects defined at the
-effective wavelength of that bandpass. [default: None]</p>
+effective wavelength of that bandpass. [default: None]</p></li>
+<li><p><strong>gsparams</strong> – An optional GSParams argument.  See the docstring for GSParams
+for details. [default: None]</p></li>
+</ul>
 </dd>
-<dt>gsparams:  An optional GSParams argument.  See the docstring for GSParams</dt><dd><p>for details. [default: None]</p>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A single PSF object (either an InterpolatedChromaticObject or an
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A single PSF object (either an InterpolatedChromaticObject or an
 InterpolatedImage depending on the inputs).</p>
 </dd>
 </dl>

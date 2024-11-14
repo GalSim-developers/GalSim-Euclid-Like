@@ -118,12 +118,15 @@
 <span class="sd">    wavelengths over which we have tabulated PSF images.  The wavelength range is read in from the</span>
 <span class="sd">    instrument parameter file.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">    AB_zeropoint (bool) : If True, set the zeropoint of the bandpass to the AB magnitude system. [default: True]</span>
-<span class="sd">    default_thin_trunc (bool) : If True, use the default thinning and truncation parameters. [default: True]</span>
-<span class="sd">    full_bandpass (bool): if True, use the full bandpass without red/blue limits needed for PSF</span>
-<span class="sd">                          calculations. [default: False]</span>
-<span class="sd">    kwargs : Additional keyword arguments to pass to either `Bandpass.thin` or `Bandpass.truncate`.</span>
+<span class="sd">    Parameters:</span>
+<span class="sd">        AB_zeropoint (bool) : If True, set the zeropoint of the bandpass to the AB magnitude system. [default: True]</span>
+<span class="sd">        default_thin_trunc (bool) : If True, use the default thinning and truncation parameters. [default: True]</span>
+<span class="sd">        full_bandpass (bool): if True, use the full bandpass without red/blue limits needed for PSF</span>
+<span class="sd">                              calculations. [default: False]</span>
+<span class="sd">        **kwargs : Additional keyword arguments to pass to either `Bandpass.thin` or `Bandpass.truncate`.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        A dict with bandpasses for the keys.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Read in the bandpass files, using a dict to distinguish the different filters</span>
     <span class="n">wave</span> <span class="o">=</span> <span class="p">{}</span>

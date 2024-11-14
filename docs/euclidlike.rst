@@ -99,10 +99,6 @@ vis_red_limit
 
 For example, to get the gain value, use euclidlike.gain.
 
-#.. automodule:: euclidlike.instrument_params
-#   :members:
-#   :undoc-members:
-
 
 Euclid-like Functions
 ===============
