@@ -1,5 +1,5 @@
 Config imsim
-============
+----------------
 
 ``was.yaml``: *euclidlike_imsim example* config file.  
 You will want to update the following entries:
@@ -23,7 +23,7 @@ You might want to specify some config entries on the command line, like:
 
 
 Config SLURM
-============
+----------------
 
 ``slurm_runner.sh`` contains the SLURM configuration to run "large scale" simulations.  
 You will want to update the following lines:

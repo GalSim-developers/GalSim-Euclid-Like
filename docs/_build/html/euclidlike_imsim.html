@@ -136,9 +136,11 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#use">Use</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#config-imsim">Config imsim</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#config-slurm">Config SLURM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#use">Use</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#config-imsim">Config imsim</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#config-slurm">Config SLURM</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
@@ -857,9 +859,8 @@ ignore here. i.e. it won’t be an error if these parameters are present.</p></l
 <section id="use">
 <h2>Use<a class="headerlink" href="#use" title="Link to this heading"></a></h2>
 <p>Example files needed for large-scale Euclid-like simulation runs are included in <code class="docutils literal notranslate"><span class="pre">GalSim-Euclid-Like/config</span></code>.</p>
-</section>
 <section id="config-imsim">
-<h2>Config imsim<a class="headerlink" href="#config-imsim" title="Link to this heading"></a></h2>
+<h3>Config imsim<a class="headerlink" href="#config-imsim" title="Link to this heading"></a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">was.yaml</span></code>: <em>euclidlike_imsim example</em> config file.
 You will want to update the following entries:</p>
 <ul class="simple">
@@ -878,7 +879,7 @@ You will want to update the following entries:</p>
 </div>
 </section>
 <section id="config-slurm">
-<h2>Config SLURM<a class="headerlink" href="#config-slurm" title="Link to this heading"></a></h2>
+<h3>Config SLURM<a class="headerlink" href="#config-slurm" title="Link to this heading"></a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">slurm_runner.sh</span></code> contains the SLURM configuration to run “large scale” simulations.
 You will want to update the following lines:</p>
 <ul class="simple">
@@ -899,6 +900,7 @@ You will want to update the following lines:</p>
 [...]
 </pre></div>
 </div>
+</section>
 </section>
 </section>
 
