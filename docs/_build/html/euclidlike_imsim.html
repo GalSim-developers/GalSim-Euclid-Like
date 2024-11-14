@@ -1,47 +1,183 @@
+
+
 <!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<html lang="en" data-content_root="./">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Euclid-like ImSim Module &mdash; GalSim-Euclid-Like 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
-    <title>The Euclid-like ImSim Module &#8212; GalSim-Euclid-Like 0.0.1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
-    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=686e5160" />
-    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
-    <script src="_static/documentation_options.js?v=d45e8c67"></script>
-    <script src="_static/doctools.js?v=9bcbadda"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Examples" href="examples.html" />
-    <link rel="prev" title="The Euclid-like Module" href="euclidlike.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
+    <link rel="prev" title="The Euclid-like Module" href="euclidlike.html" /> 
+</head>
 
-  
-  
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
 
-  </head><body>
-  
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
           
+          
+          <a href="index.html" class="icon icon-home">
+            GalSim-Euclid-Like
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="euclidlike.html">The Euclid-like Module</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">The Euclid-like ImSim Module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-euclidlike_imsim.bandpass">Classes and Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#euclidlike_imsim.bandpass.EuclidlikeBandpassBuilder"><code class="docutils literal notranslate"><span class="pre">EuclidlikeBandpassBuilder</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.bandpass.EuclidlikeBandpassBuilder.buildBandpass"><code class="docutils literal notranslate"><span class="pre">EuclidlikeBandpassBuilder.buildBandpass()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#euclidlike_imsim.ccd.EuclidlikeCCDImageBuilder"><code class="docutils literal notranslate"><span class="pre">EuclidlikeCCDImageBuilder</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.ccd.EuclidlikeCCDImageBuilder.addNoise"><code class="docutils literal notranslate"><span class="pre">EuclidlikeCCDImageBuilder.addNoise()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.ccd.EuclidlikeCCDImageBuilder.buildImage"><code class="docutils literal notranslate"><span class="pre">EuclidlikeCCDImageBuilder.buildImage()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.ccd.EuclidlikeCCDImageBuilder.setup"><code class="docutils literal notranslate"><span class="pre">EuclidlikeCCDImageBuilder.setup()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#euclidlike_imsim.noise.NoiseImageBuilder"><code class="docutils literal notranslate"><span class="pre">NoiseImageBuilder</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.noise.NoiseImageBuilder.initialize"><code class="docutils literal notranslate"><span class="pre">NoiseImageBuilder.initialize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.noise.NoiseImageBuilder.processImage"><code class="docutils literal notranslate"><span class="pre">NoiseImageBuilder.processImage()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#euclidlike_imsim.noise.SkyImageBuilder"><code class="docutils literal notranslate"><span class="pre">SkyImageBuilder</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.noise.SkyImageBuilder.processImage"><code class="docutils literal notranslate"><span class="pre">SkyImageBuilder.processImage()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#euclidlike_imsim.noise.WeightImageBuilder"><code class="docutils literal notranslate"><span class="pre">WeightImageBuilder</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.noise.WeightImageBuilder.processImage"><code class="docutils literal notranslate"><span class="pre">WeightImageBuilder.processImage()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#euclidlike_imsim.noise.get_noise"><code class="docutils literal notranslate"><span class="pre">get_noise()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#euclidlike_imsim.noise.parse_noise_config"><code class="docutils literal notranslate"><span class="pre">parse_noise_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#euclidlike_imsim.obseq.ObSeqData"><code class="docutils literal notranslate"><span class="pre">ObSeqData()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#euclidlike_imsim.obseq.ObSeqDataLoader"><code class="docutils literal notranslate"><span class="pre">ObSeqDataLoader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.obseq.ObSeqDataLoader.get"><code class="docutils literal notranslate"><span class="pre">ObSeqDataLoader.get()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.obseq.ObSeqDataLoader.read_obseq"><code class="docutils literal notranslate"><span class="pre">ObSeqDataLoader.read_obseq()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#euclidlike_imsim.photonOps.ChargeDiff"><code class="docutils literal notranslate"><span class="pre">ChargeDiff</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.photonOps.ChargeDiff.applyTo"><code class="docutils literal notranslate"><span class="pre">ChargeDiff.applyTo()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#euclidlike_imsim.photonOps.ChargeDiffBuilder"><code class="docutils literal notranslate"><span class="pre">ChargeDiffBuilder</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.photonOps.ChargeDiffBuilder.buildPhotonOp"><code class="docutils literal notranslate"><span class="pre">ChargeDiffBuilder.buildPhotonOp()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#euclidlike_imsim.psf.EuclidlikePSF"><code class="docutils literal notranslate"><span class="pre">EuclidlikePSF</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.psf.EuclidlikePSF.getPSF"><code class="docutils literal notranslate"><span class="pre">EuclidlikePSF.getPSF()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#euclidlike_imsim.psf.PSFLoader"><code class="docutils literal notranslate"><span class="pre">PSFLoader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.psf.PSFLoader.getKwargs"><code class="docutils literal notranslate"><span class="pre">PSFLoader.getKwargs()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#euclidlike_imsim.skycat.SkyCatObj"><code class="docutils literal notranslate"><span class="pre">SkyCatObj()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#euclidlike_imsim.skycat.SkyCatValue"><code class="docutils literal notranslate"><span class="pre">SkyCatValue()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#euclidlike_imsim.skycat.SkyCatWorldPos"><code class="docutils literal notranslate"><span class="pre">SkyCatWorldPos()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#euclidlike_imsim.skycat.SkyCatalogInterface"><code class="docutils literal notranslate"><span class="pre">SkyCatalogInterface</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.skycat.SkyCatalogInterface.getApproxNObjects"><code class="docutils literal notranslate"><span class="pre">SkyCatalogInterface.getApproxNObjects()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.skycat.SkyCatalogInterface.getFlux"><code class="docutils literal notranslate"><span class="pre">SkyCatalogInterface.getFlux()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.skycat.SkyCatalogInterface.getNObjects"><code class="docutils literal notranslate"><span class="pre">SkyCatalogInterface.getNObjects()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.skycat.SkyCatalogInterface.getObj"><code class="docutils literal notranslate"><span class="pre">SkyCatalogInterface.getObj()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.skycat.SkyCatalogInterface.getValue"><code class="docutils literal notranslate"><span class="pre">SkyCatalogInterface.getValue()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.skycat.SkyCatalogInterface.getWorldPos"><code class="docutils literal notranslate"><span class="pre">SkyCatalogInterface.getWorldPos()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.skycat.SkyCatalogInterface.get_ccd_center"><code class="docutils literal notranslate"><span class="pre">SkyCatalogInterface.get_ccd_center()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.skycat.SkyCatalogInterface.objects"><code class="docutils literal notranslate"><span class="pre">SkyCatalogInterface.objects</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#euclidlike_imsim.skycat.SkyCatalogLoader"><code class="docutils literal notranslate"><span class="pre">SkyCatalogLoader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.skycat.SkyCatalogLoader.getKwargs"><code class="docutils literal notranslate"><span class="pre">SkyCatalogLoader.getKwargs()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#euclidlike_imsim.stamp.Euclidlike_stamp"><code class="docutils literal notranslate"><span class="pre">Euclidlike_stamp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.stamp.Euclidlike_stamp.buildPSF"><code class="docutils literal notranslate"><span class="pre">Euclidlike_stamp.buildPSF()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.stamp.Euclidlike_stamp.draw"><code class="docutils literal notranslate"><span class="pre">Euclidlike_stamp.draw()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.stamp.Euclidlike_stamp.fix_seds"><code class="docutils literal notranslate"><span class="pre">Euclidlike_stamp.fix_seds()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.stamp.Euclidlike_stamp.getDrawMethod"><code class="docutils literal notranslate"><span class="pre">Euclidlike_stamp.getDrawMethod()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.stamp.Euclidlike_stamp.setup"><code class="docutils literal notranslate"><span class="pre">Euclidlike_stamp.setup()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#euclidlike_imsim.utils.roman_utils"><code class="docutils literal notranslate"><span class="pre">roman_utils</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.utils.roman_utils.check_input"><code class="docutils literal notranslate"><span class="pre">roman_utils.check_input()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.utils.roman_utils.getBandpass"><code class="docutils literal notranslate"><span class="pre">roman_utils.getBandpass()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.utils.roman_utils.getLocalWCS"><code class="docutils literal notranslate"><span class="pre">roman_utils.getLocalWCS()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.utils.roman_utils.getPSF"><code class="docutils literal notranslate"><span class="pre">roman_utils.getPSF()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.utils.roman_utils.getPSF_Image"><code class="docutils literal notranslate"><span class="pre">roman_utils.getPSF_Image()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.utils.roman_utils.getWCS"><code class="docutils literal notranslate"><span class="pre">roman_utils.getWCS()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#euclidlike_imsim.wcs.EuclidlikeWCS"><code class="docutils literal notranslate"><span class="pre">EuclidlikeWCS</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#euclidlike_imsim.wcs.EuclidlikeWCS.buildWCS"><code class="docutils literal notranslate"><span class="pre">EuclidlikeWCS.buildWCS()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#use">Use</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#config-imsim">Config imsim</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#config-slurm">Config SLURM</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="history.html">Revision History</a></li>
+</ul>
 
-          <div class="body" role="main">
-            
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">GalSim-Euclid-Like</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">The Euclid-like ImSim Module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/euclidlike_imsim.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
   <section id="the-euclid-like-imsim-module">
-<h1>The Euclid-like ImSim Module<a class="headerlink" href="#the-euclid-like-imsim-module" title="Link to this heading">¶</a></h1>
+<h1>The Euclid-like ImSim Module<a class="headerlink" href="#the-euclid-like-imsim-module" title="Link to this heading"></a></h1>
 <p>This module contains configuration scripts to produce large-scale Euclid-like simulation runs based on the information in <code class="docutils literal notranslate"><span class="pre">euclidlike</span></code>.
 It is based heavily on <a class="reference external" href="https://github.com/matroxel/roman_imsim">roman_imsim</a>.</p>
 <section id="module-euclidlike_imsim.bandpass">
-<span id="classes-and-functions"></span><h2>Classes and Functions<a class="headerlink" href="#module-euclidlike_imsim.bandpass" title="Link to this heading">¶</a></h2>
+<span id="classes-and-functions"></span><h2>Classes and Functions<a class="headerlink" href="#module-euclidlike_imsim.bandpass" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="euclidlike_imsim.bandpass.EuclidlikeBandpassBuilder">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.bandpass.</span></span><span class="sig-name descname"><span class="pre">EuclidlikeBandpassBuilder</span></span><a class="reference internal" href="_modules/euclidlike_imsim/bandpass.html#EuclidlikeBandpassBuilder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.bandpass.EuclidlikeBandpassBuilder" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.bandpass.</span></span><span class="sig-name descname"><span class="pre">EuclidlikeBandpassBuilder</span></span><a class="reference internal" href="_modules/euclidlike_imsim/bandpass.html#EuclidlikeBandpassBuilder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.bandpass.EuclidlikeBandpassBuilder" title="Link to this definition"></a></dt>
 <dd><p>A class for loading a Bandpass from a file</p>
 <p>FileBandpass expected the following parameter:</p>
 <blockquote>
@@ -49,7 +185,7 @@ It is based heavily on <a class="reference external" href="https://github.com/ma
 </div></blockquote>
 <dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.bandpass.EuclidlikeBandpassBuilder.buildBandpass">
-<span class="sig-name descname"><span class="pre">buildBandpass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/bandpass.html#EuclidlikeBandpassBuilder.buildBandpass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.bandpass.EuclidlikeBandpassBuilder.buildBandpass" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">buildBandpass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/bandpass.html#EuclidlikeBandpassBuilder.buildBandpass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.bandpass.EuclidlikeBandpassBuilder.buildBandpass" title="Link to this definition"></a></dt>
 <dd><p>Build the Bandpass based on the specifications in the config dict.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -69,10 +205,10 @@ It is based heavily on <a class="reference external" href="https://github.com/ma
 
 <dl class="py class" id="module-euclidlike_imsim.ccd">
 <dt class="sig sig-object py" id="euclidlike_imsim.ccd.EuclidlikeCCDImageBuilder">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.ccd.</span></span><span class="sig-name descname"><span class="pre">EuclidlikeCCDImageBuilder</span></span><a class="reference internal" href="_modules/euclidlike_imsim/ccd.html#EuclidlikeCCDImageBuilder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.ccd.EuclidlikeCCDImageBuilder" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.ccd.</span></span><span class="sig-name descname"><span class="pre">EuclidlikeCCDImageBuilder</span></span><a class="reference internal" href="_modules/euclidlike_imsim/ccd.html#EuclidlikeCCDImageBuilder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.ccd.EuclidlikeCCDImageBuilder" title="Link to this definition"></a></dt>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.ccd.EuclidlikeCCDImageBuilder.addNoise">
-<span class="sig-name descname"><span class="pre">addNoise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_num</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_num</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/ccd.html#EuclidlikeCCDImageBuilder.addNoise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.ccd.EuclidlikeCCDImageBuilder.addNoise" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">addNoise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_num</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_num</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/ccd.html#EuclidlikeCCDImageBuilder.addNoise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.ccd.EuclidlikeCCDImageBuilder.addNoise" title="Link to this definition"></a></dt>
 <dd><p>Add the final noise to a Scattered image</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -91,7 +227,7 @@ It is based heavily on <a class="reference external" href="https://github.com/ma
 
 <dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.ccd.EuclidlikeCCDImageBuilder.buildImage">
-<span class="sig-name descname"><span class="pre">buildImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_num</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_num</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/ccd.html#EuclidlikeCCDImageBuilder.buildImage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.ccd.EuclidlikeCCDImageBuilder.buildImage" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">buildImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_num</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_num</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/ccd.html#EuclidlikeCCDImageBuilder.buildImage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.ccd.EuclidlikeCCDImageBuilder.buildImage" title="Link to this definition"></a></dt>
 <dd><p>Build an Image containing multiple objects placed at arbitrary locations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -111,7 +247,7 @@ It is based heavily on <a class="reference external" href="https://github.com/ma
 
 <dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.ccd.EuclidlikeCCDImageBuilder.setup">
-<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_num</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_num</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/ccd.html#EuclidlikeCCDImageBuilder.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.ccd.EuclidlikeCCDImageBuilder.setup" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_num</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_num</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/ccd.html#EuclidlikeCCDImageBuilder.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.ccd.EuclidlikeCCDImageBuilder.setup" title="Link to this definition"></a></dt>
 <dd><p>Do the initialization and setup for building the image.</p>
 <p>This figures out the size that the image will be, but doesn’t actually build it yet.</p>
 <dl class="field-list simple">
@@ -136,10 +272,10 @@ ignore here. i.e. it won’t be an error if these parameters are present.</p></l
 
 <dl class="py class" id="module-euclidlike_imsim.noise">
 <dt class="sig sig-object py" id="euclidlike_imsim.noise.NoiseImageBuilder">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.noise.</span></span><span class="sig-name descname"><span class="pre">NoiseImageBuilder</span></span><a class="reference internal" href="_modules/euclidlike_imsim/noise.html#NoiseImageBuilder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.noise.NoiseImageBuilder" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.noise.</span></span><span class="sig-name descname"><span class="pre">NoiseImageBuilder</span></span><a class="reference internal" href="_modules/euclidlike_imsim/noise.html#NoiseImageBuilder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.noise.NoiseImageBuilder" title="Link to this definition"></a></dt>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.noise.NoiseImageBuilder.initialize">
-<span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scratch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/noise.html#NoiseImageBuilder.initialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.noise.NoiseImageBuilder.initialize" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scratch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/noise.html#NoiseImageBuilder.initialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.noise.NoiseImageBuilder.initialize" title="Link to this definition"></a></dt>
 <dd><p>Do any initial setup for this builder at the start of a new output file.</p>
 <p>The base class implementation saves two work space items into self.data and self.scratch
 that can be used to safely communicate across multiple processes.</p>
@@ -158,7 +294,7 @@ that can be used to safely communicate across multiple processes.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.noise.NoiseImageBuilder.processImage">
-<span class="sig-name descname"><span class="pre">processImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_nums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/noise.html#NoiseImageBuilder.processImage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.noise.NoiseImageBuilder.processImage" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">processImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_nums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/noise.html#NoiseImageBuilder.processImage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.noise.NoiseImageBuilder.processImage" title="Link to this definition"></a></dt>
 <dd><p>Perform any necessary processing at the end of each image construction.</p>
 <p>This function will be called after each full image is built.</p>
 <p>Compute the noise for the current image and add it to the image.
@@ -184,10 +320,10 @@ goes up to nimages-1.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="euclidlike_imsim.noise.SkyImageBuilder">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.noise.</span></span><span class="sig-name descname"><span class="pre">SkyImageBuilder</span></span><a class="reference internal" href="_modules/euclidlike_imsim/noise.html#SkyImageBuilder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.noise.SkyImageBuilder" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.noise.</span></span><span class="sig-name descname"><span class="pre">SkyImageBuilder</span></span><a class="reference internal" href="_modules/euclidlike_imsim/noise.html#SkyImageBuilder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.noise.SkyImageBuilder" title="Link to this definition"></a></dt>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.noise.SkyImageBuilder.processImage">
-<span class="sig-name descname"><span class="pre">processImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_nums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/noise.html#SkyImageBuilder.processImage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.noise.SkyImageBuilder.processImage" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">processImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_nums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/noise.html#SkyImageBuilder.processImage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.noise.SkyImageBuilder.processImage" title="Link to this definition"></a></dt>
 <dd><p>Perform any necessary processing at the end of each image construction.</p>
 <p>This function will be called after each full image is built.</p>
 <p>Compute the sky background and return it in an image.</p>
@@ -211,10 +347,10 @@ goes up to nimages-1.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="euclidlike_imsim.noise.WeightImageBuilder">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.noise.</span></span><span class="sig-name descname"><span class="pre">WeightImageBuilder</span></span><a class="reference internal" href="_modules/euclidlike_imsim/noise.html#WeightImageBuilder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.noise.WeightImageBuilder" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.noise.</span></span><span class="sig-name descname"><span class="pre">WeightImageBuilder</span></span><a class="reference internal" href="_modules/euclidlike_imsim/noise.html#WeightImageBuilder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.noise.WeightImageBuilder" title="Link to this definition"></a></dt>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.noise.WeightImageBuilder.processImage">
-<span class="sig-name descname"><span class="pre">processImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_nums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/noise.html#WeightImageBuilder.processImage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.noise.WeightImageBuilder.processImage" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">processImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_nums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/noise.html#WeightImageBuilder.processImage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.noise.WeightImageBuilder.processImage" title="Link to this definition"></a></dt>
 <dd><p>Perform any necessary processing at the end of each image construction.</p>
 <p>This function will be called after each full image is built.</p>
 <p>Compute the weight map from the noise image and return it in an image.</p>
@@ -238,32 +374,32 @@ goes up to nimages-1.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="euclidlike_imsim.noise.get_noise">
-<span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.noise.</span></span><span class="sig-name descname"><span class="pre">get_noise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg_noise</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg_image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/noise.html#get_noise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.noise.get_noise" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.noise.</span></span><span class="sig-name descname"><span class="pre">get_noise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg_noise</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg_image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/noise.html#get_noise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.noise.get_noise" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="euclidlike_imsim.noise.parse_noise_config">
-<span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.noise.</span></span><span class="sig-name descname"><span class="pre">parse_noise_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/noise.html#parse_noise_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.noise.parse_noise_config" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.noise.</span></span><span class="sig-name descname"><span class="pre">parse_noise_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/noise.html#parse_noise_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.noise.parse_noise_config" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function" id="module-euclidlike_imsim.obseq">
 <dt class="sig sig-object py" id="euclidlike_imsim.obseq.ObSeqData">
-<span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.obseq.</span></span><span class="sig-name descname"><span class="pre">ObSeqData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/obseq.html#ObSeqData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.obseq.ObSeqData" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.obseq.</span></span><span class="sig-name descname"><span class="pre">ObSeqData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/obseq.html#ObSeqData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.obseq.ObSeqData" title="Link to this definition"></a></dt>
 <dd><p>Returns the obseq data for a pointing.</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="euclidlike_imsim.obseq.ObSeqDataLoader">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.obseq.</span></span><span class="sig-name descname"><span class="pre">ObSeqDataLoader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">visit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_kind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CCD</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/obseq.html#ObSeqDataLoader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.obseq.ObSeqDataLoader" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.obseq.</span></span><span class="sig-name descname"><span class="pre">ObSeqDataLoader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">visit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_kind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CCD</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/obseq.html#ObSeqDataLoader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.obseq.ObSeqDataLoader" title="Link to this definition"></a></dt>
 <dd><p>Read the exposure information from the observation sequence.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.obseq.ObSeqDataLoader.get">
-<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_kind</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/obseq.html#ObSeqDataLoader.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.obseq.ObSeqDataLoader.get" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_kind</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/obseq.html#ObSeqDataLoader.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.obseq.ObSeqDataLoader.get" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.obseq.ObSeqDataLoader.read_obseq">
-<span class="sig-name descname"><span class="pre">read_obseq</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/obseq.html#ObSeqDataLoader.read_obseq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.obseq.ObSeqDataLoader.read_obseq" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">read_obseq</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/obseq.html#ObSeqDataLoader.read_obseq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.obseq.ObSeqDataLoader.read_obseq" title="Link to this definition"></a></dt>
 <dd><p>Read visit info from the obseq file.</p>
 </dd></dl>
 
@@ -271,17 +407,17 @@ goes up to nimages-1.</p></li>
 
 <dl class="py class" id="module-euclidlike_imsim.photonOps">
 <dt class="sig sig-object py" id="euclidlike_imsim.photonOps.ChargeDiff">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.photonOps.</span></span><span class="sig-name descname"><span class="pre">ChargeDiff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/photonOps.html#ChargeDiff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.photonOps.ChargeDiff" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.photonOps.</span></span><span class="sig-name descname"><span class="pre">ChargeDiff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/photonOps.html#ChargeDiff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.photonOps.ChargeDiff" title="Link to this definition"></a></dt>
 <dd><p>A photon operator that applies the effect of charge diffusion via a probablistic model limit.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.photonOps.ChargeDiff.applyTo">
-<span class="sig-name descname"><span class="pre">applyTo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">photon_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_wcs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/photonOps.html#ChargeDiff.applyTo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.photonOps.ChargeDiff.applyTo" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">applyTo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">photon_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_wcs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/photonOps.html#ChargeDiff.applyTo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.photonOps.ChargeDiff.applyTo" title="Link to this definition"></a></dt>
 <dd><p>Apply the charge diffusion effect to the photons</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>photon_array</strong> – A <cite>PhotonArray</cite> to apply the operator to.</p></li>
-<li><p><strong>local_wcs</strong> – A <cite>LocalWCS</cite> instance defining the local WCS for the current photon
+<li><p><strong>photon_array</strong> – A <code class="xref any docutils literal notranslate"><span class="pre">PhotonArray</span></code> to apply the operator to.</p></li>
+<li><p><strong>local_wcs</strong> – A <code class="xref any docutils literal notranslate"><span class="pre">LocalWCS</span></code> instance defining the local WCS for the current photon
 bundle in case the operator needs this information.  [default: None]</p></li>
 <li><p><strong>rng</strong> – A random number generator to use if needed. [default: None]</p></li>
 </ul>
@@ -293,11 +429,11 @@ bundle in case the operator needs this information.  [default: None]</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="euclidlike_imsim.photonOps.ChargeDiffBuilder">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.photonOps.</span></span><span class="sig-name descname"><span class="pre">ChargeDiffBuilder</span></span><a class="reference internal" href="_modules/euclidlike_imsim/photonOps.html#ChargeDiffBuilder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.photonOps.ChargeDiffBuilder" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.photonOps.</span></span><span class="sig-name descname"><span class="pre">ChargeDiffBuilder</span></span><a class="reference internal" href="_modules/euclidlike_imsim/photonOps.html#ChargeDiffBuilder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.photonOps.ChargeDiffBuilder" title="Link to this definition"></a></dt>
 <dd><p>Build ChargeDiff photonOp</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.photonOps.ChargeDiffBuilder.buildPhotonOp">
-<span class="sig-name descname"><span class="pre">buildPhotonOp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/photonOps.html#ChargeDiffBuilder.buildPhotonOp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.photonOps.ChargeDiffBuilder.buildPhotonOp" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">buildPhotonOp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/photonOps.html#ChargeDiffBuilder.buildPhotonOp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.photonOps.ChargeDiffBuilder.buildPhotonOp" title="Link to this definition"></a></dt>
 <dd><p>Build the PhotonOp based on the specifications in the config dict.</p>
 <p>Note: Sub-classes must override this function with a real implementation.</p>
 <dl class="field-list simple">
@@ -318,11 +454,11 @@ bundle in case the operator needs this information.  [default: None]</p></li>
 
 <dl class="py class" id="module-euclidlike_imsim.psf">
 <dt class="sig sig-object py" id="euclidlike_imsim.psf.EuclidlikePSF">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.psf.</span></span><span class="sig-name descname"><span class="pre">EuclidlikePSF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">CCD</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">WCS</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_waves</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bpass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_aberrations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/psf.html#EuclidlikePSF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.psf.EuclidlikePSF" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.psf.</span></span><span class="sig-name descname"><span class="pre">EuclidlikePSF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">CCD</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">WCS</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_waves</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bpass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_aberrations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/psf.html#EuclidlikePSF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.psf.EuclidlikePSF" title="Link to this definition"></a></dt>
 <dd><p>Class building needed Euclidlike PSFs.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.psf.EuclidlikePSF.getPSF">
-<span class="sig-name descname"><span class="pre">getPSF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pupil_bin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/psf.html#EuclidlikePSF.getPSF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.psf.EuclidlikePSF.getPSF" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">getPSF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pupil_bin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/psf.html#EuclidlikePSF.getPSF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.psf.EuclidlikePSF.getPSF" title="Link to this definition"></a></dt>
 <dd><p>Return a PSF to be convolved with sources.
 PSF is sampled at 4 quadrants for each CCD. Returned PSF
 corresponds to that of the quadrant of the CCD position.</p>
@@ -333,11 +469,11 @@ corresponds to that of the quadrant of the CCD position.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="euclidlike_imsim.psf.PSFLoader">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.psf.</span></span><span class="sig-name descname"><span class="pre">PSFLoader</span></span><a class="reference internal" href="_modules/euclidlike_imsim/psf.html#PSFLoader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.psf.PSFLoader" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.psf.</span></span><span class="sig-name descname"><span class="pre">PSFLoader</span></span><a class="reference internal" href="_modules/euclidlike_imsim/psf.html#PSFLoader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.psf.PSFLoader" title="Link to this definition"></a></dt>
 <dd><p>PSF loader.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.psf.PSFLoader.getKwargs">
-<span class="sig-name descname"><span class="pre">getKwargs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/psf.html#PSFLoader.getKwargs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.psf.PSFLoader.getKwargs" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">getKwargs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/psf.html#PSFLoader.getKwargs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.psf.PSFLoader.getKwargs" title="Link to this definition"></a></dt>
 <dd><p>Parse the config dict and return the kwargs needed to build the input object.</p>
 <p>The default implementation looks for special class attributes called:</p>
 <dl class="simple">
@@ -374,36 +510,36 @@ it will need to be rebuilt for each output file (False).</p>
 <p id="module-euclidlike_imsim.skycat">Interface to obtain objects from skyCatalogs.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="euclidlike_imsim.skycat.SkyCatObj">
-<span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.skycat.</span></span><span class="sig-name descname"><span class="pre">SkyCatObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gsparams</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/skycat.html#SkyCatObj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.skycat.SkyCatObj" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.skycat.</span></span><span class="sig-name descname"><span class="pre">SkyCatObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gsparams</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/skycat.html#SkyCatObj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.skycat.SkyCatObj" title="Link to this definition"></a></dt>
 <dd><p>Build an object according to info in the sky catalog.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="euclidlike_imsim.skycat.SkyCatValue">
-<span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.skycat.</span></span><span class="sig-name descname"><span class="pre">SkyCatValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/skycat.html#SkyCatValue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.skycat.SkyCatValue" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.skycat.</span></span><span class="sig-name descname"><span class="pre">SkyCatValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/skycat.html#SkyCatValue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.skycat.SkyCatValue" title="Link to this definition"></a></dt>
 <dd><p>Return a value from the object part of the skyCatalog</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="euclidlike_imsim.skycat.SkyCatWorldPos">
-<span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.skycat.</span></span><span class="sig-name descname"><span class="pre">SkyCatWorldPos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/skycat.html#SkyCatWorldPos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.skycat.SkyCatWorldPos" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.skycat.</span></span><span class="sig-name descname"><span class="pre">SkyCatWorldPos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/skycat.html#SkyCatWorldPos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.skycat.SkyCatWorldPos" title="Link to this definition"></a></dt>
 <dd><p>Return a value from the object part of the skyCatalog</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="euclidlike_imsim.skycat.SkyCatalogInterface">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.skycat.</span></span><span class="sig-name descname"><span class="pre">SkyCatalogInterface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exptime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wcs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mjd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bandpass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ysize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_pix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_flux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/skycat.html#SkyCatalogInterface"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.skycat.SkyCatalogInterface" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.skycat.</span></span><span class="sig-name descname"><span class="pre">SkyCatalogInterface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exptime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wcs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mjd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bandpass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ysize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_pix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_flux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/skycat.html#SkyCatalogInterface"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.skycat.SkyCatalogInterface" title="Link to this definition"></a></dt>
 <dd><p>Interface to skyCatalogs package.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.skycat.SkyCatalogInterface.getApproxNObjects">
-<span class="sig-name descname"><span class="pre">getApproxNObjects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/skycat.html#SkyCatalogInterface.getApproxNObjects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.skycat.SkyCatalogInterface.getApproxNObjects" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">getApproxNObjects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/skycat.html#SkyCatalogInterface.getApproxNObjects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.skycat.SkyCatalogInterface.getApproxNObjects" title="Link to this definition"></a></dt>
 <dd><p>Return the approximate number of GSObjects to render, as set in
 the class initializer.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.skycat.SkyCatalogInterface.getFlux">
-<span class="sig-name descname"><span class="pre">getFlux</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mjd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exptime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/skycat.html#SkyCatalogInterface.getFlux"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.skycat.SkyCatalogInterface.getFlux" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">getFlux</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mjd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exptime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/skycat.html#SkyCatalogInterface.getFlux"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.skycat.SkyCatalogInterface.getFlux" title="Link to this definition"></a></dt>
 <dd><p>Return the flux associated to an object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -429,13 +565,13 @@ filter.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.skycat.SkyCatalogInterface.getNObjects">
-<span class="sig-name descname"><span class="pre">getNObjects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/skycat.html#SkyCatalogInterface.getNObjects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.skycat.SkyCatalogInterface.getNObjects" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">getNObjects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/skycat.html#SkyCatalogInterface.getNObjects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.skycat.SkyCatalogInterface.getNObjects" title="Link to this definition"></a></dt>
 <dd><p>Return the number of GSObjects to render</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.skycat.SkyCatalogInterface.getObj">
-<span class="sig-name descname"><span class="pre">getObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gsparams</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exptime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/skycat.html#SkyCatalogInterface.getObj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.skycat.SkyCatalogInterface.getObj" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">getObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gsparams</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exptime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/skycat.html#SkyCatalogInterface.getObj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.skycat.SkyCatalogInterface.getObj" title="Link to this definition"></a></dt>
 <dd><p>Return the galsim object for the skyCatalog object
 corresponding to the specified index.  If the skyCatalog
 object is a galaxy, the returned galsim object will be
@@ -452,7 +588,7 @@ a galsim.Sum.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.skycat.SkyCatalogInterface.getValue">
-<span class="sig-name descname"><span class="pre">getValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/skycat.html#SkyCatalogInterface.getValue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.skycat.SkyCatalogInterface.getValue" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">getValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/skycat.html#SkyCatalogInterface.getValue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.skycat.SkyCatalogInterface.getValue" title="Link to this definition"></a></dt>
 <dd><p>Return a skyCatalog value for the an object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -472,7 +608,7 @@ a galsim.Sum.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.skycat.SkyCatalogInterface.getWorldPos">
-<span class="sig-name descname"><span class="pre">getWorldPos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/skycat.html#SkyCatalogInterface.getWorldPos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.skycat.SkyCatalogInterface.getWorldPos" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">getWorldPos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/skycat.html#SkyCatalogInterface.getWorldPos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.skycat.SkyCatalogInterface.getWorldPos" title="Link to this definition"></a></dt>
 <dd><p>Return the sky coordinates of the skyCatalog object
 corresponding to the specified index.</p>
 <dl class="field-list simple">
@@ -487,24 +623,24 @@ corresponding to the specified index.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.skycat.SkyCatalogInterface.get_ccd_center">
-<span class="sig-name descname"><span class="pre">get_ccd_center</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/skycat.html#SkyCatalogInterface.get_ccd_center"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.skycat.SkyCatalogInterface.get_ccd_center" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_ccd_center</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/skycat.html#SkyCatalogInterface.get_ccd_center"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.skycat.SkyCatalogInterface.get_ccd_center" title="Link to this definition"></a></dt>
 <dd><p>Return the CCD center.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="euclidlike_imsim.skycat.SkyCatalogInterface.objects">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">objects</span></span><a class="headerlink" href="#euclidlike_imsim.skycat.SkyCatalogInterface.objects" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">objects</span></span><a class="headerlink" href="#euclidlike_imsim.skycat.SkyCatalogInterface.objects" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="euclidlike_imsim.skycat.SkyCatalogLoader">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.skycat.</span></span><span class="sig-name descname"><span class="pre">SkyCatalogLoader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">has_nobj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_scope</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">takes_logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_proxy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">worker_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">worker_initargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/skycat.html#SkyCatalogLoader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.skycat.SkyCatalogLoader" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.skycat.</span></span><span class="sig-name descname"><span class="pre">SkyCatalogLoader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">has_nobj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_scope</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">takes_logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_proxy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">worker_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">worker_initargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/skycat.html#SkyCatalogLoader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.skycat.SkyCatalogLoader" title="Link to this definition"></a></dt>
 <dd><p>Class to load SkyCatalogInterface object.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.skycat.SkyCatalogLoader.getKwargs">
-<span class="sig-name descname"><span class="pre">getKwargs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/skycat.html#SkyCatalogLoader.getKwargs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.skycat.SkyCatalogLoader.getKwargs" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">getKwargs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/skycat.html#SkyCatalogLoader.getKwargs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.skycat.SkyCatalogLoader.getKwargs" title="Link to this definition"></a></dt>
 <dd><p>Parse the config dict and return the kwargs needed to build the input object.</p>
 <p>The default implementation looks for special class attributes called:</p>
 <dl class="simple">
@@ -540,13 +676,13 @@ it will need to be rebuilt for each output file (False).</p>
 
 <dl class="py class" id="module-euclidlike_imsim.stamp">
 <dt class="sig sig-object py" id="euclidlike_imsim.stamp.Euclidlike_stamp">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.stamp.</span></span><span class="sig-name descname"><span class="pre">Euclidlike_stamp</span></span><a class="reference internal" href="_modules/euclidlike_imsim/stamp.html#Euclidlike_stamp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.stamp.Euclidlike_stamp" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.stamp.</span></span><span class="sig-name descname"><span class="pre">Euclidlike_stamp</span></span><a class="reference internal" href="_modules/euclidlike_imsim/stamp.html#Euclidlike_stamp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.stamp.Euclidlike_stamp" title="Link to this definition"></a></dt>
 <dd><p>This performs the tasks necessary for building the stamp for a single object.</p>
 <p>It uses the regular Basic functions for most things.
 It specializes the quickSkip, buildProfile, and draw methods.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.stamp.Euclidlike_stamp.buildPSF">
-<span class="sig-name descname"><span class="pre">buildPSF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gsparams</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/stamp.html#Euclidlike_stamp.buildPSF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.stamp.Euclidlike_stamp.buildPSF" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">buildPSF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gsparams</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/stamp.html#Euclidlike_stamp.buildPSF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.stamp.Euclidlike_stamp.buildPSF" title="Link to this definition"></a></dt>
 <dd><p>Build the PSF object.</p>
 <p>For the Basic stamp type, this builds a PSF from the base[‘psf’] dict, if present,
 else returns None.</p>
@@ -568,7 +704,7 @@ list by the galaxy object.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.stamp.Euclidlike_stamp.draw">
-<span class="sig-name descname"><span class="pre">draw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prof</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/stamp.html#Euclidlike_stamp.draw"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.stamp.Euclidlike_stamp.draw" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">draw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prof</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/stamp.html#Euclidlike_stamp.draw"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.stamp.Euclidlike_stamp.draw" title="Link to this definition"></a></dt>
 <dd><p>Draw the profile on the postage stamp image.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -590,12 +726,12 @@ list by the galaxy object.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.stamp.Euclidlike_stamp.fix_seds">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fix_seds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prof</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bandpass</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/stamp.html#Euclidlike_stamp.fix_seds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.stamp.Euclidlike_stamp.fix_seds" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fix_seds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prof</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bandpass</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/stamp.html#Euclidlike_stamp.fix_seds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.stamp.Euclidlike_stamp.fix_seds" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.stamp.Euclidlike_stamp.getDrawMethod">
-<span class="sig-name descname"><span class="pre">getDrawMethod</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/stamp.html#Euclidlike_stamp.getDrawMethod"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.stamp.Euclidlike_stamp.getDrawMethod" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">getDrawMethod</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/stamp.html#Euclidlike_stamp.getDrawMethod"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.stamp.Euclidlike_stamp.getDrawMethod" title="Link to this definition"></a></dt>
 <dd><p>Determine the draw method to use.</p>
 <p>&#64;param config       The configuration dict for the stamp field.
 &#64;param base         The base configuration dict.
@@ -605,7 +741,7 @@ list by the galaxy object.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.stamp.Euclidlike_stamp.setup">
-<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xsize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ysize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/stamp.html#Euclidlike_stamp.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.stamp.Euclidlike_stamp.setup" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xsize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ysize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/stamp.html#Euclidlike_stamp.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.stamp.Euclidlike_stamp.setup" title="Link to this definition"></a></dt>
 <dd><p>Do the initialization and setup for building a postage stamp.</p>
 <p>In the base class, we check for and parse the appropriate size and position values in
 config (aka base[‘stamp’] or base[‘image’].</p>
@@ -634,28 +770,28 @@ ignore here. i.e. it won’t be an error if these parameters are present.</p></l
 
 <dl class="py class" id="module-euclidlike_imsim.utils">
 <dt class="sig sig-object py" id="euclidlike_imsim.utils.roman_utils">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.utils.</span></span><span class="sig-name descname"><span class="pre">roman_utils</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">visit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sca</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">setup_skycat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/utils.html#roman_utils"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.utils.roman_utils" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.utils.</span></span><span class="sig-name descname"><span class="pre">roman_utils</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">visit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sca</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">setup_skycat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/utils.html#roman_utils"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.utils.roman_utils" title="Link to this definition"></a></dt>
 <dd><p>Class to contain a variety of helper routines to work with the simulation data.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.utils.roman_utils.check_input">
-<span class="sig-name descname"><span class="pre">check_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">visit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sca</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/utils.html#roman_utils.check_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.utils.roman_utils.check_input" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">check_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">visit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sca</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/utils.html#roman_utils.check_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.utils.roman_utils.check_input" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.utils.roman_utils.getBandpass">
-<span class="sig-name descname"><span class="pre">getBandpass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/utils.html#roman_utils.getBandpass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.utils.roman_utils.getBandpass" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">getBandpass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/utils.html#roman_utils.getBandpass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.utils.roman_utils.getBandpass" title="Link to this definition"></a></dt>
 <dd><p>Return Roman bandpass for image</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.utils.roman_utils.getLocalWCS">
-<span class="sig-name descname"><span class="pre">getLocalWCS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/utils.html#roman_utils.getLocalWCS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.utils.roman_utils.getLocalWCS" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">getLocalWCS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/utils.html#roman_utils.getLocalWCS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.utils.roman_utils.getLocalWCS" title="Link to this definition"></a></dt>
 <dd><p>Return Roman WCS for image</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.utils.roman_utils.getPSF">
-<span class="sig-name descname"><span class="pre">getPSF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pupil_bin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/utils.html#roman_utils.getPSF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.utils.roman_utils.getPSF" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">getPSF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pupil_bin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/utils.html#roman_utils.getPSF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.utils.roman_utils.getPSF" title="Link to this definition"></a></dt>
 <dd><p>Return Roman PSF for some image position.
 :param x: x-position in SCA
 :param y: y-position in SCA
@@ -669,7 +805,7 @@ ignore here. i.e. it won’t be an error if these parameters are present.</p></l
 
 <dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.utils.roman_utils.getPSF_Image">
-<span class="sig-name descname"><span class="pre">getPSF_Image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stamp_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pupil_bin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oversampling_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_photonOps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_phot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000000.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/utils.html#roman_utils.getPSF_Image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.utils.roman_utils.getPSF_Image" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">getPSF_Image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stamp_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pupil_bin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oversampling_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_photonOps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_phot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000000.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/utils.html#roman_utils.getPSF_Image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.utils.roman_utils.getPSF_Image" title="Link to this definition"></a></dt>
 <dd><p>Return a Roman PSF image for some image position
 :param stamp_size: size of output PSF model stamp in native roman pixel_scale (oversampling_factor=1)
 :param x: x-position in SCA
@@ -687,7 +823,7 @@ ignore here. i.e. it won’t be an error if these parameters are present.</p></l
 
 <dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.utils.roman_utils.getWCS">
-<span class="sig-name descname"><span class="pre">getWCS</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/utils.html#roman_utils.getWCS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.utils.roman_utils.getWCS" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">getWCS</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/utils.html#roman_utils.getWCS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.utils.roman_utils.getWCS" title="Link to this definition"></a></dt>
 <dd><p>Return Roman WCS for image</p>
 </dd></dl>
 
@@ -695,10 +831,10 @@ ignore here. i.e. it won’t be an error if these parameters are present.</p></l
 
 <dl class="py class" id="module-euclidlike_imsim.wcs">
 <dt class="sig sig-object py" id="euclidlike_imsim.wcs.EuclidlikeWCS">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.wcs.</span></span><span class="sig-name descname"><span class="pre">EuclidlikeWCS</span></span><a class="reference internal" href="_modules/euclidlike_imsim/wcs.html#EuclidlikeWCS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.wcs.EuclidlikeWCS" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.wcs.</span></span><span class="sig-name descname"><span class="pre">EuclidlikeWCS</span></span><a class="reference internal" href="_modules/euclidlike_imsim/wcs.html#EuclidlikeWCS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.wcs.EuclidlikeWCS" title="Link to this definition"></a></dt>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="euclidlike_imsim.wcs.EuclidlikeWCS.buildWCS">
-<span class="sig-name descname"><span class="pre">buildWCS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/wcs.html#EuclidlikeWCS.buildWCS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.wcs.EuclidlikeWCS.buildWCS" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">buildWCS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/wcs.html#EuclidlikeWCS.buildWCS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.wcs.EuclidlikeWCS.buildWCS" title="Link to this definition"></a></dt>
 <dd><p>Build the WCS based on the specifications in the config dict.</p>
 <p>Note: Sub-classes must override this function with a real implementation.</p>
 <dl class="field-list simple">
@@ -719,11 +855,11 @@ ignore here. i.e. it won’t be an error if these parameters are present.</p></l
 
 </section>
 <section id="use">
-<h2>Use<a class="headerlink" href="#use" title="Link to this heading">¶</a></h2>
+<h2>Use<a class="headerlink" href="#use" title="Link to this heading"></a></h2>
 <p>Example files needed for large-scale Euclid-like simulation runs are included in <code class="docutils literal notranslate"><span class="pre">GalSim-Euclid-Like/config</span></code>.</p>
 </section>
 <section id="config-imsim">
-<h2>Config imsim<a class="headerlink" href="#config-imsim" title="Link to this heading">¶</a></h2>
+<h2>Config imsim<a class="headerlink" href="#config-imsim" title="Link to this heading"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">was.yaml</span></code>: <em>euclidlike_imsim example</em> config file.
 You will want to update the following entries:</p>
 <ul class="simple">
@@ -742,7 +878,7 @@ You will want to update the following entries:</p>
 </div>
 </section>
 <section id="config-slurm">
-<h2>Config SLURM<a class="headerlink" href="#config-slurm" title="Link to this heading">¶</a></h2>
+<h2>Config SLURM<a class="headerlink" href="#config-slurm" title="Link to this heading"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">slurm_runner.sh</span></code> contains the SLURM configuration to run “large scale” simulations.
 You will want to update the following lines:</p>
 <ul class="simple">
@@ -767,81 +903,34 @@ You will want to update the following lines:</p>
 </section>
 
 
+           </div>
           </div>
-          
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="euclidlike.html" class="btn btn-neutral float-left" title="The Euclid-like Module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="examples.html" class="btn btn-neutral float-right" title="Examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Rachel Mandelbaum, Axel Guinot, Federico Berlfein, Andy Park, Xiangchong Li, Michael Troxel, Tianqing Zhang.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="Main">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="index.html">GalSim-Euclid-Like</a></h1>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
 
-
-
-
-
-
-
-
-
-<search id="searchbox" style="display: none" role="search">
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="euclidlike.html">The Euclid-like Module</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">The Euclid-like ImSim Module</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#module-euclidlike_imsim.bandpass">Classes and Functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#use">Use</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#config-imsim">Config imsim</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#config-slurm">Config SLURM</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="history.html">Revision History</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="euclidlike.html" title="previous chapter">The Euclid-like Module</a></li>
-      <li>Next: <a href="examples.html" title="next chapter">Examples</a></li>
-  </ul></li>
-</ul>
-</div>
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &#169;2024, Rachel Mandelbaum, Axel Guinot, Federico Berlfein, Andy Park, Xiangchong Li, Michael Troxel, Tianqing Zhang.
-      
-      |
-      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.1.3</a>
-      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
-      
-      |
-      <a href="_sources/euclidlike_imsim.rst.txt"
-          rel="nofollow">Page source</a>
-    </div>
-
-    
-
-    
-  </body>
+</body>
 </html>

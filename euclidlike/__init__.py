@@ -12,3 +12,6 @@ from .euclidlike_psf import (
    getPSF, getBrightPSF
 )
 from .backgrounds import getSkyLevel
+
+from ._version import __version__, __version_info__
+version = __version__

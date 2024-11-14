@@ -1,7 +1,7 @@
 .. GalSim-Euclid-Like documentation master file 
    
 
-GalSim-Euclid-Like: Euclid-like images using GalSim
+GalSim-Euclid-Like: Euclid-like images using GalSim.
 ==============================================
 
 .. toctree::
