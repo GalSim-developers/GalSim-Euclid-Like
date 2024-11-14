@@ -35,7 +35,7 @@ Attribution for software and data used by particular routines in this library is
 Installation
 ==================
 
-Please view the `Installation Instructions` for details on how to install GalSim-Euclid-Like.
+Please view the `Installation Instructions` (in INSTALL.rst) for details on how to install GalSim-Euclid-Like.
 
 Downloading relevant data
 ==================                                                                              
