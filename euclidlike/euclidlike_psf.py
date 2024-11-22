@@ -115,7 +115,12 @@ def getPSF(
     In addition, the provided PSF images are normalized for obscuration, 
     vignetting and baffle effects. However, GalSim internally handles the 
     obscuration, so we remove this part of the normalization by dividing the
-    PSF images by collecting_area / ((diameter/2)**2*np.pi).  As a result, the sum of the pixel values in the renormalized PSF images is very close to 1.
+    PSF images by collecting_area / ((diameter/2)**2*np.pi).  As a result, the sum of the pixel
+    values in the renormalized PSF images is very close to 1.
+
+    Members of the Euclid Consortium with access to the internal PSF toolkit can reproduce the
+    precomputed PSF images using the `Develop` branch as of 21 May 2024 using the config file
+    `data/config.zip`.
     
 
     Args:
