@@ -1,4 +1,5 @@
 # Read version number from root directory
+import os
 current_dir = os.path.dirname(os.path.abspath(__file__))
 version_path = os.path.join(current_dir, "..", "VERSION")
 
