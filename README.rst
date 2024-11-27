@@ -35,7 +35,18 @@ Attribution for software and data used by particular routines in this library is
 Installation
 ==================
 
-Please view the `Installation Instructions` (in INSTALL.rst) for details on how to install GalSim-Euclid-Like.
+The source code for GalSim-Euclid-Like has not been published to pypi. To install from source code::
+
+    git clone git@github.com:GalSim-developers/GalSim-Euclid-Like.git
+
+and install by running::
+
+    conda create -n euclidlike python=3.10
+    cd GalSim-Euclid-Like
+    conda activate euclidlike
+    pip install .
+
+Please view the `Installation Instructions` (in INSTALL.rst) for further details on how to install GalSim-Euclid-Like.
 
 Downloading relevant data
 ==================                                                                              

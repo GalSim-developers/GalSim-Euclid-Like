@@ -1,3 +1,3 @@
-Changes from v0.0.0 to v0.0.1
+Changes from v0.0.0 to v0.9.0
 =========================
 Made repo public.

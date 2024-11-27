@@ -4,7 +4,7 @@ The Euclid-like ImSim Module
 This module contains configuration scripts to produce large-scale Euclid-like simulation runs based on the information in ``euclidlike``.
 It is based heavily on `roman_imsim <https://github.com/matroxel/roman_imsim>`_.
 
-Classes and Functions
+API
 =====================
 
 .. automodule:: euclidlike_imsim.bandpass

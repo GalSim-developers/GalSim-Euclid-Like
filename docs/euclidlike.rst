@@ -100,7 +100,7 @@ vis_red_limit
 For example, to get the gain value, use euclidlike.gain.
 
 
-Euclid-like Functions
+API
 ===============
 
 This module also contains the following routines:
