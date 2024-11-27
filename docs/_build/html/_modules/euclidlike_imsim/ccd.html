@@ -1,0 +1,332 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>euclidlike_imsim.ccd &mdash; GalSim-Euclid-Like 0.9.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=39bb1c6d"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            GalSim-Euclid-Like
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../euclidlike.html">The Euclid-like Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../euclidlike_imsim.html">The Euclid-like ImSim Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">Revision History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">GalSim-Euclid-Like</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">euclidlike_imsim.ccd</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for euclidlike_imsim.ccd</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">galsim</span>
+<span class="kn">import</span> <span class="nn">galsim.config</span>
+<span class="kn">from</span> <span class="nn">galsim.config</span> <span class="kn">import</span> <span class="n">RegisterImageType</span>
+<span class="kn">from</span> <span class="nn">galsim.config.image_scattered</span> <span class="kn">import</span> <span class="n">ScatteredImageBuilder</span>
+<span class="kn">from</span> <span class="nn">galsim.errors</span> <span class="kn">import</span> <span class="n">GalSimConfigValueError</span>
+<span class="kn">from</span> <span class="nn">galsim.image</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">from</span> <span class="nn">astropy.time</span> <span class="kn">import</span> <span class="n">Time</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">euclidlike</span>
+<span class="kn">from</span> <span class="nn">euclidlike.instrument_params</span> <span class="kn">import</span> <span class="n">gain</span><span class="p">,</span> <span class="n">saturation</span>
+<span class="kn">from</span> <span class="nn">.noise</span> <span class="kn">import</span> <span class="n">cfg_noise_key</span><span class="p">,</span> <span class="n">parse_noise_config</span><span class="p">,</span> <span class="n">get_noise</span>
+
+
+<div class="viewcode-block" id="EuclidlikeCCDImageBuilder">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.ccd.EuclidlikeCCDImageBuilder">[docs]</a>
+<span class="k">class</span> <span class="nc">EuclidlikeCCDImageBuilder</span><span class="p">(</span><span class="n">ScatteredImageBuilder</span><span class="p">):</span>
+
+<div class="viewcode-block" id="EuclidlikeCCDImageBuilder.setup">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.ccd.EuclidlikeCCDImageBuilder.setup">[docs]</a>
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">image_num</span><span class="p">,</span> <span class="n">obj_num</span><span class="p">,</span> <span class="n">ignore</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Do the initialization and setup for building the image.</span>
+
+<span class="sd">        This figures out the size that the image will be, but doesn&#39;t actually build it yet.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            config:     The configuration dict for the image field.</span>
+<span class="sd">            base:       The base configuration dict.</span>
+<span class="sd">            image_num:  The current image number.</span>
+<span class="sd">            obj_num:    The first object number in the image.</span>
+<span class="sd">            ignore:     A list of parameters that are allowed to be in config that we can</span>
+<span class="sd">                        ignore here. i.e. it won&#39;t be an error if these parameters are present.</span>
+<span class="sd">            logger:     If given, a logger object to log progress.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            xsize, ysize</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s2">&quot;image </span><span class="si">%d</span><span class="s2">: Building EuclidlikeCCD: image, obj = </span><span class="si">%d</span><span class="s2">,</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">image_num</span><span class="p">,</span>
+            <span class="n">image_num</span><span class="p">,</span>
+            <span class="n">obj_num</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">nobjects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getNObj</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">image_num</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;image </span><span class="si">%d</span><span class="s2">: nobj = </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">image_num</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nobjects</span><span class="p">)</span>
+
+        <span class="c1"># These are allowed for Scattered, but we don&#39;t use them here.</span>
+        <span class="n">extra_ignore</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;image_pos&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;world_pos&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;stamp_size&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;stamp_xsize&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;stamp_ysize&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;nobjects&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">req</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;CCD&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="s2">&quot;filter&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;mjd&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;exptime&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">}</span>
+        <span class="n">opt</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;draw_method&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">opt</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span> <span class="nb">bool</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">cfg_noise_key</span><span class="p">})</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">GetAllParams</span><span class="p">(</span>
+            <span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">req</span><span class="o">=</span><span class="n">req</span><span class="p">,</span> <span class="n">opt</span><span class="o">=</span><span class="n">opt</span><span class="p">,</span> <span class="n">ignore</span><span class="o">=</span><span class="n">ignore</span> <span class="o">+</span> <span class="n">extra_ignore</span>
+        <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ccd</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;CCD&quot;</span><span class="p">]</span>
+        <span class="n">base</span><span class="p">[</span><span class="s2">&quot;CCD&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ccd</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filter</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;filter&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mjd</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;mjd&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exptime</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;exptime&quot;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cfg_noise</span> <span class="o">=</span> <span class="n">parse_noise_config</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+        <span class="c1"># If draw_method isn&#39;t in image field, it may be in stamp.  Check.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">draw_method</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;draw_method&quot;</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stamp&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;draw_method&quot;</span><span class="p">,</span> <span class="s2">&quot;auto&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># If user hasn&#39;t overridden the bandpass to use, get the standard one.</span>
+        <span class="k">if</span> <span class="s2">&quot;bandpass&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="n">base</span><span class="p">[</span><span class="s2">&quot;bandpass&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">BuildBandpass</span><span class="p">(</span>
+                <span class="n">base</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">],</span> <span class="s2">&quot;bandpass&quot;</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">euclidlike</span><span class="o">.</span><span class="n">n_pix_col</span><span class="p">,</span> <span class="n">euclidlike</span><span class="o">.</span><span class="n">n_pix_row</span></div>
+
+
+<div class="viewcode-block" id="EuclidlikeCCDImageBuilder.buildImage">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.ccd.EuclidlikeCCDImageBuilder.buildImage">[docs]</a>
+    <span class="k">def</span> <span class="nf">buildImage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">image_num</span><span class="p">,</span> <span class="n">obj_num</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build an Image containing multiple objects placed at arbitrary locations.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            config:     The configuration dict for the image field.</span>
+<span class="sd">            base:       The base configuration dict.</span>
+<span class="sd">            image_num:  The current image number.</span>
+<span class="sd">            obj_num:    The first object number in the image.</span>
+<span class="sd">            logger:     If given, a logger object to log progress.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the final image and the current noise variance in the image as a tuple</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">full_xsize</span> <span class="o">=</span> <span class="n">base</span><span class="p">[</span><span class="s2">&quot;image_xsize&quot;</span><span class="p">]</span>
+        <span class="n">full_ysize</span> <span class="o">=</span> <span class="n">base</span><span class="p">[</span><span class="s2">&quot;image_ysize&quot;</span><span class="p">]</span>
+        <span class="n">wcs</span> <span class="o">=</span> <span class="n">base</span><span class="p">[</span><span class="s2">&quot;wcs&quot;</span><span class="p">]</span>
+
+        <span class="n">full_image</span> <span class="o">=</span> <span class="n">Image</span><span class="p">(</span><span class="n">full_xsize</span><span class="p">,</span> <span class="n">full_ysize</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">full_image</span><span class="o">.</span><span class="n">setOrigin</span><span class="p">(</span><span class="n">base</span><span class="p">[</span><span class="s2">&quot;image_origin&quot;</span><span class="p">])</span>
+        <span class="n">full_image</span><span class="o">.</span><span class="n">wcs</span> <span class="o">=</span> <span class="n">wcs</span>
+        <span class="n">full_image</span><span class="o">.</span><span class="n">setZero</span><span class="p">()</span>
+
+        <span class="n">full_image</span><span class="o">.</span><span class="n">header</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">FitsHeader</span><span class="p">()</span>
+        <span class="n">full_image</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;EXPTIME&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exptime</span>
+        <span class="n">full_image</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;MJD-OBS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mjd</span>
+        <span class="n">full_image</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;DATE-OBS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Time</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mjd</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;mjd&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">datetime</span><span class="p">)</span>
+        <span class="n">full_image</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;FILTER&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span>
+        <span class="n">full_image</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;GAIN&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gain</span>
+        <span class="n">full_image</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;ZPTMAG&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exptime</span> <span class="o">*</span> <span class="n">euclidlike</span><span class="o">.</span><span class="n">collecting_area</span>
+        <span class="p">)</span>
+
+        <span class="n">base</span><span class="p">[</span><span class="s2">&quot;current_image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">full_image</span>
+
+        <span class="k">if</span> <span class="s2">&quot;image_pos&quot;</span> <span class="ow">in</span> <span class="n">config</span> <span class="ow">and</span> <span class="s2">&quot;world_pos&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">GalSimConfigValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Both image_pos and world_pos specified for Scattered image.&quot;</span><span class="p">,</span>
+                <span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;image_pos&quot;</span><span class="p">],</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;world_pos&quot;</span><span class="p">]),</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="s2">&quot;image_pos&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span> <span class="ow">and</span> <span class="s2">&quot;world_pos&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="n">xmin</span> <span class="o">=</span> <span class="n">base</span><span class="p">[</span><span class="s2">&quot;image_origin&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">x</span>
+            <span class="n">xmax</span> <span class="o">=</span> <span class="n">xmin</span> <span class="o">+</span> <span class="n">full_xsize</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">ymin</span> <span class="o">=</span> <span class="n">base</span><span class="p">[</span><span class="s2">&quot;image_origin&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">y</span>
+            <span class="n">ymax</span> <span class="o">=</span> <span class="n">ymin</span> <span class="o">+</span> <span class="n">full_ysize</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">config</span><span class="p">[</span><span class="s2">&quot;image_pos&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;XY&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Random&quot;</span><span class="p">,</span> <span class="s2">&quot;min&quot;</span><span class="p">:</span> <span class="n">xmin</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">:</span> <span class="n">xmax</span><span class="p">},</span>
+                <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Random&quot;</span><span class="p">,</span> <span class="s2">&quot;min&quot;</span><span class="p">:</span> <span class="n">ymin</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">:</span> <span class="n">ymax</span><span class="p">},</span>
+            <span class="p">}</span>
+
+        <span class="n">nbatch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nobjects</span> <span class="o">//</span> <span class="mi">1000</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbatch</span><span class="p">):</span>
+            <span class="n">start_obj_num</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nobjects</span> <span class="o">*</span> <span class="n">batch</span> <span class="o">//</span> <span class="n">nbatch</span>
+            <span class="n">end_obj_num</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nobjects</span> <span class="o">*</span> <span class="p">(</span><span class="n">batch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">nbatch</span>
+            <span class="n">nobj_batch</span> <span class="o">=</span> <span class="n">end_obj_num</span> <span class="o">-</span> <span class="n">start_obj_num</span>
+            <span class="k">if</span> <span class="n">nbatch</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;Start batch </span><span class="si">%d</span><span class="s2">/</span><span class="si">%d</span><span class="s2"> with </span><span class="si">%d</span><span class="s2"> objects [</span><span class="si">%d</span><span class="s2">, </span><span class="si">%d</span><span class="s2">)&quot;</span><span class="p">,</span>
+                    <span class="n">batch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                    <span class="n">nbatch</span><span class="p">,</span>
+                    <span class="n">nobj_batch</span><span class="p">,</span>
+                    <span class="n">start_obj_num</span><span class="p">,</span>
+                    <span class="n">end_obj_num</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="n">stamps</span><span class="p">,</span> <span class="n">current_vars</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">BuildStamps</span><span class="p">(</span>
+                <span class="n">nobj_batch</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span> <span class="n">obj_num</span><span class="o">=</span><span class="n">start_obj_num</span><span class="p">,</span> <span class="n">do_noise</span><span class="o">=</span><span class="kc">False</span>
+            <span class="p">)</span>
+            <span class="n">base</span><span class="p">[</span><span class="s2">&quot;index_key&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;image_num&quot;</span>
+
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nobj_batch</span><span class="p">):</span>
+                <span class="c1"># This is our signal that the object was skipped.</span>
+                <span class="k">if</span> <span class="n">stamps</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">bounds</span> <span class="o">=</span> <span class="n">stamps</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">bounds</span> <span class="o">&amp;</span> <span class="n">full_image</span><span class="o">.</span><span class="n">bounds</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">bounds</span><span class="o">.</span><span class="n">isDefined</span><span class="p">():</span>  <span class="c1"># pragma: no cover</span>
+                    <span class="c1"># These noramlly show up as stamp==None, but technically it is possible</span>
+                    <span class="c1"># to get a stamp that is off the main image, so check for that here to</span>
+                    <span class="c1"># avoid an error.  But this isn&#39;t covered in the imsim test suite.</span>
+                    <span class="k">continue</span>
+
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="s2">&quot;image </span><span class="si">%d</span><span class="s2">: full bounds = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">image_num</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">full_image</span><span class="o">.</span><span class="n">bounds</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="s2">&quot;image </span><span class="si">%d</span><span class="s2">: stamp </span><span class="si">%d</span><span class="s2"> bounds = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">image_num</span><span class="p">,</span>
+                    <span class="n">k</span> <span class="o">+</span> <span class="n">start_obj_num</span><span class="p">,</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="n">stamps</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">bounds</span><span class="p">),</span>
+                <span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;image </span><span class="si">%d</span><span class="s2">: Overlap = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">image_num</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">bounds</span><span class="p">))</span>
+                <span class="n">full_image</span><span class="p">[</span><span class="n">bounds</span><span class="p">]</span> <span class="o">+=</span> <span class="n">stamps</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">bounds</span><span class="p">]</span>
+            <span class="n">stamps</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="n">full_image</span><span class="p">,</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="EuclidlikeCCDImageBuilder.addNoise">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.ccd.EuclidlikeCCDImageBuilder.addNoise">[docs]</a>
+    <span class="k">def</span> <span class="nf">addNoise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">image_num</span><span class="p">,</span> <span class="n">obj_num</span><span class="p">,</span> <span class="n">current_var</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add the final noise to a Scattered image</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            image:          The image onto which to add the noise.</span>
+<span class="sd">            config:         The configuration dict for the image field.</span>
+<span class="sd">            base:           The base configuration dict.</span>
+<span class="sd">            image_num:      The current image number.</span>
+<span class="sd">            obj_num:        The first object number in the image.</span>
+<span class="sd">            current_var:    The current noise variance in each postage stamps.</span>
+<span class="sd">            logger:         If given, a logger object to log progress.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># check ignore noise</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg_noise</span><span class="p">[</span><span class="s2">&quot;ignore_noise&quot;</span><span class="p">]:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="s2">&quot;noise_image&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">base</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">get_noise</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg_noise</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+
+        <span class="c1"># We first have to apply gain and quantize the image</span>
+        <span class="n">image</span> <span class="o">/=</span> <span class="n">gain</span>
+        <span class="n">image</span><span class="o">.</span><span class="n">quantize</span><span class="p">()</span>
+
+        <span class="n">image</span> <span class="o">+=</span> <span class="n">base</span><span class="p">[</span><span class="s2">&quot;noise_image&quot;</span><span class="p">]</span>
+        
+        <span class="c1"># Apply saturation</span>
+        <span class="n">saturation_ADU</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">saturation</span><span class="o">/</span><span class="n">gain</span><span class="p">)</span>
+        <span class="n">mask_saturated</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">array</span> <span class="o">&gt;</span> <span class="n">saturation_ADU</span>
+        <span class="n">base</span><span class="p">[</span><span class="s2">&quot;saturated_mask&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mask_saturated</span>
+        <span class="n">image</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="n">mask_saturated</span><span class="p">]</span> <span class="o">=</span> <span class="n">saturation_ADU</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg_noise</span><span class="p">[</span><span class="s2">&quot;sky_subtract&quot;</span><span class="p">]:</span>
+            <span class="n">image</span> <span class="o">-=</span> <span class="n">base</span><span class="p">[</span><span class="s2">&quot;sky_image&quot;</span><span class="p">]</span></div>
+</div>
+
+
+
+<span class="c1"># Register this as a valid type</span>
+<span class="n">RegisterImageType</span><span class="p">(</span><span class="s2">&quot;euclidlike_ccd&quot;</span><span class="p">,</span> <span class="n">EuclidlikeCCDImageBuilder</span><span class="p">())</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Rachel Mandelbaum, Axel Guinot, Federico Berlfein, Andy Park, Xiangchong Li, Michael Troxel, Tianqing Zhang.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

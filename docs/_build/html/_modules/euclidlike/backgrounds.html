@@ -1,0 +1,335 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>euclidlike.backgrounds &mdash; GalSim-Euclid-Like 0.9.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=39bb1c6d"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            GalSim-Euclid-Like
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../euclidlike.html">The Euclid-like Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../euclidlike_imsim.html">The Euclid-like ImSim Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">Revision History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">GalSim-Euclid-Like</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">euclidlike.backgrounds</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for euclidlike.backgrounds</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This file includes any routines needed to define the background level, for which the main contribution (currently the only one implemented) is zodiacal light.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">galsim</span>
+
+<div class="viewcode-block" id="getSkyLevel">
+<a class="viewcode-back" href="../../euclidlike.html#euclidlike.getSkyLevel">[docs]</a>
+<span class="k">def</span> <span class="nf">getSkyLevel</span><span class="p">(</span><span class="n">bandpass</span><span class="p">,</span> <span class="n">world_pos</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exptime</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">epoch</span><span class="o">=</span><span class="mi">2025</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the expected sky level for a Euclid observation due to zodiacal light for this bandpass</span>
+<span class="sd">    and position.</span>
+
+<span class="sd">    This routine can take an arbitray galsim.Bandpass() and calculate the zodiacal background</span>
+<span class="sd">    directly.  This is approximately 3x slower than using lookup tables.</span>
+
+<span class="sd">    The numbers that are returned are in units of e-/arcsec^2.  The result can either be multiplied</span>
+<span class="sd">    by the approximate pixel area to get e-/pix, or the result can be used with wcs.makeSkyImage()</span>
+<span class="sd">    to make an image of the sky that properly includes the actual pixel area as a function of</span>
+<span class="sd">    position on the detector.</span>
+
+<span class="sd">    Note that in general results will depend on the adopted model for zodiacal light, and these are</span>
+<span class="sd">    uncertain at the ~10% level.</span>
+
+<span class="sd">    Positions should be specified with the ``world_pos`` keyword, which must be a CelestialCoord</span>
+<span class="sd">    object.  If no ``world_pos`` is supplied, then the routine will use a default position that</span>
+<span class="sd">    looks sensibly away from the sun.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        bandpass:   A Bandpass object.</span>
+<span class="sd">        world_pos:  A position, given as a CelestialCoord object.  If None, then the routine</span>
+<span class="sd">                    will use an ecliptic longitude of 90 degrees with respect to the sun</span>
+<span class="sd">                    position (as a fair compromise between 0 and 180), and an ecliptic latitude</span>
+<span class="sd">                    of 30 degrees with respect to the sun position (decently out of the plane</span>
+<span class="sd">                    of the Earth-sun orbit). [default: None]</span>
+<span class="sd">        exptime:    Exposure time in seconds.  If None, use the longer Euclid exposure time.</span>
+<span class="sd">                    [default: None]</span>
+<span class="sd">        epoch:      The epoch to be used for estimating the obliquity of the ecliptic when</span>
+<span class="sd">                    converting ``world_pos`` to ecliptic coordinates.  This keyword is only used</span>
+<span class="sd">                    if ``date`` is None, otherwise ``date`` is used to determine the ``epoch``.</span>
+<span class="sd">                    [default: 2025]</span>
+<span class="sd">        date:       The date of the observation, provided as a python datetime object.  If None,</span>
+<span class="sd">                    then the conversion to ecliptic coordinates assumes the sun is at ecliptic</span>
+<span class="sd">                    coordinates of (0,0), as it is at the vernal equinox. [default: None]</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        the expected sky level in e-/arcsec^2.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">exptime</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">long_exptime</span> <span class="k">as</span> <span class="n">exptime</span>
+
+    <span class="c1"># Check for proper type for position, and extract the ecliptic coordinates.</span>
+    <span class="k">if</span> <span class="n">world_pos</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Use our defaults for the case of unspecified position.</span>
+        <span class="n">ecliptic_lat</span> <span class="o">=</span> <span class="mf">30.0</span> <span class="c1"># degrees</span>
+        <span class="n">ecliptic_lon</span> <span class="o">=</span> <span class="mf">90.0</span> <span class="c1"># degrees</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">world_pos</span><span class="p">,</span> <span class="n">galsim</span><span class="o">.</span><span class="n">CelestialCoord</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;world_pos must be supplied as a galsim.CelestialCoord.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">date</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">epoch</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">year</span>
+        <span class="n">ecliptic_lon</span><span class="p">,</span> <span class="n">ecliptic_lat</span> <span class="o">=</span> <span class="n">world_pos</span><span class="o">.</span><span class="n">ecliptic</span><span class="p">(</span><span class="n">epoch</span><span class="o">=</span><span class="n">epoch</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="n">date</span><span class="p">)</span>
+        <span class="n">ecliptic_lon</span> <span class="o">=</span> <span class="n">ecliptic_lon</span><span class="o">.</span><span class="n">deg</span>
+        <span class="n">ecliptic_lat</span> <span class="o">=</span> <span class="n">ecliptic_lat</span><span class="o">.</span><span class="n">deg</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bandpass</span><span class="p">,</span> <span class="n">galsim</span><span class="o">.</span><span class="n">Bandpass</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;bandpass must be supplied as a galsim.Bandpass&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># Then call our routine to calculate the sky background</span>
+    <span class="c1"># For now, simply require that the blue/red limits be in nm, as will be the case in general for</span>
+    <span class="c1"># how we&#39;ve set up the bandpasses</span>
+    <span class="k">if</span> <span class="n">bandpass</span><span class="o">.</span><span class="n">wave_type</span> <span class="o">!=</span> <span class="s2">&quot;nm&quot;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Error, bandpass wavelength units are not as assumed by sky level routine&quot;</span><span class="p">)</span>
+    <span class="n">sky_val</span> <span class="o">=</span> <span class="n">getZodiBackground</span><span class="p">(</span><span class="n">ecliptic_lat</span><span class="p">,</span> <span class="n">ecliptic_lon</span><span class="p">,</span> <span class="n">bandpass</span><span class="o">.</span><span class="n">blue_limit</span><span class="o">/</span><span class="mf">1000.</span><span class="p">,</span>
+                                <span class="n">bandpass</span><span class="o">.</span><span class="n">red_limit</span><span class="o">/</span><span class="mf">1000.</span><span class="p">,</span> <span class="n">bandpass</span><span class="o">.</span><span class="n">wave_list</span><span class="o">/</span><span class="mf">1000.</span><span class="p">,</span>
+                                <span class="n">bandpass</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">bandpass</span><span class="o">.</span><span class="n">wave_list</span><span class="p">))</span>
+    
+    <span class="c1"># Now, convert to the right units, and return.  (See docstring for explanation.)</span>
+    <span class="c1"># Multiply by exposure time.</span>
+    <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">gain</span>
+    <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">collecting_area</span>
+    <span class="n">sky_val</span> <span class="o">*=</span> <span class="n">exptime</span>
+    <span class="n">sky_val</span> <span class="o">*=</span> <span class="n">gain</span>
+    <span class="n">sky_val</span> <span class="o">*=</span> <span class="n">collecting_area</span><span class="o">/</span><span class="mf">1e4</span>
+
+    <span class="c1"># The result is now the sky level in e-/arcsec^2.</span>
+    <span class="k">return</span> <span class="n">sky_val</span>  </div>
+
+
+<div class="viewcode-block" id="getZodiBackground">
+<a class="viewcode-back" href="../../euclidlike.html#euclidlike.getZodiBackground">[docs]</a>
+<span class="k">def</span> <span class="nf">getZodiBackground</span><span class="p">(</span><span class="n">ecl_lat</span><span class="p">,</span> <span class="n">ecl_dlon</span><span class="p">,</span> <span class="n">lambda_min</span><span class="p">,</span> <span class="n">lambda_max</span><span class="p">,</span> <span class="n">Tlambda</span><span class="p">,</span> <span class="n">T</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This helper routine is used with permission from Chris Hirata&#39;s Exposure Time Calculator and enables the</span>
+<span class="sd">    calculation of the zodiacal light in photons/m^2/arcsec^2/sec. The ETC may be found here:</span>
+
+<span class="sd">    http://www.tapir.caltech.edu/~chirata/web/software/space-etc/</span>
+
+<span class="sd">    The code was ported from C to python by Michael Troxel (matroxel on GitHub).  The units are</span>
+<span class="sd">    exactly as in the original C code, and we convert to any other needed units outside of this</span>
+<span class="sd">    routine, in user-facing code. </span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        ecl_lat:      Ecliptic latitude (degrees)</span>
+<span class="sd">        ecl_dlon:     Ecliptic longitude (degrees)</span>
+<span class="sd">        lambda_min:   Minimum wavelength for the bandpass (microns)</span>
+<span class="sd">        lambda_max:   Maximum wavelength for the bandpass (microns)</span>
+<span class="sd">        Tlambda:      Numpy array containing a grid of wavelength values for the bandpass (microns)</span>
+<span class="sd">        T:            Numpy array containing the throughput (normalized to be between 0-1) for the</span>
+<span class="sd">                      bandpass</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        A floating point value for the zodiacal light in photons/m^2/arcsec^2/sec</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">deg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">180.</span> <span class="c1"># degrees </span>
+    <span class="n">Nlambda</span> <span class="o">=</span> <span class="mi">100</span> <span class="c1"># number of integration points in wavelength </span>
+    <span class="c1"># Sky brightness table: rows are varying ecliptic latitude, cols are varying longitude,</span>
+    <span class="c1"># at the values shown.</span>
+    <span class="c1"># </span>
+    <span class="c1"># This is at 0.5um in units of 1e-8 W/m^2/sr/um.</span>
+    <span class="c1"># Electronic version of Table 17 of Leinert (1997), except for placeholders (1&#39;s) at</span>
+    <span class="c1"># elongation &lt;15 degrees (where we should not use this routine anyway!).</span>
+    <span class="n">nlat</span> <span class="o">=</span> <span class="mi">11</span>
+    <span class="n">nlon</span> <span class="o">=</span> <span class="mi">19</span>
+    <span class="n">betaTable</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">15</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">25</span><span class="p">,</span><span class="mi">30</span><span class="p">,</span><span class="mi">45</span><span class="p">,</span><span class="mi">60</span><span class="p">,</span><span class="mi">75</span><span class="p">,</span><span class="mi">90</span><span class="p">]</span>
+    <span class="n">dlonTable</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">15</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">25</span><span class="p">,</span><span class="mi">30</span><span class="p">,</span><span class="mi">35</span><span class="p">,</span><span class="mi">40</span><span class="p">,</span><span class="mi">45</span><span class="p">,</span><span class="mi">60</span><span class="p">,</span><span class="mi">75</span><span class="p">,</span><span class="mi">90</span><span class="p">,</span><span class="mi">105</span><span class="p">,</span><span class="mi">120</span><span class="p">,</span><span class="mi">135</span><span class="p">,</span><span class="mi">150</span><span class="p">,</span><span class="mi">165</span><span class="p">,</span><span class="mi">180</span><span class="p">]</span>
+    <span class="n">skyTable</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="mi">1</span><span class="p">,</span>    <span class="mi">1</span><span class="p">,</span>    <span class="mi">1</span><span class="p">,</span> <span class="mi">3140</span><span class="p">,</span> <span class="mi">1610</span><span class="p">,</span> <span class="mi">985</span><span class="p">,</span> <span class="mi">640</span><span class="p">,</span> <span class="mi">275</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">77</span><span class="p">,</span>
+        <span class="mi">1</span><span class="p">,</span>    <span class="mi">1</span><span class="p">,</span>    <span class="mi">1</span><span class="p">,</span> <span class="mi">2940</span><span class="p">,</span> <span class="mi">1540</span><span class="p">,</span> <span class="mi">945</span><span class="p">,</span> <span class="mi">625</span><span class="p">,</span> <span class="mi">271</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">77</span><span class="p">,</span>
+        <span class="mi">1</span><span class="p">,</span>    <span class="mi">1</span><span class="p">,</span> <span class="mi">4740</span><span class="p">,</span> <span class="mi">2470</span><span class="p">,</span> <span class="mi">1370</span><span class="p">,</span> <span class="mi">865</span><span class="p">,</span> <span class="mi">590</span><span class="p">,</span> <span class="mi">264</span><span class="p">,</span> <span class="mi">148</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">77</span><span class="p">,</span>
+        <span class="mi">11500</span><span class="p">,</span> <span class="mi">6780</span><span class="p">,</span> <span class="mi">3440</span><span class="p">,</span> <span class="mi">1860</span><span class="p">,</span> <span class="mi">1110</span><span class="p">,</span> <span class="mi">755</span><span class="p">,</span> <span class="mi">525</span><span class="p">,</span> <span class="mi">251</span><span class="p">,</span> <span class="mi">146</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">77</span><span class="p">,</span>
+        <span class="mi">6400</span><span class="p">,</span> <span class="mi">4480</span><span class="p">,</span> <span class="mi">2410</span><span class="p">,</span> <span class="mi">1410</span><span class="p">,</span>  <span class="mi">910</span><span class="p">,</span> <span class="mi">635</span><span class="p">,</span> <span class="mi">454</span><span class="p">,</span> <span class="mi">237</span><span class="p">,</span> <span class="mi">141</span><span class="p">,</span>  <span class="mi">99</span><span class="p">,</span> <span class="mi">77</span><span class="p">,</span>
+        <span class="mi">3840</span><span class="p">,</span> <span class="mi">2830</span><span class="p">,</span> <span class="mi">1730</span><span class="p">,</span> <span class="mi">1100</span><span class="p">,</span>  <span class="mi">749</span><span class="p">,</span> <span class="mi">545</span><span class="p">,</span> <span class="mi">410</span><span class="p">,</span> <span class="mi">223</span><span class="p">,</span> <span class="mi">136</span><span class="p">,</span>  <span class="mi">97</span><span class="p">,</span> <span class="mi">77</span><span class="p">,</span>
+        <span class="mi">2480</span><span class="p">,</span> <span class="mi">1870</span><span class="p">,</span> <span class="mi">1220</span><span class="p">,</span>  <span class="mi">845</span><span class="p">,</span>  <span class="mi">615</span><span class="p">,</span> <span class="mi">467</span><span class="p">,</span> <span class="mi">365</span><span class="p">,</span> <span class="mi">207</span><span class="p">,</span> <span class="mi">131</span><span class="p">,</span>  <span class="mi">95</span><span class="p">,</span> <span class="mi">77</span><span class="p">,</span>
+        <span class="mi">1650</span><span class="p">,</span> <span class="mi">1270</span><span class="p">,</span>  <span class="mi">910</span><span class="p">,</span>  <span class="mi">680</span><span class="p">,</span>  <span class="mi">510</span><span class="p">,</span> <span class="mi">397</span><span class="p">,</span> <span class="mi">320</span><span class="p">,</span> <span class="mi">193</span><span class="p">,</span> <span class="mi">125</span><span class="p">,</span>  <span class="mi">93</span><span class="p">,</span> <span class="mi">77</span><span class="p">,</span>
+        <span class="mi">1180</span><span class="p">,</span>  <span class="mi">940</span><span class="p">,</span>  <span class="mi">700</span><span class="p">,</span>  <span class="mi">530</span><span class="p">,</span>  <span class="mi">416</span><span class="p">,</span> <span class="mi">338</span><span class="p">,</span> <span class="mi">282</span><span class="p">,</span> <span class="mi">179</span><span class="p">,</span> <span class="mi">120</span><span class="p">,</span>  <span class="mi">92</span><span class="p">,</span> <span class="mi">77</span><span class="p">,</span>
+        <span class="mi">910</span><span class="p">,</span>  <span class="mi">730</span><span class="p">,</span>  <span class="mi">555</span><span class="p">,</span>  <span class="mi">442</span><span class="p">,</span>  <span class="mi">356</span><span class="p">,</span> <span class="mi">292</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">166</span><span class="p">,</span> <span class="mi">116</span><span class="p">,</span>  <span class="mi">90</span><span class="p">,</span> <span class="mi">77</span><span class="p">,</span>
+        <span class="mi">505</span><span class="p">,</span>  <span class="mi">442</span><span class="p">,</span>  <span class="mi">352</span><span class="p">,</span>  <span class="mi">292</span><span class="p">,</span>  <span class="mi">243</span><span class="p">,</span> <span class="mi">209</span><span class="p">,</span> <span class="mi">183</span><span class="p">,</span> <span class="mi">134</span><span class="p">,</span> <span class="mi">104</span><span class="p">,</span>  <span class="mi">86</span><span class="p">,</span> <span class="mi">77</span><span class="p">,</span>
+        <span class="mi">338</span><span class="p">,</span>  <span class="mi">317</span><span class="p">,</span>  <span class="mi">269</span><span class="p">,</span>  <span class="mi">227</span><span class="p">,</span>  <span class="mi">196</span><span class="p">,</span> <span class="mi">172</span><span class="p">,</span> <span class="mi">151</span><span class="p">,</span> <span class="mi">116</span><span class="p">,</span>  <span class="mi">93</span><span class="p">,</span>  <span class="mi">82</span><span class="p">,</span> <span class="mi">77</span><span class="p">,</span>
+        <span class="mi">259</span><span class="p">,</span>  <span class="mi">251</span><span class="p">,</span>  <span class="mi">225</span><span class="p">,</span>  <span class="mi">193</span><span class="p">,</span>  <span class="mi">166</span><span class="p">,</span> <span class="mi">147</span><span class="p">,</span> <span class="mi">132</span><span class="p">,</span> <span class="mi">104</span><span class="p">,</span>  <span class="mi">86</span><span class="p">,</span>  <span class="mi">79</span><span class="p">,</span> <span class="mi">77</span><span class="p">,</span>
+        <span class="mi">212</span><span class="p">,</span>  <span class="mi">210</span><span class="p">,</span>  <span class="mi">197</span><span class="p">,</span>  <span class="mi">170</span><span class="p">,</span>  <span class="mi">150</span><span class="p">,</span> <span class="mi">133</span><span class="p">,</span> <span class="mi">119</span><span class="p">,</span>  <span class="mi">96</span><span class="p">,</span>  <span class="mi">82</span><span class="p">,</span>  <span class="mi">77</span><span class="p">,</span> <span class="mi">77</span><span class="p">,</span>
+        <span class="mi">188</span><span class="p">,</span>  <span class="mi">186</span><span class="p">,</span>  <span class="mi">177</span><span class="p">,</span>  <span class="mi">154</span><span class="p">,</span>  <span class="mi">138</span><span class="p">,</span> <span class="mi">125</span><span class="p">,</span> <span class="mi">113</span><span class="p">,</span>  <span class="mi">90</span><span class="p">,</span>  <span class="mi">77</span><span class="p">,</span>  <span class="mi">74</span><span class="p">,</span> <span class="mi">77</span><span class="p">,</span>
+        <span class="mi">179</span><span class="p">,</span>  <span class="mi">178</span><span class="p">,</span>  <span class="mi">166</span><span class="p">,</span>  <span class="mi">147</span><span class="p">,</span>  <span class="mi">134</span><span class="p">,</span> <span class="mi">122</span><span class="p">,</span> <span class="mi">110</span><span class="p">,</span>  <span class="mi">90</span><span class="p">,</span>  <span class="mi">77</span><span class="p">,</span>  <span class="mi">73</span><span class="p">,</span> <span class="mi">77</span><span class="p">,</span>
+        <span class="mi">179</span><span class="p">,</span>  <span class="mi">178</span><span class="p">,</span>  <span class="mi">165</span><span class="p">,</span>  <span class="mi">148</span><span class="p">,</span>  <span class="mi">137</span><span class="p">,</span> <span class="mi">127</span><span class="p">,</span> <span class="mi">116</span><span class="p">,</span>  <span class="mi">96</span><span class="p">,</span>  <span class="mi">79</span><span class="p">,</span>  <span class="mi">72</span><span class="p">,</span> <span class="mi">77</span><span class="p">,</span>
+        <span class="mi">196</span><span class="p">,</span>  <span class="mi">192</span><span class="p">,</span>  <span class="mi">179</span><span class="p">,</span>  <span class="mi">165</span><span class="p">,</span>  <span class="mi">151</span><span class="p">,</span> <span class="mi">141</span><span class="p">,</span> <span class="mi">131</span><span class="p">,</span> <span class="mi">104</span><span class="p">,</span>  <span class="mi">82</span><span class="p">,</span>  <span class="mi">72</span><span class="p">,</span> <span class="mi">77</span><span class="p">,</span>
+        <span class="mi">230</span><span class="p">,</span>  <span class="mi">212</span><span class="p">,</span>  <span class="mi">195</span><span class="p">,</span>  <span class="mi">178</span><span class="p">,</span>  <span class="mi">163</span><span class="p">,</span> <span class="mi">148</span><span class="p">,</span> <span class="mi">134</span><span class="p">,</span> <span class="mi">105</span><span class="p">,</span>  <span class="mi">83</span><span class="p">,</span>  <span class="mi">72</span><span class="p">,</span> <span class="mi">77</span>
+    <span class="p">]</span>
+    <span class="c1"># Solar spectrum: in units of W/m^2/sr/um at log10(lambda/um) = -0.80(0.01)+0.40</span>
+    <span class="c1"># Ref: Colina, Bohlin, Castelli 1996 AJ 112, 307</span>
+    <span class="c1"># </span>
+    <span class="c1"># V band (550 nm) is SolarSpec[54]</span>
+    <span class="n">SolarSpec</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="mf">1.87138e-01</span><span class="p">,</span> <span class="mf">2.61360e-01</span><span class="p">,</span> <span class="mf">4.08020e-01</span><span class="p">,</span> <span class="mf">6.22197e-01</span><span class="p">,</span> <span class="mf">9.02552e-01</span><span class="p">,</span> <span class="mf">1.51036e+00</span><span class="p">,</span> <span class="mf">2.25890e+00</span><span class="p">,</span> <span class="mf">2.75901e+00</span><span class="p">,</span> <span class="mf">4.03384e+00</span><span class="p">,</span> <span class="mf">5.42817e+00</span><span class="p">,</span> 
+        <span class="mf">7.26182e+00</span><span class="p">,</span> <span class="mf">1.01910e+01</span><span class="p">,</span> <span class="mf">2.01114e+01</span><span class="p">,</span> <span class="mf">3.62121e+01</span><span class="p">,</span> <span class="mf">4.31893e+01</span><span class="p">,</span> <span class="mf">5.43904e+01</span><span class="p">,</span> <span class="mf">4.91581e+01</span><span class="p">,</span> <span class="mf">4.95091e+01</span><span class="p">,</span> <span class="mf">4.95980e+01</span><span class="p">,</span> <span class="mf">5.93722e+01</span><span class="p">,</span> 
+        <span class="mf">5.27380e+01</span><span class="p">,</span> <span class="mf">1.02502e+02</span><span class="p">,</span> <span class="mf">1.62682e+02</span><span class="p">,</span> <span class="mf">2.53618e+02</span><span class="p">,</span> <span class="mf">2.01084e+02</span><span class="p">,</span> <span class="mf">2.08273e+02</span><span class="p">,</span> <span class="mf">4.05163e+02</span><span class="p">,</span> <span class="mf">5.39830e+02</span><span class="p">,</span> <span class="mf">5.31917e+02</span><span class="p">,</span> <span class="mf">6.31200e+02</span><span class="p">,</span> 
+        <span class="mf">7.06134e+02</span><span class="p">,</span> <span class="mf">8.13653e+02</span><span class="p">,</span> <span class="mf">1.00508e+03</span><span class="p">,</span> <span class="mf">9.56536e+02</span><span class="p">,</span> <span class="mf">9.50568e+02</span><span class="p">,</span> <span class="mf">9.82400e+02</span><span class="p">,</span> <span class="mf">1.06093e+03</span><span class="p">,</span> <span class="mf">1.12669e+03</span><span class="p">,</span> <span class="mf">1.09922e+03</span><span class="p">,</span> <span class="mf">1.10224e+03</span><span class="p">,</span> 
+        <span class="mf">1.36831e+03</span><span class="p">,</span> <span class="mf">1.72189e+03</span><span class="p">,</span> <span class="mf">1.74884e+03</span><span class="p">,</span> <span class="mf">1.59871e+03</span><span class="p">,</span> <span class="mf">1.74414e+03</span><span class="p">,</span> <span class="mf">1.98823e+03</span><span class="p">,</span> <span class="mf">2.02743e+03</span><span class="p">,</span> <span class="mf">2.00367e+03</span><span class="p">,</span> <span class="mf">2.03584e+03</span><span class="p">,</span> <span class="mf">1.90296e+03</span><span class="p">,</span> 
+        <span class="mf">1.93097e+03</span><span class="p">,</span> <span class="mf">1.86594e+03</span><span class="p">,</span> <span class="mf">1.86655e+03</span><span class="p">,</span> <span class="mf">1.87957e+03</span><span class="p">,</span> <span class="mf">1.87978e+03</span><span class="p">,</span> <span class="mf">1.83915e+03</span><span class="p">,</span> <span class="mf">1.84447e+03</span><span class="p">,</span> <span class="mf">1.80371e+03</span><span class="p">,</span> <span class="mf">1.76779e+03</span><span class="p">,</span> <span class="mf">1.70796e+03</span><span class="p">,</span> 
+        <span class="mf">1.66589e+03</span><span class="p">,</span> <span class="mf">1.61456e+03</span><span class="p">,</span> <span class="mf">1.53581e+03</span><span class="p">,</span> <span class="mf">1.51269e+03</span><span class="p">,</span> <span class="mf">1.44957e+03</span><span class="p">,</span> <span class="mf">1.39215e+03</span><span class="p">,</span> <span class="mf">1.34031e+03</span><span class="p">,</span> <span class="mf">1.28981e+03</span><span class="p">,</span> <span class="mf">1.24501e+03</span><span class="p">,</span> <span class="mf">1.19548e+03</span><span class="p">,</span> 
+        <span class="mf">1.15483e+03</span><span class="p">,</span> <span class="mf">1.10546e+03</span><span class="p">,</span> <span class="mf">1.06171e+03</span><span class="p">,</span> <span class="mf">9.94579e+02</span><span class="p">,</span> <span class="mf">9.54006e+02</span><span class="p">,</span> <span class="mf">9.15287e+02</span><span class="p">,</span> <span class="mf">8.63891e+02</span><span class="p">,</span> <span class="mf">8.31183e+02</span><span class="p">,</span> <span class="mf">7.95761e+02</span><span class="p">,</span> <span class="mf">7.62568e+02</span><span class="p">,</span> 
+        <span class="mf">7.27589e+02</span><span class="p">,</span> <span class="mf">6.94643e+02</span><span class="p">,</span> <span class="mf">6.60883e+02</span><span class="p">,</span> <span class="mf">6.21830e+02</span><span class="p">,</span> <span class="mf">5.83846e+02</span><span class="p">,</span> <span class="mf">5.59624e+02</span><span class="p">,</span> <span class="mf">5.34124e+02</span><span class="p">,</span> <span class="mf">5.06171e+02</span><span class="p">,</span> <span class="mf">4.80985e+02</span><span class="p">,</span> <span class="mf">4.63139e+02</span><span class="p">,</span> 
+        <span class="mf">4.39482e+02</span><span class="p">,</span> <span class="mf">4.13122e+02</span><span class="p">,</span> <span class="mf">3.94543e+02</span><span class="p">,</span> <span class="mf">3.75591e+02</span><span class="p">,</span> <span class="mf">3.56069e+02</span><span class="p">,</span> <span class="mf">3.35294e+02</span><span class="p">,</span> <span class="mf">3.16374e+02</span><span class="p">,</span> <span class="mf">2.98712e+02</span><span class="p">,</span> <span class="mf">2.82737e+02</span><span class="p">,</span> <span class="mf">2.69581e+02</span><span class="p">,</span> 
+        <span class="mf">2.49433e+02</span><span class="p">,</span> <span class="mf">2.36936e+02</span><span class="p">,</span> <span class="mf">2.21403e+02</span><span class="p">,</span> <span class="mf">2.04770e+02</span><span class="p">,</span> <span class="mf">1.87379e+02</span><span class="p">,</span> <span class="mf">1.75880e+02</span><span class="p">,</span> <span class="mf">1.60408e+02</span><span class="p">,</span> <span class="mf">1.46210e+02</span><span class="p">,</span> <span class="mf">1.36438e+02</span><span class="p">,</span> <span class="mf">1.24412e+02</span><span class="p">,</span> 
+        <span class="mf">1.16500e+02</span><span class="p">,</span> <span class="mf">1.07324e+02</span><span class="p">,</span> <span class="mf">9.89669e+01</span><span class="p">,</span> <span class="mf">9.12134e+01</span><span class="p">,</span> <span class="mf">8.28880e+01</span><span class="p">,</span> <span class="mf">7.71064e+01</span><span class="p">,</span> <span class="mf">7.06245e+01</span><span class="p">,</span> <span class="mf">6.42367e+01</span><span class="p">,</span> <span class="mf">5.87697e+01</span><span class="p">,</span> <span class="mf">5.39387e+01</span><span class="p">,</span> 
+        <span class="mf">4.98208e+01</span>
+    <span class="p">]</span>
+    <span class="c1"># Put longitude between 0 and 180</span>
+    <span class="n">ecl_dlon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">ecl_dlon</span><span class="p">)</span>
+    <span class="n">ecl_dlon</span> <span class="o">-=</span> <span class="mi">360</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">ecl_dlon</span><span class="o">/</span><span class="mi">360</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ecl_dlon</span><span class="o">&gt;</span><span class="mi">180</span><span class="p">):</span> <span class="n">ecl_dlon</span> <span class="o">=</span> <span class="mi">360</span><span class="o">-</span><span class="n">ecl_dlon</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ecl_dlon</span><span class="o">&gt;</span><span class="mi">180</span><span class="p">):</span> <span class="n">ecl_dlon</span> <span class="o">=</span> <span class="mi">180</span>
+    <span class="c1"># Set latitude to be positive</span>
+    <span class="n">ecl_lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">ecl_lat</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ecl_lat</span><span class="o">&gt;</span><span class="mi">90</span><span class="p">):</span> <span class="n">ecl_lat</span> <span class="o">=</span> <span class="mi">90</span>
+    <span class="c1"># Compute elongation (Sun angle). Complain if &lt;15 degrees.</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">ecl_lat</span><span class="o">*</span><span class="n">deg</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">ecl_dlon</span><span class="o">*</span><span class="n">deg</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">z</span><span class="o">&gt;=</span><span class="mi">1</span><span class="p">:</span> <span class="n">elon</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">elif</span> <span class="n">z</span><span class="o">&lt;=-</span><span class="mi">1</span><span class="p">:</span> <span class="n">elon</span> <span class="o">=</span> <span class="mi">180</span>
+    <span class="k">else</span><span class="p">:</span> <span class="n">elon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">z</span><span class="p">)</span><span class="o">/</span><span class="n">deg</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">elon</span><span class="o">&lt;</span><span class="mi">15</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error: get_zodi_bkgnd: elongation = &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">elon</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot; degrees out of valid range.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">10</span>
+    <span class="c1"># Compute sky brightness at 0.5um in units of 1e-8 W/m^2/sr/um.</span>
+    <span class="c1"># Fit to Table 17 of Leinert (1997).</span>
+    <span class="n">ilat</span><span class="o">=</span><span class="mi">0</span>
+    <span class="k">while</span> <span class="n">betaTable</span><span class="p">[</span><span class="n">ilat</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">&lt;</span><span class="n">ecl_lat</span> <span class="ow">and</span> <span class="n">ilat</span><span class="o">&lt;</span><span class="n">nlat</span><span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="n">ilat</span><span class="o">+=</span><span class="mi">1</span>
+    <span class="n">ilon</span><span class="o">=</span><span class="mi">0</span>
+    <span class="k">while</span> <span class="n">dlonTable</span><span class="p">[</span><span class="n">ilon</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">&lt;</span><span class="n">ecl_dlon</span> <span class="ow">and</span> <span class="n">ilon</span><span class="o">&lt;</span><span class="n">nlon</span><span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="n">ilon</span><span class="o">+=</span><span class="mi">1</span>
+    <span class="n">frlat</span> <span class="o">=</span> <span class="p">(</span><span class="n">ecl_lat</span><span class="o">-</span><span class="n">betaTable</span><span class="p">[</span><span class="n">ilat</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="n">betaTable</span><span class="p">[</span><span class="n">ilat</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">betaTable</span><span class="p">[</span><span class="n">ilat</span><span class="p">])</span>
+    <span class="n">frlon</span> <span class="o">=</span> <span class="p">(</span><span class="n">ecl_dlon</span><span class="o">-</span><span class="n">dlonTable</span><span class="p">[</span><span class="n">ilon</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="n">dlonTable</span><span class="p">[</span><span class="n">ilon</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">dlonTable</span><span class="p">[</span><span class="n">ilon</span><span class="p">])</span>
+    <span class="n">sky05</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">skyTable</span><span class="p">[</span><span class="n">ilat</span>  <span class="o">+</span><span class="p">(</span><span class="n">ilon</span>  <span class="p">)</span><span class="o">*</span><span class="n">nlat</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span><span class="o">-</span><span class="n">frlat</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span><span class="o">-</span><span class="n">frlon</span><span class="p">)</span>
+        <span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">skyTable</span><span class="p">[</span><span class="n">ilat</span>  <span class="o">+</span><span class="p">(</span><span class="n">ilon</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">nlat</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span><span class="o">-</span><span class="n">frlat</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span>   <span class="n">frlon</span><span class="p">)</span>
+        <span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">skyTable</span><span class="p">[</span><span class="n">ilat</span><span class="o">+</span><span class="mi">1</span><span class="o">+</span><span class="p">(</span><span class="n">ilon</span>  <span class="p">)</span><span class="o">*</span><span class="n">nlat</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span>   <span class="n">frlat</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span><span class="o">-</span><span class="n">frlon</span><span class="p">)</span>
+        <span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">skyTable</span><span class="p">[</span><span class="n">ilat</span><span class="o">+</span><span class="mi">1</span><span class="o">+</span><span class="p">(</span><span class="n">ilon</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">nlat</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span>   <span class="n">frlat</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span>   <span class="n">frlon</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="c1"># Integrate over wavelengths</span>
+    <span class="n">zodi_tot</span> <span class="o">=</span> <span class="mf">0.</span>
+    <span class="n">dlambda</span> <span class="o">=</span> <span class="p">(</span><span class="n">lambda_max</span><span class="o">-</span><span class="n">lambda_min</span><span class="p">)</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">Nlambda</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">ilambda</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Nlambda</span><span class="p">):</span>
+        <span class="n">lambda_</span> <span class="o">=</span> <span class="n">lambda_min</span> <span class="o">+</span> <span class="p">(</span><span class="n">ilambda</span><span class="o">+</span><span class="mf">0.5</span><span class="p">)</span><span class="o">/</span><span class="n">Nlambda</span> <span class="o">*</span> <span class="p">(</span><span class="n">lambda_max</span><span class="o">-</span><span class="n">lambda_min</span><span class="p">)</span>
+        <span class="c1"># Solar spectrum at this wavelength: F_lambda/F_{0.5um}</span>
+        <span class="n">index_lambda</span> <span class="o">=</span> <span class="mi">100</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">lambda_</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">10.</span><span class="p">)</span> <span class="o">+</span> <span class="mi">80</span>
+        <span class="n">ilam</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">index_lambda</span><span class="p">))</span>
+        <span class="n">frlam</span> <span class="o">=</span> <span class="n">index_lambda</span> <span class="o">-</span> <span class="n">ilam</span>
+        <span class="n">sun_spec</span> <span class="o">=</span> <span class="p">(</span><span class="n">SolarSpec</span><span class="p">[</span><span class="n">ilam</span><span class="p">]</span> <span class="o">+</span> <span class="n">frlam</span><span class="o">*</span><span class="p">(</span><span class="n">SolarSpec</span><span class="p">[</span><span class="n">ilam</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">SolarSpec</span><span class="p">[</span><span class="n">ilam</span><span class="p">]))</span><span class="o">/</span><span class="n">SolarSpec</span><span class="p">[</span><span class="mi">50</span><span class="p">]</span>
+
+        <span class="c1"># Color correction relative to solar</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">lambda_</span><span class="o">&gt;</span><span class="mf">0.5</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">elon</span><span class="o">&gt;</span><span class="mi">90</span><span class="p">:</span> <span class="n">fco</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">+</span> <span class="p">(</span><span class="mf">0.6</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">lambda_</span><span class="o">/</span><span class="mf">0.5</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">10.</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">elon</span><span class="o">&lt;</span><span class="mi">30</span><span class="p">:</span> <span class="n">fco</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">+</span> <span class="p">(</span><span class="mf">0.8</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">lambda_</span><span class="o">/</span><span class="mf">0.5</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">10.</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span> <span class="n">fco</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">+</span> <span class="p">(</span><span class="mf">0.8</span><span class="o">-</span><span class="mf">0.2</span><span class="o">*</span><span class="p">(</span><span class="n">elon</span><span class="o">-</span><span class="mi">30</span><span class="p">)</span><span class="o">/</span><span class="mf">60.</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">lambda_</span><span class="o">/</span><span class="mf">0.5</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">10.</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">elon</span><span class="o">&gt;</span><span class="mi">90</span><span class="p">:</span> <span class="n">fco</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">+</span> <span class="p">(</span><span class="mf">0.9</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">lambda_</span><span class="o">/</span><span class="mf">0.5</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">10.</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">elon</span><span class="o">&lt;</span><span class="mi">30</span><span class="p">:</span> <span class="n">fco</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">+</span> <span class="p">(</span><span class="mf">1.2</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">lambda_</span><span class="o">/</span><span class="mf">0.5</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">10.</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span> <span class="n">fco</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">+</span> <span class="p">(</span><span class="mf">1.2</span><span class="o">-</span><span class="mf">0.3</span><span class="o">*</span><span class="p">(</span><span class="n">elon</span><span class="o">-</span><span class="mi">30</span><span class="p">)</span><span class="o">/</span><span class="mf">60.</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">lambda_</span><span class="o">/</span><span class="mf">0.5</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">10.</span><span class="p">)</span>
+
+        <span class="c1"># The integral for the zodiacal foreground.</span>
+        <span class="c1"># Here sky05*fco*sun_spec*dlambda is the power per unit area per unit solid angle in this</span>
+        <span class="c1"># wavelength range (Units: 1e-8 W/m^2/sr).</span>
+        <span class="c1"># </span>
+        <span class="c1"># The conversion from 1e-8 W --&gt; photons/sec is 5.03411747e10*lambda(um).</span>
+        <span class="n">zodi_tot</span> <span class="o">+=</span> <span class="n">sky05</span> <span class="o">*</span> <span class="n">fco</span> <span class="o">*</span> <span class="n">sun_spec</span> <span class="o">*</span> <span class="n">dlambda</span> <span class="o">*</span> \
+            <span class="mf">5.03411747e10</span><span class="o">*</span><span class="n">lambda_</span><span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">lambda_</span><span class="p">,</span><span class="n">Tlambda</span><span class="p">,</span><span class="n">T</span><span class="p">)</span>
+
+    <span class="c1"># We now have the zodi level in photons/m^2/sr/sec. Convert to photons/m^2/arcsec^2/sec.</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">zodi_tot</span> <span class="o">/</span> <span class="mf">4.2545170296152206e10</span><span class="p">)</span></div>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Rachel Mandelbaum, Axel Guinot, Federico Berlfein, Andy Park, Xiangchong Li, Michael Troxel, Tianqing Zhang.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

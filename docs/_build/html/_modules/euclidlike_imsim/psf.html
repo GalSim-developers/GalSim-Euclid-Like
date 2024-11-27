@@ -1,0 +1,305 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>euclidlike_imsim.psf &mdash; GalSim-Euclid-Like 0.9.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=39bb1c6d"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            GalSim-Euclid-Like
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../euclidlike.html">The Euclid-like Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../euclidlike_imsim.html">The Euclid-like ImSim Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">Revision History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">GalSim-Euclid-Like</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">euclidlike_imsim.psf</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for euclidlike_imsim.psf</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">galsim</span>
+<span class="kn">import</span> <span class="nn">euclidlike</span>
+<span class="kn">import</span> <span class="nn">galsim.config</span>
+<span class="kn">from</span> <span class="nn">galsim.config</span> <span class="kn">import</span> <span class="n">RegisterObjectType</span><span class="p">,</span> <span class="n">RegisterInputType</span><span class="p">,</span> <span class="n">OpticalPSF</span><span class="p">,</span> <span class="n">InputLoader</span>
+
+<span class="kn">import</span> <span class="nn">euclidlike</span>
+
+
+<div class="viewcode-block" id="EuclidlikePSF">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.psf.EuclidlikePSF">[docs]</a>
+<span class="k">class</span> <span class="nc">EuclidlikePSF</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class building needed Euclidlike PSFs.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">CCD</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">WCS</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">n_waves</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">bpass</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">extra_aberrations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+
+        <span class="n">logger</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">LoggerWrapper</span><span class="p">(</span><span class="n">logger</span><span class="p">)</span>
+        <span class="c1"># n_waves parameter is only used for treatment of bright objects. In here we use n_waves = 5</span>
+        <span class="c1"># to speed up computation of the ChromaticOpticalPSF used for bright objects. </span>
+        <span class="k">if</span> <span class="n">n_waves</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">n_waves</span> <span class="o">=</span> <span class="mi">5</span>
+
+        <span class="n">corners</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">galsim</span><span class="o">.</span><span class="n">PositionD</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="n">galsim</span><span class="o">.</span><span class="n">PositionD</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">euclidlike</span><span class="o">.</span><span class="n">n_pix_row</span><span class="p">),</span>
+            <span class="n">galsim</span><span class="o">.</span><span class="n">PositionD</span><span class="p">(</span><span class="n">euclidlike</span><span class="o">.</span><span class="n">n_pix_col</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="n">galsim</span><span class="o">.</span><span class="n">PositionD</span><span class="p">(</span><span class="n">euclidlike</span><span class="o">.</span><span class="n">n_pix_col</span><span class="p">,</span> <span class="n">euclidlike</span><span class="o">.</span><span class="n">n_pix_row</span><span class="p">),</span>
+        <span class="p">]</span>
+        <span class="n">cc</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">PositionD</span><span class="p">(</span><span class="n">euclidlike</span><span class="o">.</span><span class="n">n_pix_col</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">euclidlike</span><span class="o">.</span><span class="n">n_pix_row</span><span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">tags</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ll&quot;</span><span class="p">,</span> <span class="s2">&quot;lu&quot;</span><span class="p">,</span> <span class="s2">&quot;ul&quot;</span><span class="p">,</span> <span class="s2">&quot;uu&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PSF</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">pupil_bin</span> <span class="o">=</span> <span class="mi">8</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PSF</span><span class="p">[</span><span class="n">pupil_bin</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">tag</span><span class="p">,</span> <span class="n">CCD_pos</span> <span class="ow">in</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">tags</span><span class="p">,</span> <span class="n">corners</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">PSF</span><span class="p">[</span><span class="n">pupil_bin</span><span class="p">][</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_psf_call</span><span class="p">(</span>
+                <span class="n">CCD</span><span class="p">,</span> <span class="n">bpass</span><span class="p">,</span> <span class="n">CCD_pos</span><span class="p">,</span> <span class="n">WCS</span><span class="p">,</span> <span class="n">pupil_bin</span><span class="p">,</span> <span class="n">n_waves</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">extra_aberrations</span>
+            <span class="p">)</span>
+        <span class="k">for</span> <span class="n">pupil_bin</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;achromatic&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">PSF</span><span class="p">[</span><span class="n">pupil_bin</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_psf_call</span><span class="p">(</span>
+                <span class="n">CCD</span><span class="p">,</span> <span class="n">bpass</span><span class="p">,</span> <span class="n">cc</span><span class="p">,</span> <span class="n">WCS</span><span class="p">,</span> <span class="n">pupil_bin</span><span class="p">,</span> <span class="n">n_waves</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">extra_aberrations</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_parse_pupil_bin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pupil_bin</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">pupil_bin</span> <span class="o">==</span> <span class="s2">&quot;achromatic&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">8</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pupil_bin</span>
+
+    <span class="k">def</span> <span class="nf">_psf_call</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">CCD</span><span class="p">,</span> <span class="n">bpass</span><span class="p">,</span> <span class="n">CCD_pos</span><span class="p">,</span> <span class="n">WCS</span><span class="p">,</span> <span class="n">pupil_bin</span><span class="p">,</span> <span class="n">n_waves</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">extra_aberrations</span>
+    <span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">pupil_bin</span> <span class="o">==</span> <span class="mi">8</span><span class="p">:</span>
+            <span class="n">psf</span> <span class="o">=</span> <span class="n">euclidlike</span><span class="o">.</span><span class="n">getPSF</span><span class="p">(</span>
+                <span class="n">CCD</span><span class="p">,</span>
+                <span class="n">bpass</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">ccd_pos</span><span class="o">=</span><span class="n">CCD_pos</span><span class="p">,</span>
+                <span class="n">wcs</span><span class="o">=</span><span class="n">WCS</span><span class="p">,</span>
+                <span class="c1"># pupil_bin=pupil_bin,</span>
+                <span class="c1"># n_waves=n_waves,</span>
+                <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span>
+                <span class="c1"># Don&#39;t set wavelength for this one.</span>
+                <span class="c1"># We want this to be chromatic for photon shooting.</span>
+                <span class="c1"># wavelength          = bpass.effective_wavelength,</span>
+                <span class="c1"># extra_aberrations=extra_aberrations,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">psf</span> <span class="o">=</span> <span class="n">euclidlike</span><span class="o">.</span><span class="n">getBrightPSF</span><span class="p">(</span>
+                <span class="n">CCD</span><span class="p">,</span>
+                <span class="n">bpass</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">ccd_pos</span><span class="o">=</span><span class="n">CCD_pos</span><span class="p">,</span>
+                <span class="n">wcs</span><span class="o">=</span><span class="n">WCS</span><span class="p">,</span>
+                <span class="n">pupil_bin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_parse_pupil_bin</span><span class="p">(</span><span class="n">pupil_bin</span><span class="p">),</span>
+                <span class="n">n_waves</span><span class="o">=</span><span class="n">n_waves</span><span class="p">,</span>
+                <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span>
+                <span class="c1"># Note: setting wavelength makes it achromatic.</span>
+                <span class="c1"># We only use pupil_bin = 2,4 for FFT objects.</span>
+                <span class="n">wavelength</span><span class="o">=</span><span class="n">bpass</span><span class="o">.</span><span class="n">effective_wavelength</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="c1"># psf = euclidlike.getPSF(</span>
+            <span class="c1">#     CCD,</span>
+            <span class="c1">#     bpass.name,</span>
+            <span class="c1">#     ccd_pos=CCD_pos,</span>
+            <span class="c1">#     wcs=WCS,</span>
+            <span class="c1">#     # pupil_bin=self._parse_pupil_bin(pupil_bin),</span>
+            <span class="c1">#     # n_waves=n_waves,</span>
+            <span class="c1">#     logger=logger,</span>
+            <span class="c1">#     # Note: setting wavelength makes it achromatic.</span>
+            <span class="c1">#     # We only use pupil_bin = 2,4 for FFT objects.</span>
+            <span class="c1">#     wavelength=bpass.effective_wavelength,</span>
+            <span class="c1">#     # extra_aberrations=extra_aberrations,</span>
+            <span class="c1"># )</span>
+        <span class="k">if</span> <span class="n">pupil_bin</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">psf</span><span class="o">.</span><span class="n">withGSParams</span><span class="p">(</span><span class="n">maximum_fft_size</span><span class="o">=</span><span class="mi">16384</span><span class="p">,</span> <span class="n">folding_threshold</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">pupil_bin</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">psf</span><span class="o">.</span><span class="n">withGSParams</span><span class="p">(</span><span class="n">maximum_fft_size</span><span class="o">=</span><span class="mi">16384</span><span class="p">,</span> <span class="n">folding_threshold</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">psf</span><span class="o">.</span><span class="n">withGSParams</span><span class="p">(</span><span class="n">maximum_fft_size</span><span class="o">=</span><span class="mi">16384</span><span class="p">)</span>
+
+<div class="viewcode-block" id="EuclidlikePSF.getPSF">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.psf.EuclidlikePSF.getPSF">[docs]</a>
+    <span class="k">def</span> <span class="nf">getPSF</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pupil_bin</span><span class="p">,</span> <span class="n">pos</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a PSF to be convolved with sources.</span>
+<span class="sd">        PSF is sampled at 4 quadrants for each CCD. Returned PSF</span>
+<span class="sd">        corresponds to that of the quadrant of the CCD position.</span>
+
+<span class="sd">        @param [in] what pupil binning to request.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">## For now no interpolation is used</span>
+        <span class="c1">#wll = (euclidlike.n_pix_col - pos.x) * (euclidlike.n_pix_row - pos.y)</span>
+        <span class="c1">#wlu = (euclidlike.n_pix_col - pos.x) * (pos.y - 1)</span>
+        <span class="c1">#wul = (pos.x - 1) * (euclidlike.n_pix_row - pos.y)</span>
+        <span class="c1">#wuu = (pos.x - 1) * (pos.y - 1)</span>
+        <span class="c1">#return (</span>
+        <span class="c1">#    wll * psf[&quot;ll&quot;] + wlu * psf[&quot;lu&quot;] + wul * psf[&quot;ul&quot;] + wuu * psf[&quot;uu&quot;]</span>
+        <span class="c1">#) / ((euclidlike.n_pix_row - 1) * (euclidlike.n_pix_col - 1))</span>
+
+
+        <span class="n">psf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">PSF</span><span class="p">[</span><span class="n">pupil_bin</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">pupil_bin</span> <span class="o">!=</span> <span class="mi">8</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">psf</span>
+
+        <span class="n">quad_row</span> <span class="o">=</span> <span class="s1">&#39;l&#39;</span>
+        <span class="n">quad_col</span> <span class="o">=</span> <span class="s1">&#39;l&#39;</span>
+        <span class="k">if</span> <span class="n">pos</span><span class="o">.</span><span class="n">y</span> <span class="o">&gt;</span> <span class="n">euclidlike</span><span class="o">.</span><span class="n">n_pix_row</span><span class="o">/</span><span class="mi">2</span><span class="p">:</span>
+            <span class="n">quad_row</span> <span class="o">=</span> <span class="s1">&#39;u&#39;</span>
+        <span class="k">if</span> <span class="n">pos</span><span class="o">.</span><span class="n">x</span> <span class="o">&gt;</span> <span class="n">euclidlike</span><span class="o">.</span><span class="n">n_pix_col</span><span class="o">/</span><span class="mi">2</span><span class="p">:</span>
+            <span class="n">quad_col</span> <span class="o">=</span> <span class="s1">&#39;u&#39;</span>   
+        <span class="n">quad_pos</span> <span class="o">=</span> <span class="n">quad_col</span> <span class="o">+</span> <span class="n">quad_row</span>
+        <span class="k">return</span> <span class="n">psf</span><span class="p">[</span><span class="n">quad_pos</span><span class="p">]</span></div>
+</div>
+
+        
+
+
+
+<div class="viewcode-block" id="PSFLoader">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.psf.PSFLoader">[docs]</a>
+<span class="k">class</span> <span class="nc">PSFLoader</span><span class="p">(</span><span class="n">InputLoader</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;PSF loader.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Override some defaults in the base init.</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">init_func</span><span class="o">=</span><span class="n">EuclidlikePSF</span><span class="p">,</span> <span class="n">takes_logger</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_proxy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PSFLoader.getKwargs">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.psf.PSFLoader.getKwargs">[docs]</a>
+    <span class="k">def</span> <span class="nf">getKwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Get kwargs for PSF&quot;</span><span class="p">)</span>
+
+        <span class="n">req</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">opt</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;n_waves&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">ignore</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;extra_aberrations&quot;</span><span class="p">]</span>
+
+        <span class="c1"># If CCD is in base, then don&#39;t require it in the config file.</span>
+        <span class="c1"># (Presumably because using Euclidlike image type, which sets it there for convenience.)</span>
+        <span class="k">if</span> <span class="s2">&quot;CCD&quot;</span> <span class="ow">in</span> <span class="n">base</span><span class="p">:</span>
+            <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;CCD&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">req</span><span class="p">[</span><span class="s2">&quot;CCD&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span>
+
+        <span class="n">kwargs</span><span class="p">,</span> <span class="n">safe</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">GetAllParams</span><span class="p">(</span>
+            <span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">req</span><span class="o">=</span><span class="n">req</span><span class="p">,</span> <span class="n">opt</span><span class="o">=</span><span class="n">opt</span><span class="p">,</span> <span class="n">ignore</span><span class="o">=</span><span class="n">ignore</span>
+        <span class="p">)</span>
+
+        <span class="c1"># If not given in kwargs, then it must have been in base, so this is ok.</span>
+        <span class="k">if</span> <span class="s2">&quot;CCD&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;CCD&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">base</span><span class="p">[</span><span class="s2">&quot;CCD&quot;</span><span class="p">]</span>
+
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;extra_aberrations&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">ParseAberrations</span><span class="p">(</span>
+            <span class="s2">&quot;extra_aberrations&quot;</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="s2">&quot;EuclidlikePSF&quot;</span>
+        <span class="p">)</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;WCS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">BuildWCS</span><span class="p">(</span>
+            <span class="n">base</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">],</span> <span class="s2">&quot;wcs&quot;</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span>
+        <span class="p">)</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;bpass&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">BuildBandpass</span><span class="p">(</span>
+            <span class="n">base</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">],</span> <span class="s2">&quot;bandpass&quot;</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">logger</span>
+        <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;kwargs = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">kwargs</span><span class="p">,</span> <span class="kc">False</span></div>
+</div>
+
+
+
+<span class="c1"># Register this as a valid type</span>
+<span class="n">RegisterInputType</span><span class="p">(</span><span class="s2">&quot;euclidlike_psf&quot;</span><span class="p">,</span> <span class="n">PSFLoader</span><span class="p">())</span>
+<span class="c1"># RegisterObjectType(&#39;euclidlike_psf&#39;, BuildEuclidlikePSF, input_type=&#39;euclidlikepsf_loader&#39;)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Rachel Mandelbaum, Axel Guinot, Federico Berlfein, Andy Park, Xiangchong Li, Michael Troxel, Tianqing Zhang.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

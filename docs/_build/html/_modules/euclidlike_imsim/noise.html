@@ -1,0 +1,385 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>euclidlike_imsim.noise &mdash; GalSim-Euclid-Like 0.9.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=39bb1c6d"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            GalSim-Euclid-Like
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../euclidlike.html">The Euclid-like Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../euclidlike_imsim.html">The Euclid-like ImSim Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">Revision History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">GalSim-Euclid-Like</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">euclidlike_imsim.noise</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for euclidlike_imsim.noise</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">astropy.time</span> <span class="kn">import</span> <span class="n">Time</span>
+
+<span class="kn">import</span> <span class="nn">galsim</span>
+<span class="kn">from</span> <span class="nn">galsim.errors</span> <span class="kn">import</span> <span class="n">GalSimConfigError</span>
+
+<span class="kn">import</span> <span class="nn">euclidlike</span>
+<span class="kn">from</span> <span class="nn">euclidlike.instrument_params</span> <span class="kn">import</span> <span class="n">gain</span><span class="p">,</span> <span class="n">read_noise</span>
+
+<span class="c1"># Some place holder stuff, will need to update later in euclidlike</span>
+<span class="c1"># This is just to avoid changing the code and don&#39;t have &quot;errors&quot;</span>
+<span class="n">stray_light_fraction</span> <span class="o">=</span> <span class="mf">0.</span>
+<span class="n">dark_current</span> <span class="o">=</span> <span class="mf">0.</span>
+
+<span class="n">cfg_noise_key</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;ignore_noise&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;stray_light&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;thermal_background&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;reciprocity_failure&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dark_current&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;nonlinearity&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ipc&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;read_noise&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sky_subtract&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="parse_noise_config">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.noise.parse_noise_config">[docs]</a>
+<span class="k">def</span> <span class="nf">parse_noise_config</span><span class="p">(</span><span class="n">params</span><span class="p">):</span>
+
+    <span class="n">cfg_noise</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">cfg_noise_key</span><span class="p">:</span>
+        <span class="n">cfg_noise</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">cfg_noise</span><span class="p">[</span><span class="s2">&quot;exptime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;exptime&quot;</span><span class="p">]</span>
+    <span class="n">cfg_noise</span><span class="p">[</span><span class="s2">&quot;mjd&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;mjd&quot;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">cfg_noise</span></div>
+
+
+
+<div class="viewcode-block" id="get_noise">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.noise.get_noise">[docs]</a>
+<span class="k">def</span> <span class="nf">get_noise</span><span class="p">(</span><span class="n">cfg_noise</span><span class="p">,</span> <span class="n">cfg_image</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+
+    <span class="n">noise_img</span> <span class="o">=</span> <span class="n">base</span><span class="p">[</span><span class="s2">&quot;current_image&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">noise_img</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">wcs</span> <span class="o">=</span> <span class="n">base</span><span class="p">[</span><span class="s2">&quot;wcs&quot;</span><span class="p">]</span>
+    <span class="n">bp</span> <span class="o">=</span> <span class="n">base</span><span class="p">[</span><span class="s2">&quot;bandpass&quot;</span><span class="p">]</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">GetRNG</span><span class="p">(</span><span class="n">cfg_image</span><span class="p">,</span> <span class="n">base</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+        <span class="s2">&quot;image </span><span class="si">%d</span><span class="s2">: Start EuclidlikeCCD detector effects&quot;</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;image_num&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Things that will eventually be subtracted (if sky_subtract) will have their expectation</span>
+    <span class="c1"># value added to sky_image.  So technically, this includes things that aren&#39;t just sky.</span>
+    <span class="c1"># E.g. includes dark_current and thermal backgrounds.</span>
+    <span class="n">sky_image</span> <span class="o">=</span> <span class="n">noise_img</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">sky_level</span> <span class="o">=</span> <span class="n">euclidlike</span><span class="o">.</span><span class="n">getSkyLevel</span><span class="p">(</span>
+        <span class="n">bp</span><span class="p">,</span>
+        <span class="n">world_pos</span><span class="o">=</span><span class="n">wcs</span><span class="o">.</span><span class="n">toWorld</span><span class="p">(</span><span class="n">noise_img</span><span class="o">.</span><span class="n">true_center</span><span class="p">),</span>
+        <span class="n">date</span><span class="o">=</span><span class="n">Time</span><span class="p">(</span><span class="n">cfg_noise</span><span class="p">[</span><span class="s2">&quot;mjd&quot;</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;mjd&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">datetime</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Adding sky_level = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">sky_level</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">cfg_noise</span><span class="p">[</span><span class="s2">&quot;stray_light&quot;</span><span class="p">]:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Stray light fraction = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">stray_light_fraction</span><span class="p">)</span>
+        <span class="n">sky_level</span> <span class="o">*=</span> <span class="mf">1.0</span> <span class="o">+</span> <span class="n">stray_light_fraction</span>
+    <span class="n">wcs</span><span class="o">.</span><span class="n">makeSkyImage</span><span class="p">(</span><span class="n">sky_image</span><span class="p">,</span> <span class="n">sky_level</span><span class="p">)</span>
+
+    <span class="c1"># The image up to here is an expectation value.</span>
+    <span class="c1"># Realize it as an integer number of photons.</span>
+    <span class="n">poisson_noise</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">noise</span><span class="o">.</span><span class="n">PoissonNoise</span><span class="p">(</span><span class="n">rng</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Adding poisson noise to sky photons&quot;</span><span class="p">)</span>
+    <span class="n">sky_image1</span> <span class="o">=</span> <span class="n">sky_image</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">sky_image1</span><span class="o">.</span><span class="n">addNoise</span><span class="p">(</span><span class="n">poisson_noise</span><span class="p">)</span>
+    <span class="n">noise_img</span><span class="o">.</span><span class="n">quantize</span><span class="p">()</span>
+    <span class="c1"># the image won&#39;t necessarily be integers.</span>
+    <span class="n">noise_img</span> <span class="o">+=</span> <span class="n">sky_image1</span>
+
+    <span class="c1"># Apply the detector effects here.  Not all of these are &quot;noise&quot; per se, but they</span>
+    <span class="c1"># happen interspersed with various noise effects, so apply them all in this step.</span>
+
+    <span class="k">if</span> <span class="n">cfg_noise</span><span class="p">[</span><span class="s2">&quot;dark_current&quot;</span><span class="p">]:</span>
+        <span class="n">dc</span> <span class="o">=</span> <span class="n">dark_current</span> <span class="o">*</span> <span class="n">cfg_noise</span><span class="p">[</span><span class="s2">&quot;exptime&quot;</span><span class="p">]</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Adding dark current: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">dc</span><span class="p">)</span>
+        <span class="n">sky_image</span> <span class="o">+=</span> <span class="n">dc</span>
+        <span class="n">dark_noise</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">noise</span><span class="o">.</span><span class="n">DeviateNoise</span><span class="p">(</span>
+            <span class="n">galsim</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PoissonDeviate</span><span class="p">(</span><span class="n">rng</span><span class="p">,</span> <span class="n">dc</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">noise_img</span><span class="o">.</span><span class="n">addNoise</span><span class="p">(</span><span class="n">dark_noise</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">cfg_noise</span><span class="p">[</span><span class="s2">&quot;read_noise&quot;</span><span class="p">]:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Adding read noise </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">read_noise</span><span class="p">)</span>
+        <span class="n">noise_img</span><span class="o">.</span><span class="n">addNoise</span><span class="p">(</span><span class="n">galsim</span><span class="o">.</span><span class="n">GaussianNoise</span><span class="p">(</span><span class="n">rng</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">read_noise</span><span class="p">))</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Applying gain </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">gain</span><span class="p">)</span>
+    <span class="n">noise_img</span> <span class="o">/=</span> <span class="n">gain</span>
+
+    <span class="c1"># Make integer ADU now.</span>
+    <span class="n">noise_img</span><span class="o">.</span><span class="n">quantize</span><span class="p">()</span>
+
+    <span class="n">sky_image</span> <span class="o">/=</span> <span class="n">gain</span>
+    <span class="n">sky_image</span><span class="o">.</span><span class="n">quantize</span><span class="p">()</span>
+
+    <span class="n">base</span><span class="p">[</span><span class="s2">&quot;noise_image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">noise_img</span>
+    <span class="n">base</span><span class="p">[</span><span class="s2">&quot;sky_image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sky_image</span></div>
+
+
+
+<div class="viewcode-block" id="NoiseImageBuilder">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.noise.NoiseImageBuilder">[docs]</a>
+<span class="k">class</span> <span class="nc">NoiseImageBuilder</span><span class="p">(</span><span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">ExtraOutputBuilder</span><span class="p">):</span>
+
+<div class="viewcode-block" id="NoiseImageBuilder.initialize">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.noise.NoiseImageBuilder.initialize">[docs]</a>
+    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">scratch</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Do any initial setup for this builder at the start of a new output file.</span>
+
+<span class="sd">        The base class implementation saves two work space items into self.data and self.scratch</span>
+<span class="sd">        that can be used to safely communicate across multiple processes.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            data:       An empty list of length nimages to use as work space.</span>
+<span class="sd">            scratch:    An empty dict that can be used as work space.</span>
+<span class="sd">            config:     The configuration field for this output object.</span>
+<span class="sd">            base:       The base configuration dict.</span>
+<span class="sd">            logger:     If given, a logger object to log progress. [default: None]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">req</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;CCD&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="s2">&quot;filter&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;mjd&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;exptime&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">}</span>
+        <span class="n">opt</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="nb">bool</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">cfg_noise_key</span><span class="p">}</span>
+        <span class="n">ignore</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">image_ignore</span>
+        <span class="n">extra_ignore</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;image_pos&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;world_pos&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;stamp_size&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;stamp_xsize&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;stamp_ysize&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;nobjects&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">GetAllParams</span><span class="p">(</span>
+            <span class="n">base</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">],</span> <span class="n">base</span><span class="p">,</span> <span class="n">req</span><span class="o">=</span><span class="n">req</span><span class="p">,</span> <span class="n">opt</span><span class="o">=</span><span class="n">opt</span><span class="p">,</span> <span class="n">ignore</span><span class="o">=</span><span class="n">ignore</span><span class="o">+</span><span class="n">extra_ignore</span><span class="p">,</span>
+        <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cfg_noise</span> <span class="o">=</span> <span class="n">parse_noise_config</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_input</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scratch</span> <span class="o">=</span> <span class="n">scratch</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">final_data</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg_noise</span><span class="p">[</span><span class="s2">&quot;ignore_noise&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="n">GalSimConfigError</span><span class="p">(</span>
+                <span class="s2">&quot;You cannot ignore the noise and request the noise image at the same time.&quot;</span>
+                <span class="s2">&quot; Either active the noise or remove the output noise image.&quot;</span>
+            <span class="p">)</span>
+
+<div class="viewcode-block" id="NoiseImageBuilder.processImage">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.noise.NoiseImageBuilder.processImage">[docs]</a>
+    <span class="k">def</span> <span class="nf">processImage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">obj_nums</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform any necessary processing at the end of each image construction.</span>
+
+<span class="sd">        This function will be called after each full image is built.</span>
+
+<span class="sd">        Compute the noise for the current image and add it to the image.</span>
+<span class="sd">        It will also create an independent noise image.</span>
+<span class="sd">        The code optionally subtract the background if requested.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            index:      The index in self.data to use for this image.  This isn&#39;t the image_num</span>
+<span class="sd">                        (which can be accessed at base[&#39;image_num&#39;] if needed), but rather</span>
+<span class="sd">                        an index that starts at 0 for the first image being worked on and</span>
+<span class="sd">                        goes up to nimages-1.</span>
+<span class="sd">            obj_nums:   The object numbers that were used for this image.</span>
+<span class="sd">            config:     The configuration field for this output object.</span>
+<span class="sd">            base:       The base configuration dict.</span>
+<span class="sd">            logger:     If given, a logger object to log progress. [default: None]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;noise_image&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">base</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">get_noise</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg_noise</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+
+        <span class="n">noise_image</span> <span class="o">=</span> <span class="n">base</span><span class="p">[</span><span class="s2">&quot;noise_image&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg_noise</span><span class="p">[</span><span class="s2">&quot;sky_subtract&quot;</span><span class="p">]:</span>
+            <span class="n">noise_image</span> <span class="o">-=</span> <span class="n">base</span><span class="p">[</span><span class="s2">&quot;sky_image&quot;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">noise_image</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SkyImageBuilder">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.noise.SkyImageBuilder">[docs]</a>
+<span class="k">class</span> <span class="nc">SkyImageBuilder</span><span class="p">(</span><span class="n">NoiseImageBuilder</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">_check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg_noise</span><span class="p">[</span><span class="s2">&quot;ignore_noise&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="n">GalSimConfigError</span><span class="p">(</span>
+                <span class="s2">&quot;You cannot ignore the noise and request the sky image at the same time.&quot;</span>
+                <span class="s2">&quot; Either activate the noise or remove the output sky image.&quot;</span>
+            <span class="p">)</span>
+
+<div class="viewcode-block" id="SkyImageBuilder.processImage">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.noise.SkyImageBuilder.processImage">[docs]</a>
+    <span class="k">def</span> <span class="nf">processImage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">obj_nums</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform any necessary processing at the end of each image construction.</span>
+
+<span class="sd">        This function will be called after each full image is built.</span>
+
+<span class="sd">        Compute the sky background and return it in an image.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            index:      The index in self.data to use for this image.  This isn&#39;t the image_num</span>
+<span class="sd">                        (which can be accessed at base[&#39;image_num&#39;] if needed), but rather</span>
+<span class="sd">                        an index that starts at 0 for the first image being worked on and</span>
+<span class="sd">                        goes up to nimages-1.</span>
+<span class="sd">            obj_nums:   The object numbers that were used for this image.</span>
+<span class="sd">            config:     The configuration field for this output object.</span>
+<span class="sd">            base:       The base configuration dict.</span>
+<span class="sd">            logger:     If given, a logger object to log progress. [default: None]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;noise_image&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">base</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">get_noise</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg_noise</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">base</span><span class="p">[</span><span class="s2">&quot;sky_image&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="WeightImageBuilder">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.noise.WeightImageBuilder">[docs]</a>
+<span class="k">class</span> <span class="nc">WeightImageBuilder</span><span class="p">(</span><span class="n">NoiseImageBuilder</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">_check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg_noise</span><span class="p">[</span><span class="s2">&quot;ignore_noise&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="n">GalSimConfigError</span><span class="p">(</span>
+                <span class="s2">&quot;You cannot ignore the noise and request the weight image at the same time.&quot;</span>
+                <span class="s2">&quot; Either activate the noise or remove the output sky image.&quot;</span>
+            <span class="p">)</span>
+
+<div class="viewcode-block" id="WeightImageBuilder.processImage">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.noise.WeightImageBuilder.processImage">[docs]</a>
+    <span class="k">def</span> <span class="nf">processImage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">obj_nums</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform any necessary processing at the end of each image construction.</span>
+
+<span class="sd">        This function will be called after each full image is built.</span>
+
+<span class="sd">        Compute the weight map from the noise image and return it in an image.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            index:      The index in self.data to use for this image.  This isn&#39;t the image_num</span>
+<span class="sd">                        (which can be accessed at base[&#39;image_num&#39;] if needed), but rather</span>
+<span class="sd">                        an index that starts at 0 for the first image being worked on and</span>
+<span class="sd">                        goes up to nimages-1.</span>
+<span class="sd">            obj_nums:   The object numbers that were used for this image.</span>
+<span class="sd">            config:     The configuration field for this output object.</span>
+<span class="sd">            base:       The base configuration dict.</span>
+<span class="sd">            logger:     If given, a logger object to log progress. [default: None]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;noise_image&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">base</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">get_noise</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg_noise</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+
+        <span class="n">noise_var</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">base</span><span class="p">[</span><span class="s2">&quot;noise_image&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+
+        <span class="n">weight_image</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">ImageF</span><span class="p">(</span><span class="n">base</span><span class="p">[</span><span class="s2">&quot;image_bounds&quot;</span><span class="p">])</span>
+        <span class="n">weight_image</span> <span class="o">+=</span> <span class="n">noise_var</span>
+        <span class="n">weight_image</span><span class="o">.</span><span class="n">invertSelf</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">weight_image</span></div>
+</div>
+
+
+
+<span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">RegisterExtraOutput</span><span class="p">(</span><span class="s1">&#39;noise_image&#39;</span><span class="p">,</span> <span class="n">NoiseImageBuilder</span><span class="p">())</span>
+<span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">RegisterExtraOutput</span><span class="p">(</span><span class="s1">&#39;sky_image&#39;</span><span class="p">,</span> <span class="n">SkyImageBuilder</span><span class="p">())</span>
+<span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">RegisterExtraOutput</span><span class="p">(</span><span class="s1">&#39;weight_image&#39;</span><span class="p">,</span> <span class="n">WeightImageBuilder</span><span class="p">())</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Rachel Mandelbaum, Axel Guinot, Federico Berlfein, Andy Park, Xiangchong Li, Michael Troxel, Tianqing Zhang.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
