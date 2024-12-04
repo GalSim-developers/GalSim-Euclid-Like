@@ -41,12 +41,15 @@ def getBandpasses(AB_zeropoint=True, default_thin_trunc=True, full_bandpass=Fals
     wavelengths over which we have tabulated PSF images.  The wavelength range is read in from the
     instrument parameter file.
 
-    Args:
-    AB_zeropoint (bool) : If True, set the zeropoint of the bandpass to the AB magnitude system. [default: True]
-    default_thin_trunc (bool) : If True, use the default thinning and truncation parameters. [default: True]
-    full_bandpass (bool): if True, use the full bandpass without red/blue limits needed for PSF
-                          calculations. [default: False]
-    kwargs : Additional keyword arguments to pass to either `Bandpass.thin` or `Bandpass.truncate`.
+    Parameters:
+        AB_zeropoint (bool) : If True, set the zeropoint of the bandpass to the AB magnitude system. [default: True]
+        default_thin_trunc (bool) : If True, use the default thinning and truncation parameters. [default: True]
+        full_bandpass (bool): if True, use the full bandpass without red/blue limits needed for PSF
+                              calculations. [default: False]
+        **kwargs : Additional keyword arguments to pass to either `Bandpass.thin` or `Bandpass.truncate`.
+    
+    Returns:
+        A dict with bandpasses for the keys.
     """
     # Read in the bandpass files, using a dict to distinguish the different filters
     wave = {}

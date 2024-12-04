@@ -35,7 +35,18 @@ Attribution for software and data used by particular routines in this library is
 Installation
 ==================
 
-Please view the `installation instructions <INSTALL.rst>`_ for details on how to install GalSim-Euclid-Like.
+The source code for GalSim-Euclid-Like has not been published to pypi. To install from source code::
+
+    git clone git@github.com:GalSim-developers/GalSim-Euclid-Like.git
+
+and install by running::
+
+    conda create -n euclidlike python=3.10
+    cd GalSim-Euclid-Like
+    conda activate euclidlike
+    pip install .
+
+Please view the `Installation Instructions` (in INSTALL.rst) for further details on how to install GalSim-Euclid-Like.
 
 Downloading relevant data
 ==================                                                                              
@@ -57,7 +68,7 @@ Feel free to `open a GitHub issue <https://github.com/GalSim-developers/GalSim-E
 Attribution
 ==================                                   
 
-This software is open source and may be used according to the terms of its `license <LICENSE>`_.
+This software is open source and may be used according to the terms of its `license <https://github.com/GalSim-developers/GalSim-Euclid-Like/blob/main/LICENSE>`_.
 
 When using this software, please provide the URL to the repository in the resulting paper or note.  Once there is a Zenodo DOI or journal article, this README will be updated and we will ask those using the code in their research to cite the relevant journal article.
 

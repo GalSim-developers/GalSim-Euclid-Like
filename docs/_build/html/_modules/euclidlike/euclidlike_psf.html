@@ -1,0 +1,481 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>euclidlike.euclidlike_psf &mdash; GalSim-Euclid-Like 0.9.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=39bb1c6d"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            GalSim-Euclid-Like
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../euclidlike.html">The Euclid-like Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../euclidlike_imsim.html">The Euclid-like ImSim Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">Revision History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">GalSim-Euclid-Like</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">euclidlike.euclidlike_psf</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for euclidlike.euclidlike_psf</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">galsim</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">galsim</span> <span class="kn">import</span> <span class="n">roman</span>
+<span class="kn">import</span> <span class="nn">astropy.io.fits</span> <span class="k">as</span> <span class="nn">pyfits</span>
+<span class="kn">from</span> <span class="nn">importlib.resources</span> <span class="kn">import</span> <span class="n">files</span>
+<span class="kn">from</span> <span class="nn">galsim.utilities</span> <span class="kn">import</span> <span class="n">LRU_Cache</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">n_ccd</span><span class="p">,</span> <span class="n">n_pix_col</span><span class="p">,</span> <span class="n">n_pix_row</span><span class="p">,</span> <span class="n">pixel_scale</span><span class="p">,</span> <span class="n">diameter</span><span class="p">,</span> <span class="n">obscuration</span><span class="p">,</span> <span class="n">det2ccd</span><span class="p">,</span> <span class="n">collecting_area</span>
+<span class="kn">from</span> <span class="nn">.bandpass</span> <span class="kn">import</span> <span class="n">getBandpasses</span>
+<span class="kn">from</span> <span class="nn">galsim.config</span> <span class="kn">import</span> <span class="n">LoggerWrapper</span>
+<span class="kn">import</span> <span class="nn">pathlib</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">@file euclidlike_psf.py</span>
+
+<span class="sd">Part of the Euclid-like simulation module. This file includes routines needed</span>
+<span class="sd">to define a Euclid-like PSF.  All PSF creation routines are quite approximate, and their limitations</span>
+<span class="sd">are specified in the routine&#39;s docstring.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">meta_dir</span> <span class="o">=</span> <span class="n">files</span><span class="p">(</span><span class="s2">&quot;euclidlike.data&quot;</span><span class="p">)</span>
+<span class="n">test_dir</span> <span class="o">=</span> <span class="n">files</span><span class="p">(</span><span class="s2">&quot;euclidlike&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;../tests&#39;</span><span class="p">)</span>
+<span class="c1"># hard coded effective wavelength. Calculate from bandpass object using `bandpass.effective_wavelength`</span>
+<span class="n">effective_wave</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;VIS&#39;</span><span class="p">:</span> <span class="mf">718.0867202226793</span> <span class="p">}</span>
+<span class="c1">#read wavelengths sampled for PSF</span>
+<span class="n">wave_file</span> <span class="o">=</span> <span class="n">files</span><span class="p">(</span><span class="s2">&quot;euclidlike.data&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;psf_wavelengths.dat&#39;</span><span class="p">)</span>
+<span class="n">wave_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="n">wave_file</span><span class="p">)</span>
+
+<span class="c1"># if PSF data is not downloaded, the code defaults to use the PSF for a single quadrant of CCD = 7, stored in tests directory.</span>
+<span class="n">default_ccd</span><span class="o">=</span><span class="mi">7</span>
+
+<span class="k">def</span> <span class="nf">_make_psf_list</span><span class="p">(</span><span class="n">psf_file</span><span class="p">):</span>
+    <span class="n">image_array</span> <span class="o">=</span> <span class="n">pyfits</span><span class="o">.</span><span class="n">getdata</span><span class="p">(</span><span class="n">psf_file</span><span class="p">)</span>
+    <span class="n">scale</span> <span class="o">=</span> <span class="n">pixel_scale</span><span class="o">/</span><span class="mi">3</span>  <span class="c1"># images are oversampled by a factor of 3</span>
+    <span class="n">im_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">nsample</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">image_array</span> <span class="p">)</span>
+    <span class="c1"># Provided PSF is normalized such that it includes the effects of obscuration; we want to remove it as obscuration is internally handled by Galsim by using the effective collecting area to compute the measured flux.</span>
+    <span class="c1"># Diameter is in meters, collecting area in cm^2, need to convert diameter to cm</span>
+    <span class="n">m2cm_conv</span> <span class="o">=</span> <span class="mf">1e2</span>
+    <span class="n">obscuration_norm</span> <span class="o">=</span> <span class="n">collecting_area</span> <span class="o">/</span> <span class="p">((</span><span class="n">m2cm_conv</span><span class="o">*</span><span class="n">diameter</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nsample</span><span class="p">):</span>
+        <span class="n">psf_arr</span> <span class="o">=</span> <span class="n">image_array</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="n">obscuration_norm</span>
+        <span class="n">im_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">galsim</span><span class="o">.</span><span class="n">Image</span><span class="p">(</span><span class="n">psf_arr</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">im_list</span>
+
+<span class="k">def</span> <span class="nf">__get_quadrant_psf</span><span class="p">(</span><span class="n">ccd</span><span class="p">,</span> <span class="n">bandpass</span><span class="p">,</span> <span class="n">psf_dir</span><span class="p">):</span>
+    <span class="n">ccd_ID</span> <span class="o">=</span> <span class="n">det2ccd</span><span class="p">[</span><span class="n">ccd</span><span class="p">]</span>
+    <span class="n">col</span><span class="p">,</span> <span class="n">row</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ccd_ID</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">ccd_ID</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="c1"># get ccd quadrant IDs</span>
+    <span class="n">ul</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">col</span><span class="o">*</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="o">*</span><span class="mi">2</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">ll</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">col</span><span class="o">*</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">ur</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">col</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="o">*</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">lr</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">col</span><span class="o">*</span><span class="mi">2</span> <span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="o">*</span><span class="mi">2</span> <span class="p">)</span>
+    <span class="n">quadrants</span> <span class="o">=</span> <span class="p">[</span><span class="n">ll</span><span class="p">,</span> <span class="n">ul</span><span class="p">,</span> <span class="n">lr</span><span class="p">,</span> <span class="n">ur</span><span class="p">]</span>
+    <span class="n">tags</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ll&quot;</span><span class="p">,</span> <span class="s2">&quot;ul&quot;</span><span class="p">,</span> <span class="s2">&quot;lr&quot;</span><span class="p">,</span> <span class="s2">&quot;ur&quot;</span><span class="p">]</span> <span class="c1"># ll = lower left, ul = upper left, lr = lower right, ur = upper right</span>
+    <span class="n">tag_idx</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">psf_images</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">tag</span><span class="p">,</span> <span class="n">CCD_quad</span> <span class="ow">in</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">tags</span><span class="p">,</span><span class="n">quadrants</span><span class="p">)):</span>
+        <span class="n">psf_file</span> <span class="o">=</span><span class="n">psf_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;monopsfs_&quot;</span><span class="o">+</span> <span class="n">CCD_quad</span> <span class="o">+</span> <span class="s2">&quot;.fits.gz&quot;</span><span class="p">)</span>
+        <span class="n">psf_images</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="n">_make_psf_list</span><span class="p">(</span><span class="n">psf_file</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">psf_images</span>
+
+    
+<span class="n">_get_quadrant_psf</span> <span class="o">=</span> <span class="n">LRU_Cache</span><span class="p">(</span><span class="n">__get_quadrant_psf</span><span class="p">)</span>
+
+<div class="viewcode-block" id="getPSF">
+<a class="viewcode-back" href="../../euclidlike.html#euclidlike.getPSF">[docs]</a>
+<span class="k">def</span> <span class="nf">getPSF</span><span class="p">(</span>
+        <span class="n">ccd</span><span class="p">,</span> <span class="n">bandpass</span><span class="p">,</span>
+        <span class="n">ccd_pos</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">wcs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">wavelength</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gsparams</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">psf_dir</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get a single PSF for a Euclid-like simulation.</span>
+
+<span class="sd">    These PSFs are based on precomputed, oversampled (by 3x) PSF images on a grid in wavelength and</span>
+<span class="sd">    focal plane position.  These images were provided by Lance Miller and Chris Duncan.  They are</span>
+<span class="sd">    meant to provide an approximately correct description of the PSF size and shape without the</span>
+<span class="sd">    level of accuracy needed for precision tests of weak lensing shear inference.  The precomputed</span>
+<span class="sd">    images are combined in a way that accounts for the bandpass and (if provided) SED.  The effects</span>
+<span class="sd">    of detector linear charge diffusion, a simplified model for guiding errors, and wavefront error</span>
+<span class="sd">    due to measured surface figure errors are incorporated in the precomputed images.  The telescope</span>
+<span class="sd">    focus is set to a value from September 2023, and is therefore within a realistic range but does</span>
+<span class="sd">    not reflect variation over time for any particular observation.</span>
+
+<span class="sd">    Several important effects were omitted in these images, including the following:</span>
+<span class="sd">    </span>
+<span class="sd">    * the effect of the dichroic;</span>
+<span class="sd">    * polarization aberrations; </span>
+<span class="sd">    * non-linear detector effects such as charge-transfer inefficiency, the brighter-fatter effect,</span>
+<span class="sd">      and readout nonlinearity;</span>
+<span class="sd">    * the effects of decontamination by ice.</span>
+
+<span class="sd">    Functionally the lack of non-linear detector effects means the images produced should be thought</span>
+<span class="sd">    of as post-instrument signature removal (assuming the ISR process is carried out perfectly).</span>
+
+<span class="sd">    For applications that require very high accuracy in the modeling of the PSF, with very limited</span>
+<span class="sd">    aliasing, you may want to lower the `folding_threshold` in the gsparams.  Otherwise very bright</span>
+<span class="sd">    stars will show some reflections in the spider pattern and possibly some boxiness at the</span>
+<span class="sd">    outskirts of the PSF due to the size of the precomputed images.  Using ``gsparams =</span>
+<span class="sd">    GSParams(folding_threshold=1.e-4)`` generally provides good results.</span>
+<span class="sd">    </span>
+<span class="sd">    The PSF model is constructed from oversampled images accross the focal plane.</span>
+<span class="sd">    Therefore, in order to use allow for a spatially varying PSF, the images must be downloaded</span>
+<span class="sd">    before using this function. This can be done using the terminal</span>
+<span class="sd">    command `euclidlike_download_psf`. The images are sampled at the 4 quadrant</span>
+<span class="sd">    centers of each CCD and at 17 discrete wavelengths. If the images are not</span>
+<span class="sd">    downloaded, the function will default to use the PSF from a default CCD quadrant, without any spatial variation.</span>
+<span class="sd">    The `ccd` argument refers to the detector ID (integer between 0-35),</span>
+<span class="sd">    not the focal plane position (in format column-row). The sampled</span>
+<span class="sd">    PSF images are stored using the focal plane position format. Therefore,</span>
+<span class="sd">    we convert the CCD detector ID to the appropiate focal plane position</span>
+<span class="sd">    internally.</span>
+
+<span class="sd">    In addition, the provided PSF images are normalized for obscuration, </span>
+<span class="sd">    vignetting and baffle effects. However, GalSim internally handles the </span>
+<span class="sd">    obscuration, so we remove this part of the normalization by dividing the</span>
+<span class="sd">    PSF images by collecting_area / ((diameter/2)**2*np.pi).  As a result, the sum of the pixel values in the renormalized PSF images is very close to 1.</span>
+<span class="sd">    </span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        ccd (int):  Single value specifying the CCD for which the PSF</span>
+<span class="sd">            should be loaded.</span>
+<span class="sd">        bandpass (str): Single string specifying the bandpass to use when</span>
+<span class="sd">            defining the pupil plane configuration and/or interpolation of</span>
+<span class="sd">            chromatic PSFs.</span>
+<span class="sd">        ccd_pos:  Single galsim.PositionD indicating the position within the CCD</span>
+<span class="sd">            for which the PSF should be created. If None, the exact center of the</span>
+<span class="sd">            CCD is chosen. [default: None]</span>
+<span class="sd">        wcs:  The WCS to use to project the PSF into world coordinates. [default:</span>
+<span class="sd">            galsim.PixelScale(euclid_like.roman.pixel_scale)]</span>
+<span class="sd">        wavelength (float):  An option to get an achromatic PSF for a single</span>
+<span class="sd">            wavelength, for users who do not care about chromaticity of the PSF. If</span>
+<span class="sd">            None, then the fully chromatic PSF is returned as an</span>
+<span class="sd">            InterpolatedChromaticObject. Alternatively the user should supply</span>
+<span class="sd">            either (a) a wavelength in nanometers, and they will get an</span>
+<span class="sd">            InterpolatedImage object for that wavelength, or (b) a bandpass object,</span>
+<span class="sd">            in which case they will get an InterpolatedImage objects defined at the</span>
+<span class="sd">            effective wavelength of that bandpass. [default: None]</span>
+<span class="sd">        gsparams:  An optional GSParams argument.  See the docstring for GSParams</span>
+<span class="sd">            for details. [default: None]</span>
+<span class="sd">        psf_dir (str): Directory where sampled PSF images can be accessed. If not</span>
+<span class="sd">            given, look in ./data directory. [default: None] </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A single PSF object (either an InterpolatedChromaticObject or an</span>
+<span class="sd">        InterpolatedImage depending on the inputs).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">ccd</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">ccd</span> <span class="o">&gt;=</span> <span class="n">n_ccd</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">galsim</span><span class="o">.</span><span class="n">GalSimRangeError</span><span class="p">(</span><span class="s2">&quot;Invalid ccd.&quot;</span><span class="p">,</span> <span class="n">ccd</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n_ccd</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">bandpass</span> <span class="o">==</span> <span class="s2">&quot;VIS&quot;</span><span class="p">,</span> <span class="s2">&quot;Only VIS band is supported&quot;</span>
+
+    <span class="c1"># ccd_pos: if None, then all should just be center of the ccd.</span>
+    <span class="k">if</span> <span class="n">ccd_pos</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ccd_pos</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">PositionD</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">n_pix_col</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">n_pix_row</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">wavelength</span><span class="p">,</span> <span class="p">(</span><span class="n">galsim</span><span class="o">.</span><span class="n">Bandpass</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">))):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="s2">&quot;wavelength should either be a Bandpass, float, or None.&quot;</span>
+        <span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">psf_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">psf_dir</span> <span class="o">=</span> <span class="n">meta_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;monopsfs_euclidlike&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">psf_dir</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">psf_dir</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">psf_dir</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;psf_dir must be a string.&quot;</span><span class="p">)</span>
+        
+    <span class="c1">#check if psf directory exists </span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">psf_dir</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;Unable to use PSF images for full field of view because directory </span><span class="si">%s</span><span class="s2"> does not exist. &quot;</span>
+            <span class="s2">&quot;Defaulting to use PSF from single quadrant in CCD = </span><span class="si">%d</span><span class="s2"> . All PSF images can be downloaded &quot;</span> 
+            <span class="s2">&quot;by running the command `euclidlike_download_psf` in the terminal.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">psf_dir</span><span class="p">,</span> <span class="n">default_ccd</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">psf_dir</span> <span class="o">=</span> <span class="n">test_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;psfs&quot;</span><span class="p">)</span>
+        <span class="n">ccd</span> <span class="o">=</span> <span class="n">default_ccd</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">LoggerWrapper</span><span class="p">(</span><span class="n">logger</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Loading PSF images from: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">psf_dir</span><span class="p">))</span>
+    <span class="c1"># Now get psf model</span>
+    <span class="n">psf</span> <span class="o">=</span> <span class="n">_get_single_psf_obj</span><span class="p">(</span><span class="n">ccd</span><span class="p">,</span> <span class="n">bandpass</span><span class="p">,</span> <span class="n">ccd_pos</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span> <span class="n">psf_dir</span><span class="p">,</span> <span class="n">gsparams</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+    <span class="c1"># Apply WCS.</span>
+    <span class="c1"># The current version is in arcsec units, but oriented parallel to the</span>
+    <span class="c1"># image coordinates. So to apply the right WCS, project to pixels using the</span>
+    <span class="c1"># Euclid mean pixel_scale, then project back to world coordinates with the</span>
+    <span class="c1"># provided wcs.</span>
+    <span class="k">if</span> <span class="n">wcs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">PixelScale</span><span class="p">(</span><span class="n">pixel_scale</span><span class="p">)</span>
+        <span class="n">psf</span> <span class="o">=</span> <span class="n">wcs</span><span class="o">.</span><span class="n">toWorld</span><span class="p">(</span><span class="n">scale</span><span class="o">.</span><span class="n">toImage</span><span class="p">(</span><span class="n">psf</span><span class="p">),</span> <span class="n">image_pos</span><span class="o">=</span><span class="n">ccd_pos</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">psf</span></div>
+
+
+
+<div class="viewcode-block" id="getBrightPSF">
+<a class="viewcode-back" href="../../euclidlike.html#euclidlike.getBrightPSF">[docs]</a>
+<span class="k">def</span> <span class="nf">getBrightPSF</span><span class="p">(</span>
+       <span class="n">ccd</span><span class="p">,</span>
+    <span class="n">bandpass</span><span class="p">,</span>
+    <span class="n">ccd_pos</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">pupil_bin</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">wcs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">n_waves</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">wavelength</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">gsparams</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get a fake optical PSF for very bright objects in Euclid-like simulations.</span>
+<span class="sd">    Depending on the inputs, this routine returns a chromatic or achromatic PSF using the</span>
+<span class="sd">    Euclid telescope diameter and Euclid-like aperture.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">        ccd (int):  Single value specifying the CCD for which the PSF should be</span>
+<span class="sd">            loaded.</span>
+<span class="sd">        bandpass (str): Single string specifying the bandpass to use when</span>
+<span class="sd">            defining the pupil plane configuration and/or interpolation of</span>
+<span class="sd">            chromatic PSFs.</span>
+<span class="sd">        ccd_pos:  Single galsim.PositionD indicating the position within the CCD</span>
+<span class="sd">            for which the PSF should be created. If None, the exact center of the</span>
+<span class="sd">            CCD is chosen. [default: None]</span>
+<span class="sd">        wcs:  The WCS to use to project the PSF into world coordinates. [default:</span>
+<span class="sd">            galsim.PixelScale(euclidlike.pixel_scale)]</span>
+<span class="sd">        n_waves (int): Number of wavelengths to use for setting up interpolation of the</span>
+<span class="sd">            chromatic PSF objects, which can lead to much faster image</span>
+<span class="sd">            rendering.  If None, then no interpolation is used. Note that</span>
+<span class="sd">            users who want to interpolate can always set up the interpolation</span>
+<span class="sd">            later on even if they do not do so when calling `getPSF`.</span>
+<span class="sd">            [default: None]</span>
+<span class="sd">        wavelength (float):  An option to get an achromatic PSF for a single</span>
+<span class="sd">            wavelength, for users who do not care about chromaticity of the PSF. If</span>
+<span class="sd">            None, then the fully chromatic PSF is returned as an</span>
+<span class="sd">            InterpolatedChromaticObject. Alternatively the user should supply</span>
+<span class="sd">            either (a) a wavelength in nanometers, and they will get an</span>
+<span class="sd">            InterpolatedImage object for that wavelength, or (b) a bandpass object,</span>
+<span class="sd">            in which case they will get an InterpolatedImage objects defined at the</span>
+<span class="sd">            effective wavelength of that bandpass. [default: None]</span>
+<span class="sd">        gsparams:  An optional GSParams argument.  See the docstring for GSParams</span>
+<span class="sd">            for details. [default: None]</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A single PSF object (either an InterpolatedChromaticObject or an</span>
+<span class="sd">        InterpolatedImage depending on the inputs).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">ccd</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">ccd</span> <span class="o">&gt;=</span> <span class="n">n_ccd</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">galsim</span><span class="o">.</span><span class="n">GalSimRangeError</span><span class="p">(</span><span class="s2">&quot;Invalid ccd.&quot;</span><span class="p">,</span> <span class="n">ccd</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n_ccd</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># ccd_pos: if None, then all should just be center of the ccd.</span>
+    <span class="k">if</span> <span class="n">ccd_pos</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ccd_pos</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">PositionD</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">n_pix_col</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">n_pix_row</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">wavelength</span><span class="p">,</span> <span class="p">(</span><span class="n">galsim</span><span class="o">.</span><span class="n">Bandpass</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">))):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="s2">&quot;wavelength should either be a Bandpass, float, or None.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Now call _get_single_PSF().</span>
+    <span class="n">psf</span> <span class="o">=</span> <span class="n">_get_single_bright_psf_obj</span><span class="p">(</span>
+        <span class="n">ccd</span><span class="p">,</span>
+        <span class="n">bandpass</span><span class="p">,</span>
+        <span class="n">ccd_pos</span><span class="p">,</span>
+        <span class="n">pupil_bin</span><span class="p">,</span>
+        <span class="n">n_waves</span><span class="p">,</span>
+        <span class="n">wavelength</span><span class="p">,</span>
+        <span class="n">gsparams</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Apply WCS.</span>
+    <span class="c1"># The current version is in arcsec units, but oriented parallel to the image coordinates.</span>
+    <span class="c1"># So to apply the right WCS, project to pixels using the Roman mean pixel_scale, then</span>
+    <span class="c1"># project back to world coordinates with the provided wcs.</span>
+    <span class="k">if</span> <span class="n">wcs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">PixelScale</span><span class="p">(</span><span class="n">pixel_scale</span><span class="p">)</span>
+        <span class="n">psf</span> <span class="o">=</span> <span class="n">wcs</span><span class="o">.</span><span class="n">toWorld</span><span class="p">(</span><span class="n">scale</span><span class="o">.</span><span class="n">toImage</span><span class="p">(</span><span class="n">psf</span><span class="p">),</span> <span class="n">image_pos</span><span class="o">=</span><span class="n">ccd_pos</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">psf</span></div>
+
+
+<span class="k">def</span> <span class="nf">_get_single_psf_obj</span><span class="p">(</span><span class="n">ccd</span><span class="p">,</span> <span class="n">bandpass</span><span class="p">,</span> <span class="n">ccd_pos</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span> <span class="n">psf_dir</span><span class="p">,</span> <span class="n">gsparams</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Routine for making a single PSF.  This gets called by `getPSF` after it</span>
+<span class="sd">    parses all the options that were passed in.  Users will not directly</span>
+<span class="sd">    interact with this routine.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">psf_ims</span> <span class="o">=</span> <span class="n">_get_quadrant_psf</span><span class="p">(</span><span class="n">ccd</span><span class="p">,</span><span class="n">bandpass</span><span class="p">,</span> <span class="n">psf_dir</span><span class="p">)</span>
+    <span class="c1"># key: ll = lower left, lu = top left, ul = lower right, uu = top right</span>
+    <span class="c1"># if position lies within the dividing line between quadrants, default</span>
+    <span class="c1"># is to pick the quadrant center below and/or to the left of the boundary</span>
+    <span class="n">quad_row</span> <span class="o">=</span> <span class="s1">&#39;l&#39;</span>
+    <span class="n">quad_col</span> <span class="o">=</span> <span class="s1">&#39;l&#39;</span>
+    <span class="k">if</span> <span class="n">ccd_pos</span><span class="o">.</span><span class="n">y</span> <span class="o">&gt;</span> <span class="n">n_pix_row</span><span class="o">/</span><span class="mi">2</span><span class="p">:</span>
+        <span class="n">quad_row</span> <span class="o">=</span> <span class="s1">&#39;r&#39;</span>
+    <span class="k">if</span> <span class="n">ccd_pos</span><span class="o">.</span><span class="n">x</span> <span class="o">&gt;</span> <span class="n">n_pix_col</span><span class="o">/</span><span class="mi">2</span><span class="p">:</span>
+        <span class="n">quad_col</span> <span class="o">=</span> <span class="s1">&#39;u&#39;</span>
+    <span class="n">quad_pos</span> <span class="o">=</span> <span class="n">quad_col</span> <span class="o">+</span> <span class="n">quad_row</span> 
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;CCD position in quadrant &#39;</span> <span class="o">+</span> <span class="n">quad_pos</span><span class="p">)</span>
+    <span class="c1"># instantiate psf object from list of images and wavelengths</span>
+    <span class="n">psf_obj</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">InterpolatedChromaticObject</span><span class="o">.</span><span class="n">from_images</span><span class="p">(</span><span class="n">psf_ims</span><span class="p">[</span><span class="n">quad_pos</span><span class="p">],</span> <span class="n">wave_list</span><span class="p">,</span> <span class="n">gsparams</span> <span class="o">=</span> <span class="n">gsparams</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">wavelength</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">wavelength</span><span class="p">,</span> <span class="n">galsim</span><span class="o">.</span><span class="n">Bandpass</span><span class="p">):</span>
+            <span class="n">wave</span> <span class="o">=</span> <span class="n">wavelength</span><span class="o">.</span><span class="n">effective_wavelength</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">wave</span> <span class="o">=</span> <span class="n">wavelength</span>
+        <span class="n">psf_obj</span> <span class="o">=</span> <span class="n">psf_obj</span><span class="o">.</span><span class="n">evaluateAtWavelength</span><span class="p">(</span><span class="n">wave</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">psf_obj</span>
+
+
+
+
+<span class="k">def</span> <span class="nf">_get_single_bright_psf_obj</span><span class="p">(</span>
+    <span class="n">ccd</span><span class="p">,</span>
+    <span class="n">bandpass</span><span class="p">,</span>
+    <span class="n">ccd_pos</span><span class="p">,</span>
+    <span class="n">pupil_bin</span><span class="p">,</span>
+    <span class="n">n_waves</span><span class="p">,</span>
+    <span class="n">wavelength</span><span class="p">,</span>
+    <span class="n">gsparams</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Routine for making a single Optical PSF, designed to handle very bright objects.   </span>
+<span class="sd">       This gets called by `getBrightPSF` after it parses all the options that were passed in. </span>
+<span class="sd">       Users will not directly interact with this routine.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">wavelength</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">wave</span> <span class="o">=</span> <span class="n">effective_wave</span><span class="p">[</span><span class="n">bandpass</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">wavelength</span><span class="p">,</span> <span class="n">galsim</span><span class="o">.</span><span class="n">Bandpass</span><span class="p">):</span>
+        <span class="n">wave</span> <span class="o">=</span> <span class="n">wavelength</span> <span class="o">=</span> <span class="n">wavelength</span><span class="o">.</span><span class="n">effective_wavelength</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">wave</span> <span class="o">=</span> <span class="n">wavelength</span>
+
+    <span class="c1"># All parameters relevant to the aperture.  We may be able to use a cached version.</span>
+    <span class="n">aper</span> <span class="o">=</span> <span class="n">_make_aperture</span><span class="p">(</span><span class="n">pupil_bin</span><span class="p">,</span> <span class="n">wave</span><span class="p">,</span> <span class="n">gsparams</span><span class="p">)</span>
+
+    <span class="c1"># Now set up the PSF, including the option to interpolate over waves</span>
+    <span class="k">if</span> <span class="n">wavelength</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">PSF</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">ChromaticOpticalPSF</span><span class="p">(</span>
+            <span class="n">lam</span><span class="o">=</span><span class="n">wave</span><span class="p">,</span>
+            <span class="n">diam</span><span class="o">=</span><span class="n">diameter</span><span class="p">,</span>
+            <span class="n">aper</span><span class="o">=</span><span class="n">aper</span><span class="p">,</span>
+            <span class="n">gsparams</span><span class="o">=</span><span class="n">gsparams</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">n_waves</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># To decide the range of wavelengths to use, check the bandpass.</span>
+            <span class="n">bp_dict</span> <span class="o">=</span> <span class="n">getBandpasses</span><span class="p">()</span>
+            <span class="n">bp</span> <span class="o">=</span> <span class="n">bp_dict</span><span class="p">[</span><span class="n">bandpass</span><span class="p">]</span>
+            <span class="n">PSF</span> <span class="o">=</span> <span class="n">PSF</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">waves</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">bp</span><span class="o">.</span><span class="n">blue_limit</span><span class="p">,</span> <span class="n">bp</span><span class="o">.</span><span class="n">red_limit</span><span class="p">,</span> <span class="n">n_waves</span><span class="p">),</span>
+                                  <span class="n">oversample_fac</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">PSF</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">OpticalPSF</span><span class="p">(</span><span class="n">lam</span><span class="o">=</span><span class="n">wave</span><span class="p">,</span> <span class="n">diam</span><span class="o">=</span><span class="n">diameter</span><span class="p">,</span>
+                         <span class="n">aper</span><span class="o">=</span><span class="n">aper</span><span class="p">,</span> <span class="n">gsparams</span><span class="o">=</span><span class="n">gsparams</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">PSF</span>
+
+
+<span class="k">def</span> <span class="nf">_make_aperture</span><span class="p">(</span><span class="n">pupil_bin</span><span class="p">,</span> <span class="n">wave</span><span class="p">,</span> <span class="n">gsparams</span><span class="p">):</span>
+    <span class="c1"># Load the pupil plane image.</span>
+    <span class="n">pupil_plane_im_path</span> <span class="o">=</span> <span class="n">files</span><span class="p">(</span><span class="s2">&quot;euclidlike.data&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;euclid_pupil_plane.fits.gz&quot;</span><span class="p">)</span>
+    <span class="n">pupil_plane_im</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">fits</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">pupil_plane_im_path</span><span class="p">),</span> <span class="n">read_header</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">pupil_plane_im</span> <span class="o">=</span> <span class="n">pupil_plane_im</span><span class="o">.</span><span class="n">bin</span><span class="p">(</span><span class="n">pupil_bin</span><span class="p">,</span> <span class="n">pupil_bin</span><span class="p">)</span>
+
+    <span class="n">aper</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">Aperture</span><span class="p">(</span>
+        <span class="n">lam</span><span class="o">=</span><span class="n">wave</span><span class="p">,</span> <span class="n">diam</span><span class="o">=</span><span class="n">diameter</span><span class="p">,</span>
+        <span class="n">obscuration</span><span class="o">=</span><span class="n">obscuration</span><span class="p">,</span>
+        <span class="n">pupil_plane_im</span><span class="o">=</span><span class="n">pupil_plane_im</span><span class="p">,</span>
+        <span class="n">gsparams</span><span class="o">=</span><span class="n">gsparams</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">aper</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Rachel Mandelbaum, Axel Guinot, Federico Berlfein, Andy Park, Xiangchong Li, Michael Troxel, Tianqing Zhang.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

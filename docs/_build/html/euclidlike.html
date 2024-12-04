@@ -1,0 +1,539 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Euclid-like Module &mdash; GalSim-Euclid-Like 0.9.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=39bb1c6d"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="The Euclid-like ImSim Module" href="euclidlike_imsim.html" />
+    <link rel="prev" title="Installation" href="install.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            GalSim-Euclid-Like
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">The Euclid-like Module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-level-attributes">Module-level Attributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#api">API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#euclidlike.getBandpasses"><code class="docutils literal notranslate"><span class="pre">getBandpasses()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#euclidlike.getSkyLevel"><code class="docutils literal notranslate"><span class="pre">getSkyLevel()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#euclidlike.getZodiBackground"><code class="docutils literal notranslate"><span class="pre">getZodiBackground()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#euclidlike.getPSF"><code class="docutils literal notranslate"><span class="pre">getPSF()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#euclidlike.getBrightPSF"><code class="docutils literal notranslate"><span class="pre">getBrightPSF()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#euclidlike.getWCS"><code class="docutils literal notranslate"><span class="pre">getWCS()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#euclidlike.findCCD"><code class="docutils literal notranslate"><span class="pre">findCCD()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="euclidlike_imsim.html">The Euclid-like ImSim Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="history.html">Revision History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">GalSim-Euclid-Like</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">The Euclid-like Module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/euclidlike.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="the-euclid-like-module">
+<h1>The Euclid-like Module<a class="headerlink" href="#the-euclid-like-module" title="Link to this heading"></a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">euclidlike</span></code> module contains telescope information and functionality needed for image simulations.
+The demo script end_to_end_demo.py shows how to use many of the atrributes and functions described here.</p>
+<section id="module-level-attributes">
+<h2>Module-level Attributes<a class="headerlink" href="#module-level-attributes" title="Link to this heading"></a></h2>
+<p>There are several of attributes of the <code class="docutils literal notranslate"><span class="pre">euclidlike</span></code> module which define some numerical
+parameters related to a Euclid-like geometry.  Some of these parameters relate to the entire
+wide-field imager.  Others, especially the return values of the functions to get the
+PSF and WCS, are specific to each CCD and therefore are indexed based on the detector number.
+All detector-related arrays are 0-indexed, which might differ from the CCD indices for Euclid,
+which run 1-1 to n_row-n_col.</p>
+<dl class="simple">
+<dt>gain</dt><dd><p>The gain for all CCDs is expected to be the roughly the same.</p>
+</dd>
+<dt>pixel_scale</dt><dd><p>The pixel scale in units of arcsec/pixel.</p>
+</dd>
+<dt>diameter</dt><dd><p>The telescope diameter in meters.</p>
+</dd>
+<dt>obscuration</dt><dd><p>The linear obscuration of the telescope, expressed as a fraction of the diameter.</p>
+</dd>
+<dt>collecting_area</dt><dd><dl class="simple">
+<dt>The actual collecting area after accounting for obscuration, struts, etc. in</dt><dd><p>units of cm^2.</p>
+</dd>
+</dl>
+</dd>
+<dt>long_exptime</dt><dd><p>The typical exposure time for the longer exposures used for VIS images, in units of seconds.
+The number that is stored is for a single dither.</p>
+</dd>
+<dt>short_exptime_nisp</dt><dd><p>The typical exposure time for the shorter NISP imaging exposures used for VIS images, in units of seconds.
+The number that is stored is for a single dither.</p>
+</dd>
+<dt>short_exptime_vis</dt><dd><p>The typical exposure time for the shorter exposures with VIS taken in parallel with NISP imaging, in units of seconds.
+The number that is stored is for a single dither.</p>
+</dd>
+<dt>n_dithers</dt><dd><p>The number of dithers per filter.</p>
+</dd>
+<dt>n_ccd</dt><dd><p>The number of CCDs in the focal plane.</p>
+</dd>
+<dt>n_ccd_row</dt><dd><p>The number of CCDs in the each focal plane row.</p>
+</dd>
+<dt>n_ccd_col</dt><dd><p>The number of CCDs in the each focal plane column.</p>
+</dd>
+<dt>n_pix_row</dt><dd><p>Each CCD has n_pix_row total pixels in each row.</p>
+</dd>
+<dt>n_pix_col</dt><dd><p>Each CCD has n_pix_col total pixels in each column.</p>
+</dd>
+<dt>pixel_scale_mm</dt><dd><p>The physical pixel size, in units of mm.</p>
+</dd>
+<dt>plate_scale</dt><dd><p>The plate scale, in units of arcsec / mm</p>
+</dd>
+<dt>read_noise</dt><dd><p>Total readout noise, in units of e-.</p>
+</dd>
+<dt>saturation</dt><dd><p>Pixel saturation, in units of e-.</p>
+</dd>
+<dt>det2ccd</dt><dd><p>Mapping from DETID to CCDID.</p>
+</dd>
+<dt>ccd2det</dt><dd><p>Mapping from CCDID to DETID.</p>
+</dd>
+<dt>min_sun_angle</dt><dd><p>Minimum allowed angle from the telescope solar panels to the sun, in degrees.</p>
+</dd>
+<dt>max_sun_angle</dt><dd><p>Maximum allowed angle from the telescope solar panels to the sun, in degrees.</p>
+</dd>
+<dt>vis_bands</dt><dd><p>List of available VIS bands</p>
+</dd>
+<dt>nisp_bands</dt><dd><p>List of available NISP bands</p>
+</dd>
+<dt>vis_blue_limit</dt><dd><p>Bandpass blue limit  needed for consistency with the wavelength range covered by ur tabulated
+PSF images, in nm.</p>
+</dd>
+<dt>vis_red_limit</dt><dd><p>Bandpass red limit  needed for consistency with the wavelength range covered by ur tabulated
+PSF images, in nm.</p>
+</dd>
+</dl>
+<p>For example, to get the gain value, use euclidlike.gain.</p>
+</section>
+<section id="api">
+<h2>API<a class="headerlink" href="#api" title="Link to this heading"></a></h2>
+<p>This module also contains the following routines:</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#euclidlike.getBandpasses" title="euclidlike.getBandpasses"><code class="xref any py py-func docutils literal notranslate"><span class="pre">euclidlike.getBandpasses</span></code></a></dt><dd><p>A utility to get a dictionary containing galsim.Bandpass objects for each of
+the Euclid-like imaging bandpasses, which by default have AB zeropoints given using
+the GalSim zeropoint convention (see <a class="reference internal" href="#euclidlike.getBandpasses" title="euclidlike.getBandpasses"><code class="xref any py py-func docutils literal notranslate"><span class="pre">getBandpasses</span></code></a> docstring for more details).</p>
+</dd>
+<dt><a class="reference internal" href="#euclidlike.getSkyLevel" title="euclidlike.getSkyLevel"><code class="xref any py py-func docutils literal notranslate"><span class="pre">euclidlike.getSkyLevel</span></code></a></dt><dd><p>A utility to find the expected sky level due to zodiacal light at a given
+position, in a given band.</p>
+</dd>
+<dt><a class="reference internal" href="#euclidlike.getZodiBackground" title="euclidlike.getZodiBackground"><code class="xref any py py-func docutils literal notranslate"><span class="pre">euclidlike.getZodiBackground</span></code></a></dt><dd><p>This helper routine is enables the calculation of the zodiacal light, in photons/m^2/arcsec^2/sec</p>
+</dd>
+<dt><a class="reference internal" href="#euclidlike.getPSF" title="euclidlike.getPSF"><code class="xref any py py-func docutils literal notranslate"><span class="pre">euclidlike.getPSF</span></code></a></dt><dd><p>A routine to get a chromatic representation of the PSF in a single CCD.
+PSFs are based on precomputed, oversampled (by 3x) PSF images on a grid in wavelength and
+focal plane position.</p>
+</dd>
+<dt><a class="reference internal" href="#euclidlike.getBrightPSF" title="euclidlike.getBrightPSF"><code class="xref any py py-func docutils literal notranslate"><span class="pre">euclidlike.getBrightPSF</span></code></a></dt><dd><p>Get a fake optical PSF for very bright objects.</p>
+</dd>
+<dt><a class="reference internal" href="#euclidlike.getWCS" title="euclidlike.getWCS"><code class="xref any py py-func docutils literal notranslate"><span class="pre">euclidlike.getWCS</span></code></a></dt><dd><p>This routine returns a dict containing a WCS for each of the Euclid CCDs.</p>
+</dd>
+<dt><a class="reference internal" href="#euclidlike.findCCD" title="euclidlike.findCCD"><code class="xref any py py-func docutils literal notranslate"><span class="pre">euclidlike.findCCD</span></code></a></dt><dd><p>This is a helper routine to calculate the minimum and maximum pixel values that should be
+considered within a CCD.</p>
+</dd>
+</dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="euclidlike.getBandpasses">
+<span class="sig-prename descclassname"><span class="pre">euclidlike.</span></span><span class="sig-name descname"><span class="pre">getBandpasses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">AB_zeropoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_thin_trunc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_bandpass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike/bandpass.html#getBandpasses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike.getBandpasses" title="Link to this definition"></a></dt>
+<dd><p>Function to get the bandpass information for the Euclid VIS band and the three Euclid NISP passbands.</p>
+<p>This routine reads in files containing a list of wavelengths and
+transmission values for the Euclid bands. The files are located in the
+euclidlike.data directory. The routine then creates a Bandpass object
+using the LookupTable class from the GalSim package, and returns a dict with bandpasses for the
+keys.</p>
+<p>The bandpasses are publicly available from IPAC:
+<a class="reference external" href="http://svo2.cab.inta-csic.es/svo/theory/fps3/index.php?mode=browse&amp;gname=Euclid&amp;gname2=VIS&amp;asttype=">http://svo2.cab.inta-csic.es/svo/theory/fps3/index.php?mode=browse&amp;gname=Euclid&amp;gname2=VIS&amp;asttype=</a>.
+<a class="reference external" href="https://euclid.esac.esa.int/msp/refdata/nisp/NISP-PHOTO-PASSBANDS-V1">https://euclid.esac.esa.int/msp/refdata/nisp/NISP-PHOTO-PASSBANDS-V1</a></p>
+<p>These are relatively old files that do not include the latest estimates of system response.
+They correspond to end-of-life estimates, with some expected degradation of the QE and filter
+transmission over time.  This can lead to flux estimates that are suppressed by 5-10% from
+beginning-of-life flux estimates.</p>
+<p>The VIS bandpass red and blue limits are set not by the transmission curve but by the range of
+wavelengths over which we have tabulated PSF images.  The wavelength range is read in from the
+instrument parameter file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>AB_zeropoint</strong> (<em>bool</em>) – If True, set the zeropoint of the bandpass to the AB magnitude system. [default: True]</p></li>
+<li><p><strong>default_thin_trunc</strong> (<em>bool</em>) – If True, use the default thinning and truncation parameters. [default: True]</p></li>
+<li><p><strong>full_bandpass</strong> (<em>bool</em>) – if True, use the full bandpass without red/blue limits needed for PSF
+calculations. [default: False]</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments to pass to either <code class="xref any docutils literal notranslate"><span class="pre">Bandpass.thin</span></code> or <code class="xref any docutils literal notranslate"><span class="pre">Bandpass.truncate</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dict with bandpasses for the keys.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="euclidlike.getSkyLevel">
+<span class="sig-prename descclassname"><span class="pre">euclidlike.</span></span><span class="sig-name descname"><span class="pre">getSkyLevel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bandpass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">world_pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exptime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2025</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike/backgrounds.html#getSkyLevel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike.getSkyLevel" title="Link to this definition"></a></dt>
+<dd><p>Get the expected sky level for a Euclid observation due to zodiacal light for this bandpass
+and position.</p>
+<p>This routine can take an arbitray galsim.Bandpass() and calculate the zodiacal background
+directly.  This is approximately 3x slower than using lookup tables.</p>
+<p>The numbers that are returned are in units of e-/arcsec^2.  The result can either be multiplied
+by the approximate pixel area to get e-/pix, or the result can be used with wcs.makeSkyImage()
+to make an image of the sky that properly includes the actual pixel area as a function of
+position on the detector.</p>
+<p>Note that in general results will depend on the adopted model for zodiacal light, and these are
+uncertain at the ~10% level.</p>
+<p>Positions should be specified with the <code class="docutils literal notranslate"><span class="pre">world_pos</span></code> keyword, which must be a CelestialCoord
+object.  If no <code class="docutils literal notranslate"><span class="pre">world_pos</span></code> is supplied, then the routine will use a default position that
+looks sensibly away from the sun.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bandpass</strong> – A Bandpass object.</p></li>
+<li><p><strong>world_pos</strong> – A position, given as a CelestialCoord object.  If None, then the routine
+will use an ecliptic longitude of 90 degrees with respect to the sun
+position (as a fair compromise between 0 and 180), and an ecliptic latitude
+of 30 degrees with respect to the sun position (decently out of the plane
+of the Earth-sun orbit). [default: None]</p></li>
+<li><p><strong>exptime</strong> – Exposure time in seconds.  If None, use the longer Euclid exposure time.
+[default: None]</p></li>
+<li><p><strong>epoch</strong> – The epoch to be used for estimating the obliquity of the ecliptic when
+converting <code class="docutils literal notranslate"><span class="pre">world_pos</span></code> to ecliptic coordinates.  This keyword is only used
+if <code class="docutils literal notranslate"><span class="pre">date</span></code> is None, otherwise <code class="docutils literal notranslate"><span class="pre">date</span></code> is used to determine the <code class="docutils literal notranslate"><span class="pre">epoch</span></code>.
+[default: 2025]</p></li>
+<li><p><strong>date</strong> – The date of the observation, provided as a python datetime object.  If None,
+then the conversion to ecliptic coordinates assumes the sun is at ecliptic
+coordinates of (0,0), as it is at the vernal equinox. [default: None]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the expected sky level in e-/arcsec^2.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="euclidlike.getZodiBackground">
+<span class="sig-prename descclassname"><span class="pre">euclidlike.</span></span><span class="sig-name descname"><span class="pre">getZodiBackground</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ecl_lat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ecl_dlon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_min</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_max</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Tlambda</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike/backgrounds.html#getZodiBackground"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike.getZodiBackground" title="Link to this definition"></a></dt>
+<dd><p>This helper routine is used with permission from Chris Hirata’s Exposure Time Calculator and enables the
+calculation of the zodiacal light in photons/m^2/arcsec^2/sec. The ETC may be found here:</p>
+<p><a class="reference external" href="http://www.tapir.caltech.edu/~chirata/web/software/space-etc/">http://www.tapir.caltech.edu/~chirata/web/software/space-etc/</a></p>
+<p>The code was ported from C to python by Michael Troxel (matroxel on GitHub).  The units are
+exactly as in the original C code, and we convert to any other needed units outside of this
+routine, in user-facing code.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ecl_lat</strong> – Ecliptic latitude (degrees)</p></li>
+<li><p><strong>ecl_dlon</strong> – Ecliptic longitude (degrees)</p></li>
+<li><p><strong>lambda_min</strong> – Minimum wavelength for the bandpass (microns)</p></li>
+<li><p><strong>lambda_max</strong> – Maximum wavelength for the bandpass (microns)</p></li>
+<li><p><strong>Tlambda</strong> – Numpy array containing a grid of wavelength values for the bandpass (microns)</p></li>
+<li><p><strong>T</strong> – Numpy array containing the throughput (normalized to be between 0-1) for the
+bandpass</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A floating point value for the zodiacal light in photons/m^2/arcsec^2/sec</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="euclidlike.getPSF">
+<span class="sig-prename descclassname"><span class="pre">euclidlike.</span></span><span class="sig-name descname"><span class="pre">getPSF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ccd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bandpass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ccd_pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wcs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gsparams</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psf_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike/euclidlike_psf.html#getPSF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike.getPSF" title="Link to this definition"></a></dt>
+<dd><p>Get a single PSF for a Euclid-like simulation.</p>
+<p>These PSFs are based on precomputed, oversampled (by 3x) PSF images on a grid in wavelength and
+focal plane position.  These images were provided by Lance Miller and Chris Duncan.  They are
+meant to provide an approximately correct description of the PSF size and shape without the
+level of accuracy needed for precision tests of weak lensing shear inference.  The precomputed
+images are combined in a way that accounts for the bandpass and (if provided) SED.  The effects
+of detector linear charge diffusion, a simplified model for guiding errors, and wavefront error
+due to measured surface figure errors are incorporated in the precomputed images.  The telescope
+focus is set to a value from September 2023, and is therefore within a realistic range but does
+not reflect variation over time for any particular observation.</p>
+<p>Several important effects were omitted in these images, including the following:</p>
+<ul class="simple">
+<li><p>the effect of the dichroic;</p></li>
+<li><p>polarization aberrations;</p></li>
+<li><p>non-linear detector effects such as charge-transfer inefficiency, the brighter-fatter effect,
+and readout nonlinearity;</p></li>
+<li><p>the effects of decontamination by ice.</p></li>
+</ul>
+<p>Functionally the lack of non-linear detector effects means the images produced should be thought
+of as post-instrument signature removal (assuming the ISR process is carried out perfectly).</p>
+<p>For applications that require very high accuracy in the modeling of the PSF, with very limited
+aliasing, you may want to lower the <code class="xref any docutils literal notranslate"><span class="pre">folding_threshold</span></code> in the gsparams.  Otherwise very bright
+stars will show some reflections in the spider pattern and possibly some boxiness at the
+outskirts of the PSF due to the size of the precomputed images.  Using <code class="docutils literal notranslate"><span class="pre">gsparams</span> <span class="pre">=</span>
+<span class="pre">GSParams(folding_threshold=1.e-4)</span></code> generally provides good results.</p>
+<p>The PSF model is constructed from oversampled images accross the focal plane.
+Therefore, in order to use allow for a spatially varying PSF, the images must be downloaded
+before using this function. This can be done using the terminal
+command <code class="xref any docutils literal notranslate"><span class="pre">euclidlike_download_psf</span></code>. The images are sampled at the 4 quadrant
+centers of each CCD and at 17 discrete wavelengths. If the images are not
+downloaded, the function will default to use the PSF from a default CCD quadrant, without any spatial variation.
+The <a class="reference internal" href="euclidlike_imsim.html#module-euclidlike_imsim.ccd" title="euclidlike_imsim.ccd"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">ccd</span></code></a> argument refers to the detector ID (integer between 0-35),
+not the focal plane position (in format column-row). The sampled
+PSF images are stored using the focal plane position format. Therefore,
+we convert the CCD detector ID to the appropiate focal plane position
+internally.</p>
+<p>In addition, the provided PSF images are normalized for obscuration,
+vignetting and baffle effects. However, GalSim internally handles the
+obscuration, so we remove this part of the normalization by dividing the
+PSF images by collecting_area / ((diameter/2)**2*np.pi).  As a result, the sum of the pixel values in the renormalized PSF images is very close to 1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ccd</strong> (<em>int</em>) – Single value specifying the CCD for which the PSF
+should be loaded.</p></li>
+<li><p><strong>bandpass</strong> (<em>str</em>) – Single string specifying the bandpass to use when
+defining the pupil plane configuration and/or interpolation of
+chromatic PSFs.</p></li>
+<li><p><strong>ccd_pos</strong> – Single galsim.PositionD indicating the position within the CCD
+for which the PSF should be created. If None, the exact center of the
+CCD is chosen. [default: None]</p></li>
+<li><p><strong>wcs</strong> – The WCS to use to project the PSF into world coordinates. [default:
+galsim.PixelScale(euclid_like.roman.pixel_scale)]</p></li>
+<li><p><strong>wavelength</strong> (<em>float</em>) – An option to get an achromatic PSF for a single
+wavelength, for users who do not care about chromaticity of the PSF. If
+None, then the fully chromatic PSF is returned as an
+InterpolatedChromaticObject. Alternatively the user should supply
+either (a) a wavelength in nanometers, and they will get an
+InterpolatedImage object for that wavelength, or (b) a bandpass object,
+in which case they will get an InterpolatedImage objects defined at the
+effective wavelength of that bandpass. [default: None]</p></li>
+<li><p><strong>gsparams</strong> – An optional GSParams argument.  See the docstring for GSParams
+for details. [default: None]</p></li>
+<li><p><strong>psf_dir</strong> (<em>str</em>) – Directory where sampled PSF images can be accessed. If not
+given, look in ./data directory. [default: None]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A single PSF object (either an InterpolatedChromaticObject or an
+InterpolatedImage depending on the inputs).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="euclidlike.getBrightPSF">
+<span class="sig-prename descclassname"><span class="pre">euclidlike.</span></span><span class="sig-name descname"><span class="pre">getBrightPSF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ccd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bandpass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ccd_pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pupil_bin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wcs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_waves</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gsparams</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike/euclidlike_psf.html#getBrightPSF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike.getBrightPSF" title="Link to this definition"></a></dt>
+<dd><p>Get a fake optical PSF for very bright objects in Euclid-like simulations.
+Depending on the inputs, this routine returns a chromatic or achromatic PSF using the
+Euclid telescope diameter and Euclid-like aperture.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ccd</strong> (<em>int</em>) – Single value specifying the CCD for which the PSF should be
+loaded.</p></li>
+<li><p><strong>bandpass</strong> (<em>str</em>) – Single string specifying the bandpass to use when
+defining the pupil plane configuration and/or interpolation of
+chromatic PSFs.</p></li>
+<li><p><strong>ccd_pos</strong> – Single galsim.PositionD indicating the position within the CCD
+for which the PSF should be created. If None, the exact center of the
+CCD is chosen. [default: None]</p></li>
+<li><p><strong>wcs</strong> – The WCS to use to project the PSF into world coordinates. [default:
+galsim.PixelScale(euclidlike.pixel_scale)]</p></li>
+<li><p><strong>n_waves</strong> (<em>int</em>) – Number of wavelengths to use for setting up interpolation of the
+chromatic PSF objects, which can lead to much faster image
+rendering.  If None, then no interpolation is used. Note that
+users who want to interpolate can always set up the interpolation
+later on even if they do not do so when calling <a class="reference internal" href="#euclidlike.getPSF" title="euclidlike.getPSF"><code class="xref any py py-func docutils literal notranslate"><span class="pre">getPSF</span></code></a>.
+[default: None]</p></li>
+<li><p><strong>wavelength</strong> (<em>float</em>) – An option to get an achromatic PSF for a single
+wavelength, for users who do not care about chromaticity of the PSF. If
+None, then the fully chromatic PSF is returned as an
+InterpolatedChromaticObject. Alternatively the user should supply
+either (a) a wavelength in nanometers, and they will get an
+InterpolatedImage object for that wavelength, or (b) a bandpass object,
+in which case they will get an InterpolatedImage objects defined at the
+effective wavelength of that bandpass. [default: None]</p></li>
+<li><p><strong>gsparams</strong> – An optional GSParams argument.  See the docstring for GSParams
+for details. [default: None]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A single PSF object (either an InterpolatedChromaticObject or an
+InterpolatedImage depending on the inputs).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="euclidlike.getWCS">
+<span class="sig-prename descclassname"><span class="pre">euclidlike.</span></span><span class="sig-name descname"><span class="pre">getWCS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">world_pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PA</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CCDs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PA_is_FPA</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SAA</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike/euclidlike_wcs.html#getWCS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike.getWCS" title="Link to this definition"></a></dt>
+<dd><p>This routine returns a dict containing a WCS for each of the Euclid CCDs.
+The Euclid CCDs are labeled 0-35, so these numbers are used as the keys in
+the dict.  Alternatively the user can request a subset of the CCDs using
+the <code class="docutils literal notranslate"><span class="pre">CCDs</span></code> option.  The basic instrument parameters used to create the
+WCS correspond to those in Early Release Observations (ERO) data and are
+likely to change in the future.</p>
+<p>The user must specify a position for observation, at which the center of
+the focal plane array will point. This must be supplied as a CelestialCoord
+<code class="docutils literal notranslate"><span class="pre">world_pos</span></code>.  In general, only certain positions are observable on
+certain dates, and for a given position there is an optimal position angle
+for the observatory (with the solar panels pointed as directly towards the
+sun as possible).  Users who are knowledgable about these details may
+choose to supply a position angle as <code class="docutils literal notranslate"><span class="pre">PA</span></code>, either for the observatory or
+for the focal plane (using <code class="docutils literal notranslate"><span class="pre">PA_is_FPA</span></code> to indicate this).  But otherwise,
+the routine will simply choose the optimal position angle for a given date.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>world_pos</strong> – A <code class="xref any docutils literal notranslate"><span class="pre">galsim.CelestialCoord</span></code> indicating the position to
+observe at the center of the focal plane array (FPA).
+Note that if the given position is not observable on
+the given date, then the routine will raise an
+exception.</p></li>
+<li><p><strong>PA</strong> – A <code class="xref any docutils literal notranslate"><span class="pre">galsim.Angle</span></code> representing the position angle of the
+observatory +Y axis, unless <code class="docutils literal notranslate"><span class="pre">PA_is_FPA=True</span></code>, in
+which case it’s the position angle of the FPA.  For
+users to do not care about this, then leaving this as
+None will result in the routine using the supplied
+<code class="docutils literal notranslate"><span class="pre">date</span></code> and <code class="docutils literal notranslate"><span class="pre">world_pos</span></code> to select the optimal
+orientation for the observatory.  Note that if a user
+supplies a <code class="docutils literal notranslate"><span class="pre">PA</span></code> value, the routine does not check
+whether this orientation is actually allowed.
+[default: None]</p></li>
+<li><p><strong>date</strong> – The date of the observation, as a python datetime
+object.  If None, then the vernal equinox in 2025 will
+be used.  [default: None]</p></li>
+<li><p><strong>PA_is_FPA</strong> – If True, then the position angle that was provided was
+the PA of the focal plane array, not the observatory.
+[default: False]</p></li>
+<li><p><strong>CCDs</strong> – A single number or iterable giving the CCDs for which
+the WCS should be obtained.  If None, then the WCS is
+calculated for all CCDs. [default: None]</p></li>
+<li><p><strong>SAA</strong> – A <code class="xref any docutils literal notranslate"><span class="pre">galsim.Angle</span></code> representing the Solar Aspect Angle
+of the telescope for the observation. If not provided,
+it will be computed internally.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dict of WCS objects for each CCD.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="euclidlike.findCCD">
+<span class="sig-prename descclassname"><span class="pre">euclidlike.</span></span><span class="sig-name descname"><span class="pre">findCCD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wcs_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">world_pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_border</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike/euclidlike_wcs.html#findCCD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike.findCCD" title="Link to this definition"></a></dt>
+<dd><p>This is a subroutine to take a dict of WCS (one per CCD) from euclidlike.getWCS() and query
+which CCD a particular real-world coordinate would be located on.  The position (<code class="docutils literal notranslate"><span class="pre">world_pos</span></code>)
+should be specified as a galsim.CelestialCoord.  If the position is not located on any of the
+CCDs, the result will be None.  Note that if <code class="docutils literal notranslate"><span class="pre">wcs_dict</span></code> does not include all CCDs in it, then
+it’s possible the position might lie on one of the CCDs that was not included.</p>
+<p>Depending on what the user wants to do with the results, they may wish to use the
+<code class="docutils literal notranslate"><span class="pre">include_border</span></code> keyword.  This keyword determines whether or not to include an additional
+border corresponding to half of the gaps between CCDs.  For example, if a user is drawing a
+single image they may wish to only know whether a given position falls onto a CCD, and if so,
+which one (ignoring everything in the gaps).  In contrast, a user who plans to make a sequence
+of dithered images might find it most useful to know whether the position is either on a CCD or
+close enough that in a small dither sequence it might appear on the CCD at some point.  Use of
+<code class="docutils literal notranslate"><span class="pre">include_border</span></code> switches between these scenarios.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wcs_dict</strong> – The dict of WCS’s output from euclidlike.getWCS().</p></li>
+<li><p><strong>world_pos</strong> – A galsim.CelestialCoord indicating the sky position of interest.</p></li>
+<li><p><strong>include_border</strong> – If True, then include the half-border around CCD to cover the gap
+between each sensor. [default: False]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>an integer value of the CCD on which the position falls, or None if the position is not
+on any CCD.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="install.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="euclidlike_imsim.html" class="btn btn-neutral float-right" title="The Euclid-like ImSim Module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Rachel Mandelbaum, Axel Guinot, Federico Berlfein, Andy Park, Xiangchong Li, Michael Troxel, Tianqing Zhang.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,251 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>euclidlike_imsim.utils &mdash; GalSim-Euclid-Like 0.9.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=39bb1c6d"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            GalSim-Euclid-Like
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../euclidlike.html">The Euclid-like Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../euclidlike_imsim.html">The Euclid-like ImSim Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">Revision History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">GalSim-Euclid-Like</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">euclidlike_imsim.utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for euclidlike_imsim.utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">galsim</span>
+<span class="kn">import</span> <span class="nn">galsim.config</span>
+<span class="kn">import</span> <span class="nn">galsim.roman</span> <span class="k">as</span> <span class="nn">roman</span>
+
+<div class="viewcode-block" id="roman_utils">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.utils.roman_utils">[docs]</a>
+<span class="k">class</span> <span class="nc">roman_utils</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class to contain a variety of helper routines to work with the simulation data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file</span><span class="p">,</span><span class="n">visit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">sca</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">image_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">setup_skycat</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setup information about a simulated Roman image.</span>
+<span class="sd">        Parameters:</span>
+<span class="sd">            config_file: the GalSim config file that produced the simulation</span>
+<span class="sd">            visit: the visit (observation sequence) number of the pointing </span>
+<span class="sd">            sca: the SCA number</span>
+<span class="sd">            image_name: the filename of the image (can be used instead of visit, sca)</span>
+<span class="sd">            setup_skycat: setup the skycatalog information to have access to</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">ReadConfig</span><span class="p">(</span><span class="n">config_file</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">sca</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_input</span><span class="p">(</span><span class="n">visit</span><span class="p">,</span><span class="n">sca</span><span class="p">,</span><span class="n">image_name</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">setup_skycat</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;sky_catalog&#39;</span><span class="p">]</span>
+        <span class="n">config</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;obseq_data&#39;</span><span class="p">][</span><span class="s1">&#39;visit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visit</span>
+        <span class="n">config</span><span class="p">[</span><span class="s1">&#39;image&#39;</span><span class="p">][</span><span class="s1">&#39;SCA&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sca</span>
+        <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">ProcessInput</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">setup_skycat</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">skycat</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">GetInputObj</span><span class="p">(</span><span class="s1">&#39;sky_catalog&#39;</span><span class="p">,</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;sky_catalog&#39;</span><span class="p">],</span><span class="n">config</span><span class="p">,</span><span class="s1">&#39;sky_catalog&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PSF</span>        <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">GetInputObj</span><span class="p">(</span><span class="s1">&#39;roman_psf&#39;</span><span class="p">,</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;roman_psf&#39;</span><span class="p">],</span><span class="n">config</span><span class="p">,</span><span class="s1">&#39;roman_psf&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wcs</span>        <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">BuildWCS</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;image&#39;</span><span class="p">],</span> <span class="s1">&#39;wcs&#39;</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bpass</span>      <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">BuildBandpass</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;image&#39;</span><span class="p">],</span> <span class="s1">&#39;bandpass&#39;</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="kc">None</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">photon_ops</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">BuildPhotonOps</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;stamp&#39;</span><span class="p">],</span> <span class="s1">&#39;photon_ops&#39;</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rng</span>        <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">GetRNG</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;image&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;psf_image&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="roman_utils.check_input">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.utils.roman_utils.check_input">[docs]</a>
+    <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">visit</span><span class="p">,</span><span class="n">sca</span><span class="p">,</span><span class="n">image_name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">image_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Inferring visit and sca from image_name.&#39;</span><span class="p">)</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="mi">21</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="o">-</span><span class="mi">5</span>
+            <span class="k">if</span> <span class="s1">&#39;simple_model&#39;</span> <span class="ow">in</span> <span class="n">image_name</span><span class="p">:</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="mi">28</span>
+            <span class="k">if</span> <span class="s1">&#39;gz&#39;</span> <span class="ow">in</span> <span class="n">image_name</span><span class="p">:</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="o">-</span><span class="mi">8</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">image_name</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">tmp</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">tmp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">visit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">sca</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Insufficient information to construct visit info - all inputs are None.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">visit</span><span class="p">,</span><span class="n">sca</span></div>
+
+
+<div class="viewcode-block" id="roman_utils.getPSF">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.utils.roman_utils.getPSF">[docs]</a>
+    <span class="k">def</span> <span class="nf">getPSF</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">pupil_bin</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return Roman PSF for some image position.</span>
+<span class="sd">        Parameters:</span>
+<span class="sd">            x: x-position in SCA</span>
+<span class="sd">            y: y-position in SCA</span>
+<span class="sd">            pupil_bin: pupil image binning factor</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            the chromatic GalSim PSF model object (does not include additional effects like charge diffusion!)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">pupil_bin</span><span class="o">!=</span><span class="mi">8</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span><span class="o">|</span><span class="p">(</span><span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;x,y position for pupil_bin values other than 8 not supported. Using SCA center.&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">PSF</span><span class="o">.</span><span class="n">getPSF</span><span class="p">(</span><span class="n">pupil_bin</span><span class="p">,</span><span class="n">galsim</span><span class="o">.</span><span class="n">PositionD</span><span class="p">(</span><span class="n">roman</span><span class="o">.</span><span class="n">n_pix</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span><span class="n">roman</span><span class="o">.</span><span class="n">n_pix</span><span class="o">/</span><span class="mi">2</span><span class="p">))</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">PSF</span><span class="o">.</span><span class="n">getPSF</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="n">galsim</span><span class="o">.</span><span class="n">PositionD</span><span class="p">(</span><span class="n">roman</span><span class="o">.</span><span class="n">n_pix</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span><span class="n">roman</span><span class="o">.</span><span class="n">n_pix</span><span class="o">/</span><span class="mi">2</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">PSF</span><span class="o">.</span><span class="n">getPSF</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="n">galsim</span><span class="o">.</span><span class="n">PositionD</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="roman_utils.getWCS">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.utils.roman_utils.getWCS">[docs]</a>
+    <span class="k">def</span> <span class="nf">getWCS</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return Roman WCS for image</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">wcs</span></div>
+
+
+<div class="viewcode-block" id="roman_utils.getLocalWCS">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.utils.roman_utils.getLocalWCS">[docs]</a>
+    <span class="k">def</span> <span class="nf">getLocalWCS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return Roman WCS for image</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">wcs</span><span class="o">.</span><span class="n">local</span><span class="p">(</span><span class="n">galsim</span><span class="o">.</span><span class="n">PositionD</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="roman_utils.getBandpass">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.utils.roman_utils.getBandpass">[docs]</a>
+    <span class="k">def</span> <span class="nf">getBandpass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return Roman bandpass for image</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bpass</span></div>
+
+
+<div class="viewcode-block" id="roman_utils.getPSF_Image">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.utils.roman_utils.getPSF_Image">[docs]</a>
+    <span class="k">def</span> <span class="nf">getPSF_Image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">stamp_size</span><span class="p">,</span><span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">pupil_bin</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span><span class="n">sed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">oversampling_factor</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">include_photonOps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">n_phot</span><span class="o">=</span><span class="mf">1e6</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a Roman PSF image for some image position</span>
+<span class="sd">        Parameters:</span>
+<span class="sd">            stamp_size: size of output PSF model stamp in native roman pixel_scale (oversampling_factor=1)</span>
+<span class="sd">            x: x-position in SCA</span>
+<span class="sd">            y: y-position in SCA</span>
+<span class="sd">            pupil_bin: pupil image binning factor</span>
+<span class="sd">            sed: SED to be used to draw the PSF - default is a flat SED.</span>
+<span class="sd">            oversampling_factor: factor by which to oversample native roman pixel_scale</span>
+<span class="sd">            include_photonOps: include additional contributions from other photon operators in effective psf image</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            the PSF GalSim image object (use image.array to get a numpy array representation)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">sed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">sed</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">SED</span><span class="p">(</span><span class="n">galsim</span><span class="o">.</span><span class="n">LookupTable</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mi">2600</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">interpolant</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">),</span>
+                              <span class="n">wave_type</span><span class="o">=</span><span class="s1">&#39;nm&#39;</span><span class="p">,</span> <span class="n">flux_type</span><span class="o">=</span><span class="s1">&#39;fphotons&#39;</span><span class="p">)</span>
+        <span class="n">point</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">DeltaFunction</span><span class="p">()</span><span class="o">*</span><span class="n">sed</span>
+        <span class="n">point</span> <span class="o">=</span> <span class="n">point</span><span class="o">.</span><span class="n">withFlux</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">bpass</span><span class="p">)</span>
+        <span class="n">local_wcs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getLocalWCS</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">wcs</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">JacobianWCS</span><span class="p">(</span><span class="n">dudx</span><span class="o">=</span><span class="n">local_wcs</span><span class="o">.</span><span class="n">dudx</span><span class="o">/</span><span class="n">oversampling_factor</span><span class="p">,</span>
+                                 <span class="n">dudy</span><span class="o">=</span><span class="n">local_wcs</span><span class="o">.</span><span class="n">dudy</span><span class="o">/</span><span class="n">oversampling_factor</span><span class="p">,</span>
+                                 <span class="n">dvdx</span><span class="o">=</span><span class="n">local_wcs</span><span class="o">.</span><span class="n">dvdx</span><span class="o">/</span><span class="n">oversampling_factor</span><span class="p">,</span>
+                                 <span class="n">dvdy</span><span class="o">=</span><span class="n">local_wcs</span><span class="o">.</span><span class="n">dvdy</span><span class="o">/</span><span class="n">oversampling_factor</span><span class="p">)</span>
+        <span class="n">stamp</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">Image</span><span class="p">(</span><span class="n">stamp_size</span><span class="o">*</span><span class="n">oversampling_factor</span><span class="p">,</span><span class="n">stamp_size</span><span class="o">*</span><span class="n">oversampling_factor</span><span class="p">,</span><span class="n">wcs</span><span class="o">=</span><span class="n">wcs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">include_photonOps</span><span class="p">:</span>
+            <span class="n">psf</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">Convolve</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">getPSF</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">pupil_bin</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">psf</span><span class="o">.</span><span class="n">drawImage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bpass</span><span class="p">,</span><span class="n">image</span><span class="o">=</span><span class="n">stamp</span><span class="p">,</span><span class="n">wcs</span><span class="o">=</span><span class="n">wcs</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;no_pixel&#39;</span><span class="p">)</span>
+        <span class="n">photon_ops</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">getPSF</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">pupil_bin</span><span class="p">)]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">photon_ops</span>
+        <span class="k">return</span> <span class="n">point</span><span class="o">.</span><span class="n">drawImage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bpass</span><span class="p">,</span>
+                                <span class="n">method</span><span class="o">=</span><span class="s1">&#39;phot&#39;</span><span class="p">,</span>
+                                <span class="n">rng</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="p">,</span>
+                                <span class="n">maxN</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span>
+                                <span class="n">n_photons</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span>
+                                <span class="n">image</span><span class="o">=</span><span class="n">stamp</span><span class="p">,</span>
+                                <span class="n">photon_ops</span><span class="o">=</span><span class="n">photon_ops</span><span class="p">,</span>
+                                <span class="n">poisson_flux</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Rachel Mandelbaum, Axel Guinot, Federico Berlfein, Andy Park, Xiangchong Li, Michael Troxel, Tianqing Zhang.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

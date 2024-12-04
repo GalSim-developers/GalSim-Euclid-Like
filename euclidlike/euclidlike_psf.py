@@ -85,6 +85,7 @@ def getPSF(
     not reflect variation over time for any particular observation.
 
     Several important effects were omitted in these images, including the following:
+    
     * the effect of the dichroic;
     * polarization aberrations; 
     * non-linear detector effects such as charge-transfer inefficiency, the brighter-fatter effect,
@@ -123,29 +124,29 @@ def getPSF(
     `data/config.zip`.
     
 
-    Args:
-    ccd (int):  Single value specifying the CCD for which the PSF
-        should be loaded.
-    bandpass (str): Single string specifying the bandpass to use when
-        defining the pupil plane configuration and/or interpolation of
-        chromatic PSFs.
-    ccd_pos:  Single galsim.PositionD indicating the position within the CCD
-        for which the PSF should be created. If None, the exact center of the
-        CCD is chosen. [default: None]
-    wcs:  The WCS to use to project the PSF into world coordinates. [default:
-        galsim.PixelScale(euclid_like.roman.pixel_scale)]
-    wavelength (float):  An option to get an achromatic PSF for a single
-        wavelength, for users who do not care about chromaticity of the PSF. If
-        None, then the fully chromatic PSF is returned as an
-        InterpolatedChromaticObject. Alternatively the user should supply
-        either (a) a wavelength in nanometers, and they will get an
-        InterpolatedImage object for that wavelength, or (b) a bandpass object,
-        in which case they will get an InterpolatedImage objects defined at the
-        effective wavelength of that bandpass. [default: None]
-    gsparams:  An optional GSParams argument.  See the docstring for GSParams
-        for details. [default: None]
-    psf_dir (str): Directory where sampled PSF images can be accessed. If not
-        given, look in ./data directory. [default: None] 
+    Parameters:
+        ccd (int):  Single value specifying the CCD for which the PSF
+            should be loaded.
+        bandpass (str): Single string specifying the bandpass to use when
+            defining the pupil plane configuration and/or interpolation of
+            chromatic PSFs.
+        ccd_pos:  Single galsim.PositionD indicating the position within the CCD
+            for which the PSF should be created. If None, the exact center of the
+            CCD is chosen. [default: None]
+        wcs:  The WCS to use to project the PSF into world coordinates. [default:
+            galsim.PixelScale(euclid_like.roman.pixel_scale)]
+        wavelength (float):  An option to get an achromatic PSF for a single
+            wavelength, for users who do not care about chromaticity of the PSF. If
+            None, then the fully chromatic PSF is returned as an
+            InterpolatedChromaticObject. Alternatively the user should supply
+            either (a) a wavelength in nanometers, and they will get an
+            InterpolatedImage object for that wavelength, or (b) a bandpass object,
+            in which case they will get an InterpolatedImage objects defined at the
+            effective wavelength of that bandpass. [default: None]
+        gsparams:  An optional GSParams argument.  See the docstring for GSParams
+            for details. [default: None]
+        psf_dir (str): Directory where sampled PSF images can be accessed. If not
+            given, look in ./data directory. [default: None] 
 
     Returns:
         A single PSF object (either an InterpolatedChromaticObject or an
@@ -214,33 +215,33 @@ def getBrightPSF(
     Depending on the inputs, this routine returns a chromatic or achromatic PSF using the
     Euclid telescope diameter and Euclid-like aperture.
     
-    Args:
-    ccd (int):  Single value specifying the CCD for which the PSF should be
-        loaded.
-    bandpass (str): Single string specifying the bandpass to use when
-        defining the pupil plane configuration and/or interpolation of
-        chromatic PSFs.
-    ccd_pos:  Single galsim.PositionD indicating the position within the CCD
-        for which the PSF should be created. If None, the exact center of the
-        CCD is chosen. [default: None]
-    wcs:  The WCS to use to project the PSF into world coordinates. [default:
-        galsim.PixelScale(euclidlike.pixel_scale)]
-    n_waves (int): Number of wavelengths to use for setting up interpolation of the
-        chromatic PSF objects, which can lead to much faster image
-        rendering.  If None, then no interpolation is used. Note that
-        users who want to interpolate can always set up the interpolation
-        later on even if they do not do so when calling `getPSF`.
-        [default: None]
-    wavelength (float):  An option to get an achromatic PSF for a single
-        wavelength, for users who do not care about chromaticity of the PSF. If
-        None, then the fully chromatic PSF is returned as an
-        InterpolatedChromaticObject. Alternatively the user should supply
-        either (a) a wavelength in nanometers, and they will get an
-        InterpolatedImage object for that wavelength, or (b) a bandpass object,
-        in which case they will get an InterpolatedImage objects defined at the
-        effective wavelength of that bandpass. [default: None]
-    gsparams:  An optional GSParams argument.  See the docstring for GSParams
-        for details. [default: None]
+    Parameters:
+        ccd (int):  Single value specifying the CCD for which the PSF should be
+            loaded.
+        bandpass (str): Single string specifying the bandpass to use when
+            defining the pupil plane configuration and/or interpolation of
+            chromatic PSFs.
+        ccd_pos:  Single galsim.PositionD indicating the position within the CCD
+            for which the PSF should be created. If None, the exact center of the
+            CCD is chosen. [default: None]
+        wcs:  The WCS to use to project the PSF into world coordinates. [default:
+            galsim.PixelScale(euclidlike.pixel_scale)]
+        n_waves (int): Number of wavelengths to use for setting up interpolation of the
+            chromatic PSF objects, which can lead to much faster image
+            rendering.  If None, then no interpolation is used. Note that
+            users who want to interpolate can always set up the interpolation
+            later on even if they do not do so when calling `getPSF`.
+            [default: None]
+        wavelength (float):  An option to get an achromatic PSF for a single
+            wavelength, for users who do not care about chromaticity of the PSF. If
+            None, then the fully chromatic PSF is returned as an
+            InterpolatedChromaticObject. Alternatively the user should supply
+            either (a) a wavelength in nanometers, and they will get an
+            InterpolatedImage object for that wavelength, or (b) a bandpass object,
+            in which case they will get an InterpolatedImage objects defined at the
+            effective wavelength of that bandpass. [default: None]
+        gsparams:  An optional GSParams argument.  See the docstring for GSParams
+            for details. [default: None]
 
     Returns:
         A single PSF object (either an InterpolatedChromaticObject or an

@@ -1,0 +1,185 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Overview &mdash; GalSim-Euclid-Like 0.9.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=39bb1c6d"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation" href="install.html" />
+    <link rel="prev" title="GalSim-Euclid-Like: Euclid-like images using GalSim." href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            GalSim-Euclid-Like
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#galsim-euclid-like">GalSim-Euclid-Like</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#downloading-relevant-data">Downloading relevant data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#getting-started">Getting started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#communicating-with-the-developers">Communicating with the developers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#attribution">Attribution</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="euclidlike.html">The Euclid-like Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="euclidlike_imsim.html">The Euclid-like ImSim Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="history.html">Revision History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">GalSim-Euclid-Like</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Overview</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/overview.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="overview">
+<h1>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h1>
+<section id="galsim-euclid-like">
+<h2>GalSim-Euclid-Like<a class="headerlink" href="#galsim-euclid-like" title="Link to this heading"></a></h2>
+<p>Helper functions to generate simulations of Euclid-like images using GalSim.</p>
+<p>This repository contains information about the Euclid space telescope and survey that is needed to
+produce simulations using <a class="reference external" href="https://github.com/GalSim-developers/GalSim">GalSim</a>.  Some of the
+information provided is approximate, aimed towards fast simulations rather than full accuracy in
+representation of Euclid images.  Places where the information is only approximate are flagged and
+described in the docstring, and we particularly highlight that the PSF is only approximate;
+for details, see the docstring of the <code class="docutils literal notranslate"><span class="pre">getPSF()</span></code> method.  This library should enable generation of
+Euclid-like images of sufficient fidelity for preliminary exploration of object detection,
+photometry, deblending, and joint analysis with ground-based observatories.  For
+applications requiring high precision such as weak lensing, the higher fidelity simulations
+available within the Euclid Consortium should be used.</p>
+<p>This repository includes two distinct packages:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">euclidlike</span></code>: has basic observatory, instrumentation, and survey information for Euclid.
+This package can be used on its own along with GalSim to produce Euclid-like simulations.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">euclidlike_imsim</span></code>: has configuration scripts to produce large-scale Euclid-like simulation runs
+based on the information in <code class="docutils literal notranslate"><span class="pre">euclidlike</span></code>. It is based heavily on <a class="reference external" href="https://github.com/matroxel/roman_imsim">roman_imsim</a>.</p></li>
+</ul>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<p>For more information about <a class="reference external" href="https://github.com/GalSim-developers/GalSim">GalSim</a>, please see its README and documentation.</p>
+<p>For more information about Euclid, please see the <a class="reference external" href="https://www.euclid-ec.org/">Euclid Consortium website</a> and papers linked from there.</p>
+<p>Attribution for software and data used by particular routines in this library is given in the docstring for the relevant routine.</p>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<p>The source code for GalSim-Euclid-Like has not been published to pypi. To install from source code:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="p">:</span><span class="n">GalSim</span><span class="o">-</span><span class="n">developers</span><span class="o">/</span><span class="n">GalSim</span><span class="o">-</span><span class="n">Euclid</span><span class="o">-</span><span class="n">Like</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+<p>and install by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">n</span> <span class="n">euclidlike</span> <span class="n">python</span><span class="o">=</span><span class="mf">3.10</span>
+<span class="n">cd</span> <span class="n">GalSim</span><span class="o">-</span><span class="n">Euclid</span><span class="o">-</span><span class="n">Like</span>
+<span class="n">conda</span> <span class="n">activate</span> <span class="n">euclidlike</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="o">.</span>
+</pre></div>
+</div>
+<p>Please view the <a class="reference internal" href="install.html#installation-instructions"><span class="std std-ref">Installation Instructions</span></a> (in INSTALL.rst) for further details on how to install GalSim-Euclid-Like.</p>
+</section>
+<section id="downloading-relevant-data">
+<h2>Downloading relevant data<a class="headerlink" href="#downloading-relevant-data" title="Link to this heading"></a></h2>
+<p>The Euclid-like PSF is constructed from precomputed oversampled images on a grid in focal plane position and wavelength. To use the full FOV PSF within GalSim-Euclid-Like, the images must be downloaded by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ euclidlike_download_psf
+</pre></div>
+</div>
+<p>in the terminal after installation of GalSim-Euclid-Like. To install in an alternative directory to the default, use the <code class="docutils literal notranslate"><span class="pre">--dir</span></code> argument. Refer to the <code class="docutils literal notranslate"><span class="pre">getPSF</span></code> documentation for further details about the PSF.</p>
+</section>
+<section id="getting-started">
+<h2>Getting started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h2>
+<p>Please see the examples/ directory for demos illustrating the use of this code.</p>
+</section>
+<section id="communicating-with-the-developers">
+<h2>Communicating with the developers<a class="headerlink" href="#communicating-with-the-developers" title="Link to this heading"></a></h2>
+<p>Feel free to <a class="reference external" href="https://github.com/GalSim-developers/GalSim-Euclid-Like/issues">open a GitHub issue</a> to reach the developers with questions, comments, and bug reports.  New contributors are also welcome and can indicate their interest in developing this code base through the Issues.</p>
+</section>
+<section id="attribution">
+<h2>Attribution<a class="headerlink" href="#attribution" title="Link to this heading"></a></h2>
+<p>This software is open source and may be used according to the terms of its <a class="reference external" href="https://github.com/GalSim-developers/GalSim-Euclid-Like/blob/main/LICENSE">license</a>.</p>
+<p>When using this software, please provide the URL to the repository in the resulting paper or note.  Once there is a Zenodo DOI or journal article, this README will be updated and we will ask those using the code in their research to cite the relevant journal article.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="GalSim-Euclid-Like: Euclid-like images using GalSim." accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="install.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Rachel Mandelbaum, Axel Guinot, Federico Berlfein, Andy Park, Xiangchong Li, Michael Troxel, Tianqing Zhang.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

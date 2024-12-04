@@ -1,0 +1,455 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>euclidlike_imsim.stamp &mdash; GalSim-Euclid-Like 0.9.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=39bb1c6d"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            GalSim-Euclid-Like
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../euclidlike.html">The Euclid-like Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../euclidlike_imsim.html">The Euclid-like ImSim Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">Revision History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">GalSim-Euclid-Like</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">euclidlike_imsim.stamp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for euclidlike_imsim.stamp</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">galsim</span>
+<span class="kn">import</span> <span class="nn">euclidlike</span>
+<span class="kn">import</span> <span class="nn">galsim.config</span>
+<span class="kn">from</span> <span class="nn">galsim.config</span> <span class="kn">import</span> <span class="n">RegisterStampType</span><span class="p">,</span> <span class="n">StampBuilder</span>
+<span class="c1"># import os, psutil</span>
+<span class="c1"># process = psutil.Process()</span>
+
+<span class="c1"># Parameter below determines the flux at which we switch from using Euclid-like PSF to the bright star PSF</span>
+<span class="c1"># This is done to avoid visual artifacts from using the Euclid-like PSF for very bright objects.</span>
+<span class="c1"># Tests to determine this value can be found here: https://github.com/GalSim-developers/GalSim-Euclid-Like/issues/46</span>
+<span class="n">psf_switch_limit</span> <span class="o">=</span> <span class="mf">8e5</span>
+
+<div class="viewcode-block" id="Euclidlike_stamp">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.stamp.Euclidlike_stamp">[docs]</a>
+<span class="k">class</span> <span class="nc">Euclidlike_stamp</span><span class="p">(</span><span class="n">StampBuilder</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This performs the tasks necessary for building the stamp for a single object.</span>
+
+<span class="sd">    It uses the regular Basic functions for most things.</span>
+<span class="sd">    It specializes the quickSkip, buildProfile, and draw methods.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_trivial_sed</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">SED</span><span class="p">(</span>
+        <span class="n">galsim</span><span class="o">.</span><span class="n">LookupTable</span><span class="p">(</span>
+            <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">2600</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="n">interpolant</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span>
+        <span class="p">),</span>
+        <span class="n">wave_type</span><span class="o">=</span><span class="s1">&#39;nm&#39;</span><span class="p">,</span> <span class="n">flux_type</span><span class="o">=</span><span class="s1">&#39;fphotons&#39;</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="Euclidlike_stamp.setup">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.stamp.Euclidlike_stamp.setup">[docs]</a>
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">xsize</span><span class="p">,</span> <span class="n">ysize</span><span class="p">,</span> <span class="n">ignore</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Do the initialization and setup for building a postage stamp.</span>
+
+<span class="sd">        In the base class, we check for and parse the appropriate size and position values in</span>
+<span class="sd">        config (aka base[&#39;stamp&#39;] or base[&#39;image&#39;].</span>
+
+<span class="sd">        Values given in base[&#39;stamp&#39;] take precedence if these are given in both places (which</span>
+<span class="sd">        would be confusing, so probably shouldn&#39;t do that, but there might be a use case where it</span>
+<span class="sd">        would make sense).</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            config:     The configuration dict for the stamp field.</span>
+<span class="sd">            base:       The base configuration dict.</span>
+<span class="sd">            xsize:      The xsize of the image to build (if known).</span>
+<span class="sd">            ysize:      The ysize of the image to build (if known).</span>
+<span class="sd">            ignore:     A list of parameters that are allowed to be in config that we can</span>
+<span class="sd">                        ignore here. i.e. it won&#39;t be an error if these parameters are present.</span>
+<span class="sd">            logger:     A logger object to log progress.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            xsize, ysize, image_pos, world_pos</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># print(&#39;stamp setup&#39;,process.memory_info().rss)</span>
+
+        <span class="n">gal</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">BuildGSObject</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="s1">&#39;gal&#39;</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">gal</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">SkipThisObject</span><span class="p">(</span><span class="s1">&#39;gal is None (invalid parameters)&#39;</span><span class="p">)</span>
+        <span class="n">base</span><span class="p">[</span><span class="s1">&#39;object_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gal</span><span class="o">.</span><span class="n">object_type</span>
+        <span class="n">bandpass</span> <span class="o">=</span> <span class="n">base</span><span class="p">[</span><span class="s1">&#39;bandpass&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">gal</span><span class="p">,</span> <span class="s1">&#39;flux&#39;</span><span class="p">):</span>
+            <span class="c1"># In this case, the object flux has not been precomputed</span>
+            <span class="c1"># or cached by the skyCatalogs code.</span>
+            <span class="n">gal</span><span class="o">.</span><span class="n">flux</span> <span class="o">=</span> <span class="n">gal</span><span class="o">.</span><span class="n">calculateFlux</span><span class="p">(</span><span class="n">bandpass</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flux</span> <span class="o">=</span> <span class="n">gal</span><span class="o">.</span><span class="n">flux</span>
+        <span class="c1"># Cap (star) flux at 30M photons to avoid gross artifacts when trying to draw the Euclid PSF in finite time and memory</span>
+        <span class="n">flux_cap</span> <span class="o">=</span> <span class="mf">3e7</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span> <span class="o">&gt;</span> <span class="n">flux_cap</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">gal</span><span class="p">,</span> <span class="s1">&#39;original&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">gal</span><span class="o">.</span><span class="n">original</span><span class="p">,</span> <span class="s1">&#39;original&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gal</span><span class="o">.</span><span class="n">original</span><span class="o">.</span><span class="n">original</span><span class="p">,</span> <span class="n">galsim</span><span class="o">.</span><span class="n">DeltaFunction</span><span class="p">))</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">gal</span><span class="p">,</span> <span class="n">galsim</span><span class="o">.</span><span class="n">DeltaFunction</span><span class="p">)):</span>
+                <span class="n">gal</span> <span class="o">=</span> <span class="n">gal</span><span class="o">.</span><span class="n">withFlux</span><span class="p">(</span><span class="n">flux_cap</span><span class="p">,</span> <span class="n">bandpass</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">flux</span> <span class="o">=</span> <span class="n">flux_cap</span>
+                <span class="n">gal</span><span class="o">.</span><span class="n">flux</span> <span class="o">=</span> <span class="n">flux_cap</span>
+        <span class="n">base</span><span class="p">[</span><span class="s1">&#39;flux&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gal</span><span class="o">.</span><span class="n">flux</span>
+        <span class="n">base</span><span class="p">[</span><span class="s1">&#39;mag&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">2.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">gal</span><span class="o">.</span><span class="n">flux</span><span class="p">)</span> <span class="o">+</span> <span class="n">bandpass</span><span class="o">.</span><span class="n">zeropoint</span>
+        <span class="c1"># print(&#39;stamp setup2&#39;,process.memory_info().rss)</span>
+
+        <span class="c1"># Compute or retrieve the realized flux.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rng</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">GetRNG</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="s2">&quot;Euclidlike_stamp&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">realized_flux</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">PoissonDeviate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">)()</span>
+        <span class="n">base</span><span class="p">[</span><span class="s1">&#39;realized_flux&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">realized_flux</span>
+
+        <span class="c1"># Check if the realized flux is 0.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">realized_flux</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># If so, we&#39;ll skip everything after this.</span>
+            <span class="c1"># The mechanism within GalSim to do this is to raise a special SkipThisObject class.</span>
+            <span class="k">raise</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">SkipThisObject</span><span class="p">(</span><span class="s1">&#39;realized flux=0&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Otherwise figure out the stamp size</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="c1"># For really faint things, don&#39;t try too hard.  Just use 32x32.</span>
+            <span class="n">image_size</span> <span class="o">=</span> <span class="mi">32</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pupil_bin</span> <span class="o">=</span> <span class="s1">&#39;achromatic&#39;</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">gal_achrom</span> <span class="o">=</span> <span class="n">gal</span><span class="o">.</span><span class="n">evaluateAtWavelength</span><span class="p">(</span><span class="n">bandpass</span><span class="o">.</span><span class="n">effective_wavelength</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">gal_achrom</span><span class="p">,</span> <span class="s1">&#39;original&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gal_achrom</span><span class="o">.</span><span class="n">original</span><span class="p">,</span> <span class="n">galsim</span><span class="o">.</span><span class="n">DeltaFunction</span><span class="p">)):</span>
+                <span class="c1"># For bright stars, set the following stamp size limits</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span> <span class="o">&lt;</span> <span class="n">psf_switch_limit</span><span class="p">:</span>
+                    <span class="n">image_size</span> <span class="o">=</span> <span class="mi">500</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">pupil_bin</span> <span class="o">=</span> <span class="mi">8</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span> <span class="o">&lt;</span> <span class="mf">6e6</span><span class="p">:</span>
+                    <span class="n">image_size</span> <span class="o">=</span> <span class="mi">1000</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">pupil_bin</span> <span class="o">=</span> <span class="mi">4</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">image_size</span> <span class="o">=</span> <span class="mi">1600</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">pupil_bin</span> <span class="o">=</span> <span class="mi">2</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pupil_bin</span> <span class="o">=</span> <span class="mi">8</span>
+                <span class="c1"># # Get storead achromatic PSF</span>
+                <span class="c1"># psf = galsim.config.BuildGSObject(base, &#39;psf&#39;, logger=logger)[0][&#39;achromatic&#39;]</span>
+                <span class="c1"># obj = galsim.Convolve(gal_achrom, psf).withFlux(self.flux)</span>
+                <span class="n">obj</span> <span class="o">=</span> <span class="n">gal_achrom</span><span class="o">.</span><span class="n">withGSParams</span><span class="p">(</span><span class="n">galsim</span><span class="o">.</span><span class="n">GSParams</span><span class="p">(</span><span class="n">stepk_minimum_hlr</span><span class="o">=</span><span class="mi">20</span><span class="p">))</span>
+                <span class="n">image_size</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">getGoodImageSize</span><span class="p">(</span><span class="n">euclidlike</span><span class="o">.</span><span class="n">pixel_scale</span><span class="p">)</span>
+
+        <span class="c1"># print(&#39;stamp setup3&#39;,process.memory_info().rss)</span>
+        <span class="n">base</span><span class="p">[</span><span class="s1">&#39;pupil_bin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pupil_bin</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Object flux is </span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Object </span><span class="si">%d</span><span class="s1"> will use stamp size = </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;obj_num&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">image_size</span><span class="p">)</span>
+
+        <span class="c1"># Determine where this object is going to go:</span>
+        <span class="c1"># This is the same as what the base StampBuilder does:</span>
+        <span class="k">if</span> <span class="s1">&#39;image_pos&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="n">image_pos</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">ParseValue</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s1">&#39;image_pos&#39;</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">galsim</span><span class="o">.</span><span class="n">PositionD</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">image_pos</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="s1">&#39;world_pos&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="n">world_pos</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">ParseWorldPos</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s1">&#39;world_pos&#39;</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">world_pos</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="n">image_size</span><span class="p">,</span> <span class="n">image_size</span><span class="p">,</span> <span class="n">image_pos</span><span class="p">,</span> <span class="n">world_pos</span></div>
+
+
+<div class="viewcode-block" id="Euclidlike_stamp.buildPSF">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.stamp.Euclidlike_stamp.buildPSF">[docs]</a>
+    <span class="k">def</span> <span class="nf">buildPSF</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">gsparams</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the PSF object.</span>
+
+<span class="sd">        For the Basic stamp type, this builds a PSF from the base[&#39;psf&#39;] dict, if present,</span>
+<span class="sd">        else returns None.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            config:     The configuration dict for the stamp field.</span>
+<span class="sd">            base:       The base configuration dict.</span>
+<span class="sd">            gsparams:   A dict of kwargs to use for a GSParams.  More may be added to this</span>
+<span class="sd">                        list by the galaxy object.</span>
+<span class="sd">            logger:     A logger object to log progress.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the PSF</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">base</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;psf&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;euclidlike_psf&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="s1">&#39;euclidlike_psf&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">BuildGSObject</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="s1">&#39;psf&#39;</span><span class="p">,</span> <span class="n">gsparams</span><span class="o">=</span><span class="n">gsparams</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">euclidlike_psf</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">GetInputObj</span><span class="p">(</span><span class="s1">&#39;euclidlike_psf&#39;</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="s1">&#39;buildPSF&#39;</span><span class="p">)</span>
+        <span class="n">psf</span> <span class="o">=</span> <span class="n">euclidlike_psf</span><span class="o">.</span><span class="n">getPSF</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pupil_bin</span><span class="p">,</span> <span class="n">base</span><span class="p">[</span><span class="s1">&#39;image_pos&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">psf</span></div>
+
+
+<div class="viewcode-block" id="Euclidlike_stamp.getDrawMethod">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.stamp.Euclidlike_stamp.getDrawMethod">[docs]</a>
+    <span class="k">def</span> <span class="nf">getDrawMethod</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determine the draw method to use.</span>
+
+<span class="sd">        @param config       The configuration dict for the stamp field.</span>
+<span class="sd">        @param base         The base configuration dict.</span>
+<span class="sd">        @param logger       A logger object to log progress.</span>
+
+<span class="sd">        @returns method</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">ParseValue</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="s1">&#39;draw_method&#39;</span><span class="p">,</span><span class="n">base</span><span class="p">,</span><span class="nb">str</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">valid_draw_methods</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">galsim</span><span class="o">.</span><span class="n">GalSimConfigValueError</span><span class="p">(</span><span class="s2">&quot;Invalid draw_method.&quot;</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span>
+                                                <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">valid_draw_methods</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">method</span>  <span class="o">==</span> <span class="s1">&#39;auto&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pupil_bin</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">]:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Auto -&gt; Use FFT drawing for object </span><span class="si">%d</span><span class="s1">.&#39;</span><span class="p">,</span><span class="n">base</span><span class="p">[</span><span class="s1">&#39;obj_num&#39;</span><span class="p">])</span>
+                <span class="k">return</span> <span class="s1">&#39;fft&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Auto -&gt; Use photon shooting for object </span><span class="si">%d</span><span class="s1">.&#39;</span><span class="p">,</span><span class="n">base</span><span class="p">[</span><span class="s1">&#39;obj_num&#39;</span><span class="p">])</span>
+                <span class="k">return</span> <span class="s1">&#39;phot&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># If user sets something specific for the method, rather than auto,</span>
+            <span class="c1"># then respect their wishes.</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Use specified method=</span><span class="si">%s</span><span class="s1"> for object </span><span class="si">%d</span><span class="s1">.&#39;</span><span class="p">,</span><span class="n">method</span><span class="p">,</span><span class="n">base</span><span class="p">[</span><span class="s1">&#39;obj_num&#39;</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">method</span></div>
+
+
+<div class="viewcode-block" id="Euclidlike_stamp.fix_seds">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.stamp.Euclidlike_stamp.fix_seds">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">fix_seds</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">prof</span><span class="p">,</span> <span class="n">bandpass</span><span class="p">):</span>
+        <span class="c1"># If any SEDs are not currently using a LookupTable for the function or if they are</span>
+        <span class="c1"># using spline interpolation, then the codepath is quite slow.</span>
+        <span class="c1"># Better to fix them before doing WavelengthSampler.</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">prof</span><span class="p">,</span> <span class="n">galsim</span><span class="o">.</span><span class="n">SimpleChromaticTransformation</span><span class="p">)</span> <span class="ow">and</span>
+            <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prof</span><span class="o">.</span><span class="n">_flux_ratio</span><span class="o">.</span><span class="n">_spec</span><span class="p">,</span> <span class="n">galsim</span><span class="o">.</span><span class="n">LookupTable</span><span class="p">)</span>
+             <span class="ow">or</span> <span class="n">prof</span><span class="o">.</span><span class="n">_flux_ratio</span><span class="o">.</span><span class="n">_spec</span><span class="o">.</span><span class="n">interpolant</span> <span class="o">!=</span> <span class="s1">&#39;linear&#39;</span><span class="p">)):</span>
+            <span class="n">original</span> <span class="o">=</span> <span class="n">prof</span><span class="o">.</span><span class="n">_original</span>
+            <span class="n">sed</span> <span class="o">=</span> <span class="n">prof</span><span class="o">.</span><span class="n">_flux_ratio</span>
+            <span class="n">wave_list</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">combine_wave_list</span><span class="p">(</span><span class="n">sed</span><span class="p">,</span> <span class="n">bandpass</span><span class="p">)</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span><span class="n">sed</span><span class="p">(</span><span class="n">wave_list</span><span class="p">),</span> <span class="n">wave_list</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="n">new_spec</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">LookupTable</span><span class="p">(</span><span class="n">wave_list</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">interpolant</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">)</span>
+            <span class="n">new_sed</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">SED</span><span class="p">(</span>
+                <span class="n">new_spec</span><span class="p">,</span>
+                <span class="s1">&#39;nm&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;fphotons&#39;</span> <span class="k">if</span> <span class="n">sed</span><span class="o">.</span><span class="n">spectral</span> <span class="k">else</span> <span class="s1">&#39;1&#39;</span>
+            <span class="p">)</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">_flux_ratio</span> <span class="o">=</span> <span class="n">new_sed</span>
+
+        <span class="c1"># Also recurse onto any components.</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prof</span><span class="p">,</span> <span class="n">galsim</span><span class="o">.</span><span class="n">ChromaticObject</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">prof</span><span class="p">,</span> <span class="s1">&#39;obj_list&#39;</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">prof</span><span class="o">.</span><span class="n">obj_list</span><span class="p">:</span>
+                    <span class="bp">cls</span><span class="o">.</span><span class="n">fix_seds</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">bandpass</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">prof</span><span class="p">,</span> <span class="s1">&#39;original&#39;</span><span class="p">):</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">fix_seds</span><span class="p">(</span><span class="n">prof</span><span class="o">.</span><span class="n">original</span><span class="p">,</span> <span class="n">bandpass</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Euclidlike_stamp.draw">
+<a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.stamp.Euclidlike_stamp.draw">[docs]</a>
+    <span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prof</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Draw the profile on the postage stamp image.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            prof:       The profile to draw.</span>
+<span class="sd">            image:      The image onto which to draw the profile (which may be None).</span>
+<span class="sd">            method:     The method to use in drawImage.</span>
+<span class="sd">            offset:     The offset to apply when drawing.</span>
+<span class="sd">            config:     The configuration dict for the stamp field.</span>
+<span class="sd">            base:       The base configuration dict.</span>
+<span class="sd">            logger:     A logger object to log progress.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the resulting image</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">prof</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># If was decide to do any rejection steps, this could be set to None, in which case,</span>
+            <span class="c1"># don&#39;t draw anything.</span>
+            <span class="k">return</span> <span class="n">image</span>
+
+        <span class="c1"># Prof is normally a convolution here with obj_list being [gal, psf1, psf2,...]</span>
+        <span class="c1"># for some number of component PSFs.</span>
+        <span class="c1"># print(&#39;stamp draw&#39;,process.memory_info().rss)</span>
+
+        <span class="n">gal</span><span class="p">,</span> <span class="o">*</span><span class="n">psfs</span> <span class="o">=</span> <span class="n">prof</span><span class="o">.</span><span class="n">obj_list</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">prof</span><span class="p">,</span> <span class="s1">&#39;obj_list&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">prof</span><span class="p">]</span>
+
+        <span class="n">faint</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span> <span class="o">&lt;</span> <span class="mi">40</span>
+        <span class="n">bandpass</span> <span class="o">=</span> <span class="n">base</span><span class="p">[</span><span class="s1">&#39;bandpass&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">faint</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Flux = </span><span class="si">%.0f</span><span class="s2">  Using trivial sed&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fix_seds</span><span class="p">(</span><span class="n">gal</span><span class="p">,</span> <span class="n">bandpass</span><span class="p">)</span>
+
+        <span class="n">image</span><span class="o">.</span><span class="n">wcs</span> <span class="o">=</span> <span class="n">base</span><span class="p">[</span><span class="s1">&#39;wcs&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Set limit on the size of photons batches to consider when</span>
+        <span class="c1"># calling gsobject.drawImage.</span>
+        <span class="n">maxN</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">1e6</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;maxN&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="n">maxN</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">ParseValue</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s1">&#39;maxN&#39;</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="nb">int</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># print(&#39;stamp draw2&#39;,process.memory_info().rss)</span>
+
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;fft&#39;</span><span class="p">:</span>
+            <span class="n">fft_image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">fft_offset</span> <span class="o">=</span> <span class="n">offset</span>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                <span class="n">method</span><span class="o">=</span><span class="s1">&#39;fft&#39;</span><span class="p">,</span>
+                <span class="n">offset</span><span class="o">=</span><span class="n">fft_offset</span><span class="p">,</span>
+                <span class="n">image</span><span class="o">=</span><span class="n">fft_image</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">faint</span> <span class="ow">and</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;fft_photon_ops&#39;</span><span class="p">):</span>
+                <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+                    <span class="s2">&quot;photon_ops&quot;</span><span class="p">:</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">BuildPhotonOps</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s1">&#39;fft_photon_ops&#39;</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">logger</span><span class="p">),</span>
+                    <span class="s2">&quot;maxN&quot;</span><span class="p">:</span> <span class="n">maxN</span><span class="p">,</span>
+                    <span class="s2">&quot;rng&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="p">,</span>
+                    <span class="s2">&quot;n_subsample&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="p">})</span>
+
+            <span class="c1"># Go back to a combined convolution for fft drawing.</span>
+            <span class="n">gal</span> <span class="o">=</span> <span class="n">gal</span><span class="o">.</span><span class="n">withFlux</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="n">bandpass</span><span class="p">)</span>
+            <span class="n">prof</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">Convolve</span><span class="p">([</span><span class="n">gal</span><span class="p">]</span> <span class="o">+</span> <span class="n">psfs</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">prof</span><span class="o">.</span><span class="n">drawImage</span><span class="p">(</span><span class="n">bandpass</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">galsim</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">GalSimFFTSizeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="c1"># I think this shouldn&#39;t happen with the updates I made to how the image size</span>
+                <span class="c1"># is calculated, even for extremely bright things.  So it should be ok to</span>
+                <span class="c1"># just report what happened, give some extra information to diagonose the problem</span>
+                <span class="c1"># and raise the error.</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Caught error trying to draw using FFT:&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;You may need to add a gsparams field with maximum_fft_size to&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;either the psf or gal field to allow larger FFTs.&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;prof = </span><span class="si">%r</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">prof</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;fft_image = </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">fft_image</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;offset = </span><span class="si">%r</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">offset</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;wcs = </span><span class="si">%r</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">image</span><span class="o">.</span><span class="n">wcs</span><span class="p">)</span>
+                <span class="k">raise</span>
+            <span class="c1"># Some pixels can end up negative from FFT numerics.  Just set them to 0.</span>
+            <span class="n">fft_image</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="n">fft_image</span><span class="o">.</span><span class="n">array</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span>
+            <span class="n">fft_image</span><span class="o">.</span><span class="n">addNoise</span><span class="p">(</span><span class="n">galsim</span><span class="o">.</span><span class="n">PoissonNoise</span><span class="p">(</span><span class="n">rng</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="p">))</span>
+            <span class="c1"># In case we had to make a bigger image, just copy the part we need.</span>
+            <span class="n">image</span> <span class="o">+=</span> <span class="n">fft_image</span><span class="p">[</span><span class="n">image</span><span class="o">.</span><span class="n">bounds</span><span class="p">]</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># We already calculated realized_flux above.  Use that now and tell GalSim not</span>
+            <span class="c1"># recalculate the Poisson realization of the flux.</span>
+            <span class="n">gal</span> <span class="o">=</span> <span class="n">gal</span><span class="o">.</span><span class="n">withFlux</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">realized_flux</span><span class="p">,</span> <span class="n">bandpass</span><span class="p">)</span>
+            <span class="c1"># print(&#39;stamp draw3b &#39;,process.memory_info().rss)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">faint</span> <span class="ow">and</span> <span class="s1">&#39;photon_ops&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+                <span class="n">photon_ops</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">BuildPhotonOps</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s1">&#39;photon_ops&#39;</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">photon_ops</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="c1"># Put the psfs at the start of the photon_ops.</span>
+            <span class="c1"># Probably a little better to put them a bit later than the start in some cases</span>
+            <span class="c1"># (e.g. after TimeSampler, PupilAnnulusSampler), but leave that as a todo for now.</span>
+            <span class="n">photon_ops</span> <span class="o">=</span> <span class="n">psfs</span> <span class="o">+</span> <span class="n">photon_ops</span>
+
+            <span class="c1"># prof = galsim.Convolve([gal] + psfs)</span>
+
+            <span class="c1"># print(&#39;-------- gal ----------&#39;,gal)</span>
+            <span class="c1"># print(&#39;-------- psf ----------&#39;,psfs)</span>
+
+            <span class="c1"># print(&#39;stamp draw3a&#39;,process.memory_info().rss)</span>
+            <span class="n">gal</span><span class="o">.</span><span class="n">drawImage</span><span class="p">(</span><span class="n">bandpass</span><span class="p">,</span>
+                          <span class="n">method</span><span class="o">=</span><span class="s1">&#39;phot&#39;</span><span class="p">,</span>
+                          <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span>
+                          <span class="n">rng</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="p">,</span>
+                          <span class="n">maxN</span><span class="o">=</span><span class="n">maxN</span><span class="p">,</span>
+                          <span class="n">n_photons</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">realized_flux</span><span class="p">,</span>
+                          <span class="n">image</span><span class="o">=</span><span class="n">image</span><span class="p">,</span>
+                          <span class="n">photon_ops</span><span class="o">=</span><span class="n">photon_ops</span><span class="p">,</span>
+                          <span class="n">sensor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                          <span class="n">add_to_image</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                          <span class="n">poisson_flux</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="c1"># print(&#39;stamp draw3&#39;,process.memory_info().rss)</span>
+
+        <span class="k">return</span> <span class="n">image</span></div>
+</div>
+
+
+
+<span class="c1"># Register this as a valid type</span>
+<span class="n">RegisterStampType</span><span class="p">(</span><span class="s1">&#39;Euclidlike_stamp&#39;</span><span class="p">,</span> <span class="n">Euclidlike_stamp</span><span class="p">())</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Rachel Mandelbaum, Axel Guinot, Federico Berlfein, Andy Park, Xiangchong Li, Michael Troxel, Tianqing Zhang.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,136 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Examples &mdash; GalSim-Euclid-Like 0.9.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=39bb1c6d"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Revision History" href="history.html" />
+    <link rel="prev" title="The Euclid-like ImSim Module" href="euclidlike_imsim.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            GalSim-Euclid-Like
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="euclidlike.html">The Euclid-like Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="euclidlike_imsim.html">The Euclid-like ImSim Module</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#end-to-end-demo">End-to-end demo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#focal-plane-layout">Focal Plane Layout</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="history.html">Revision History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">GalSim-Euclid-Like</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Examples</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/examples.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="examples">
+<h1>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">GalSim-Euclid-Like/examples</span></code> directory contains example files for how use the euclidlike module.</p>
+<section id="end-to-end-demo">
+<h2>End-to-end demo<a class="headerlink" href="#end-to-end-demo" title="Link to this heading"></a></h2>
+<p><a class="reference external" href="https://github.com/GalSim-developers/GalSim-Euclid-Like/blob/main/examples/end_to_end_demo.py"><code class="file docutils literal notranslate"><span class="pre">end_to_end_demo.py</span> </code></a></p>
+<p>This first demo is the euclidlike-equivalent of  <a class="reference external" href="https://github.com/GalSim-developers/GalSim/blob/main/examples/demo13.py">demo13</a> in <code class="docutils literal notranslate"><span class="pre">GalSim</span></code>. This demo uses the Euclid-like PSF, WCS, and background noise to produce a realistic scene of galaxies and stars as observed from a Euclid-like Telescope.</p>
+<p><strong>Features introduced in the Python file</strong>:</p>
+<ul class="simple">
+<li><p>euclidlike.getBandpasses(AB_zeropoint)</p></li>
+<li><p>euclidlike.getWCS(world_pos, CCDs_CCD, date)</p></li>
+<li><p>euclidlike.getPSF(use_CCD, filter_name, wcs)</p></li>
+<li><p>euclidlike.getSkyLevel(bandpass, world_pos)</p></li>
+</ul>
+<p>The output generated from this file can be visualized by running the script <a class="reference external" href="https://github.com/GalSim-developers/GalSim-Euclid-Like/blob/main/examples/plot_VIS.py"><code class="file docutils literal notranslate"><span class="pre">plot_VIS.py</span> </code></a>.</p>
+</section>
+<section id="focal-plane-layout">
+<h2>Focal Plane Layout<a class="headerlink" href="#focal-plane-layout" title="Link to this heading"></a></h2>
+<p><a class="reference external" href="https://github.com/GalSim-developers/GalSim-Euclid-Like/blob/main/examples/focal_plane_layout.ipynb"><code class="file docutils literal notranslate"><span class="pre">focal_plane_layout.ipynb</span> </code></a></p>
+<p>This Jupyter Notebook shows the display of the focal plane used in the euclidlike package, along with the CCD centers and ID convention.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="euclidlike_imsim.html" class="btn btn-neutral float-left" title="The Euclid-like ImSim Module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="history.html" class="btn btn-neutral float-right" title="Revision History" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Rachel Mandelbaum, Axel Guinot, Federico Berlfein, Andy Park, Xiangchong Li, Michael Troxel, Tianqing Zhang.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
