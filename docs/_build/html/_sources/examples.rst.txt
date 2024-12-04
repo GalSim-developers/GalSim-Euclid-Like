@@ -8,9 +8,9 @@ End-to-end demo
 
 :gh-link:`end_to_end_demo.py <examples/end_to_end_demo.py>`
 
-This first demo is the euclidlike-equivalent of  _`demo 13 <https://github.com/GalSim-developers/GalSim/blob/main/examples/demo13.py>`_ in ``GalSim``. This demo uses the Euclid-like PSF, WCS, and background noise to produce a realistic scene of galaxies and stars as observed from a Euclid-like Telescope. 
+This first demo is the euclidlike-equivalent of  `demo13 <https://github.com/GalSim-developers/GalSim/blob/main/examples/demo13.py>`_ in ``GalSim``. This demo uses the Euclid-like PSF, WCS, and background noise to produce a realistic scene of galaxies and stars as observed from a Euclid-like Telescope. 
 
-** Features introduced in the Python file**:
+**Features introduced in the Python file**:
 
 - euclidlike.getBandpasses(AB_zeropoint)
 - euclidlike.getWCS(world_pos, CCDs_CCD, date)
