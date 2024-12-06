@@ -9,10 +9,13 @@ def getSkyLevel(bandpass, world_pos=None, exptime=None, epoch=2025, date=None):
     Get the expected sky level for a Euclid observation due to zodiacal light for this bandpass
     and position.
 
-    This routine can take an arbitray galsim.Bandpass() and calculate the zodiacal background
+    This routine can take an arbitrary galsim.Bandpass() and calculate the zodiacal background
     directly.  This is approximately 3x slower than using lookup tables.
 
-    The numbers that are returned are in units of e-/arcsec^2.  The result can either be multiplied
+    This routine starts by calling another routine to get the zodiacal background in
+    photons/m^2/arcsec^2/sec.  After multiplying by the collecting area in m^2 and exposure time in sec,
+    while using a bandpass including the quantum efficiency (to go from photons to electrons), 
+    the numbers that are returned are in units of e-/arcsec^2.  The result can either be multiplied
     by the approximate pixel area to get e-/pix, or the result can be used with wcs.makeSkyImage()
     to make an image of the sky that properly includes the actual pixel area as a function of
     position on the detector.
@@ -75,11 +78,9 @@ def getSkyLevel(bandpass, world_pos=None, exptime=None, epoch=2025, date=None):
                                 bandpass.func(bandpass.wave_list))
     
     # Now, convert to the right units, and return.  (See docstring for explanation.)
-    # Multiply by exposure time.
-    from . import gain
+    # Multiply by exposure time, collecting area in m^2
     from . import collecting_area
     sky_val *= exptime
-    sky_val *= gain
     sky_val *= collecting_area/1e4
 
     # The result is now the sky level in e-/arcsec^2.

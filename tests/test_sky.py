@@ -22,7 +22,7 @@ def test_sky():
         sky2 = galsim.roman.getSkyLevel(galsim.roman.getBandpasses()['H158'], world_pos=galsim_pos,
                                  exptime=euclidlike.long_exptime)
         # correct galsim.roman outputs to Euclid-like scenario
-        sky2 *= euclidlike.collecting_area/galsim.roman.collecting_area*euclidlike.gain
+        sky2 *= euclidlike.collecting_area/galsim.roman.collecting_area
         fracdiff = (sky2-sky1)/sky1
         np.testing.assert_almost_equal(fracdiff, 0, 3)
     return
