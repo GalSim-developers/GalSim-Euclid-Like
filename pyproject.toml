@@ -43,3 +43,4 @@ include-package-data = true
 
 [project.scripts]
 euclidlike_download_psf = "scripts.download_psf:run_main"
+euclidlike_make_obseq = "scripts.make_obseq:run_main"
