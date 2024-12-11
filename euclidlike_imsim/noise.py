@@ -46,7 +46,7 @@ def get_noise(cfg_noise, cfg_image, base, logger):
     Parameters:
         cfg_noise (dict): Configuration dictionary for noise parameters.
 
-    NOTE on the quantization: This prevent to have problems due to the rounding.
+    NOTE on the quantization: This prevents problems due to the rounding.
     For example, given the very low amplitude of the sky background, we can have
     spatial variations of only ~1 ADU. This will be impossible to properly pick
     up by tools SExtractor. Adding this noise prvent this problem and do not
