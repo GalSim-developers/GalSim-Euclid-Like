@@ -1,3 +1,19 @@
+"""
+This script processes Euclid observation sequence XML file and convert it into
+a pandas DataFrame.
+It handle the conversion from ecliptic coordinates (from EC) to equatorial.
+The dates of the observations are derived from Figure 4.4 of MOCDC_v4.2
+(https://euclid.roe.ac.uk/dmsf/files/20821/view  EC only).
+
+NOTE: The true observation date is shifted by 6 years to match the current
+Roman/Rubin simulations. That allows us to inlucde transients.
+
+NOTE 2: This observation sequence has been made from the `rsd2024a` 
+https://euclid.roe.ac.uk/dmsf/files/20839/view (EC only).
+
+To run the script run the command:
+    python make_obseq.py <path_to_xml_file>
+"""
 import os
 import sys
 from tqdm import tqdm
@@ -25,7 +41,7 @@ def s2days(s):
     return s / 86400.
 
 
-def convert_ecliptic_to_equatorial(elon, elat, epa=None):
+def convert_ecliptic_to_equatorial(elon, elat, epa):
     """ Transform coordinate frame.
 
     Parameters
@@ -76,7 +92,7 @@ NISP_exp_eff = nisp_exptime_eff
 NISP_exp_wait = NISP_exp_int - NISP_exp_eff
 
 # Figure 4.4 of MOCDC_v4.2
-# https://euclid.roe.ac.uk/dmsf/files/20821/view
+# https://euclid.roe.ac.uk/dmsf/files/20821/view (EC only)
 dither_seq = {
     0: {
         "VIS": [
