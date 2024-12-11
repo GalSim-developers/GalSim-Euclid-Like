@@ -50,7 +50,7 @@ def get_noise(cfg_noise, cfg_image, base, logger):
     For example, given the very low amplitude of the sky background, we can have
     spatial variations of only ~1 ADU. This will be impossible to properly pick
     up by tools like SExtractor. Adding this noise prevents this problem and does not
-    change the signal in the image. This is discuss in [Cuillandre et al. 2025](https://arxiv.org/abs/2405.13496)
+    change the signal in the image. This is discussed in [Cuillandre et al. 2025](https://arxiv.org/abs/2405.13496)
     Sect. 4.2.7.
     """
 
