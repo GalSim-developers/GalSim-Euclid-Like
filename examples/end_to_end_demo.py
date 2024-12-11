@@ -402,7 +402,7 @@ def main(argv):
         # Here we add quantization noise to the image. This prevent to have problems due
         # to the rounding. For example, given the very low amplitude of the sky background,
         # we can have spatial variations of only ~1 ADU. This will be impossible to 
-        # properly pick up by tools SExtractor. Adding this noise prvent this problem
+        # properly pick up by tools like SExtractor. Adding this noise prevents this problem
         # and does not change the signal in the image.
         quantization_noise = full_image.copy()
         quantization_noise.fill(0)
