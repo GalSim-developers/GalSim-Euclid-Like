@@ -6,7 +6,7 @@ The dates of the observations are derived from Figure 4.4 of MOCDC_v4.2
 (https://euclid.roe.ac.uk/dmsf/files/20821/view  EC only).
 
 NOTE: The true observation date is shifted by 6 years to match the current
-Roman/Rubin simulations. That allows us to inlucde transients.
+Roman/Rubin simulations. That allows us to include transients.
 
 NOTE 2: This observation sequence has been made from the `rsd2024a` 
 https://euclid.roe.ac.uk/dmsf/files/20839/view (EC only).
