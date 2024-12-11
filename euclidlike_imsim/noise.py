@@ -98,7 +98,7 @@ def get_noise(cfg_noise, cfg_image, base, logger):
     noise_img.quantize()
 
     # Add quantization noise (this avoid issues related to rounding e.g.
-    # backgroud estimation)
+    # background estimation)
     quantization_noise = noise_img.copy()
     quantization_noise.fill(0)
     quantization_noise.addNoise(galsim.DeviateNoise(galsim.UniformDeviate(rng)))
