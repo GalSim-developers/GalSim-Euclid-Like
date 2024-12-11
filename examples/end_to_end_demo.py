@@ -395,7 +395,7 @@ def main(argv):
 
         # Finally, the analog-to-digital converter reads in an integer value.
         full_image.quantize()
-        # sky_image.quantize() # Quantizinf the background will actually lead to some issues.
+        # sky_image.quantize() # Quantizing the background will actually lead to some issues.
         # Note that the image type after this step is still a float.  If we want to actually
         # get integer values, we can do new_img = galsim.Image(full_image, dtype=int)
 
