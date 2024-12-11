@@ -85,15 +85,17 @@ image:
     # is even more pronounced in this case.
     draw_method: 'auto'
 
-    # These are all by default turned on, but you can turn any of them off if desired:
-    ignore_noise: False
-    stray_light: False
-    thermal_background: False
-    reciprocity_failure: False
-    dark_current: False
-    nonlinearity: False
-    ipc: False
+    # If "use_noise" is False, none of the noise sources will be added to the image.
+    # If "use_noise" is True, it will add sky background and associated noise.
+    use_noise: True
+    # stray_light: False          # Not yet implemented
+    # thermal_background: False   # Not yet implemented
+    # reciprocity_failure: False  # Not yet implemented
+    # dark_current: False         # Not yet implemented
+    # nonlinearity: False         # Not yet implemented
+    # ipc: False                  # Not yet implemented
     read_noise: True
+    quantization_noise: True
     sky_subtract: False
 
     # nobjects: 1

@@ -14,7 +14,7 @@ stray_light_fraction = 0.
 dark_current = 0.
 
 cfg_noise_key = [
-    "ignore_noise",
+    "use_noise",
     "stray_light",
     "thermal_background",
     "reciprocity_failure",
@@ -22,6 +22,7 @@ cfg_noise_key = [
     "nonlinearity",
     "ipc",
     "read_noise",
+    "quantization_noise",
     "sky_subtract",
 ]
 
@@ -39,6 +40,19 @@ def parse_noise_config(params):
 
 
 def get_noise(cfg_noise, cfg_image, base, logger):
+    """
+    Generate and apply noise to an image based on the provided configuration.
+
+    Parameters:
+        cfg_noise (dict): Configuration dictionary for noise parameters.
+
+    NOTE on the quantization: This prevents problems due to the rounding.
+    For example, given the very low amplitude of the sky background, we can have
+    spatial variations of only ~1 ADU. This will be impossible to properly pick
+    up by tools like SExtractor. Adding this noise prevents this problem and does not
+    change the signal in the image. This is discussed in [Cuillandre et al. 2025](https://arxiv.org/abs/2405.13496)
+    Sect. 4.2.7.
+    """
 
     noise_img = base["current_image"].copy()
     noise_img.fill(0)
@@ -97,8 +111,16 @@ def get_noise(cfg_noise, cfg_image, base, logger):
     # Make integer ADU now.
     noise_img.quantize()
 
+    # Add quantization noise (this avoid issues related to rounding e.g.
+    # background estimation)
+    if cfg_noise["quantization_noise"]:
+        quantization_noise = noise_img.copy()
+        quantization_noise.fill(0)
+        quantization_noise.addNoise(galsim.DeviateNoise(galsim.UniformDeviate(rng)))
+        noise_img += quantization_noise
+        noise_img -= 0.5
+
     sky_image /= gain
-    sky_image.quantize()
 
     base["noise_image"] = noise_img
     base["sky_image"] = sky_image
@@ -142,7 +164,7 @@ class NoiseImageBuilder(galsim.config.ExtraOutputBuilder):
         self.final_data = None
 
     def _check_input(self):
-        if self.cfg_noise["ignore_noise"]:
+        if not self.cfg_noise["use_noise"]:
             raise GalSimConfigError(
                 "You cannot ignore the noise and request the noise image at the same time."
                 " Either active the noise or remove the output noise image."
@@ -181,7 +203,7 @@ class NoiseImageBuilder(galsim.config.ExtraOutputBuilder):
 class SkyImageBuilder(NoiseImageBuilder):
 
     def _check_input(self):
-        if self.cfg_noise["ignore_noise"]:
+        if not self.cfg_noise["use_noise"]:
             raise GalSimConfigError(
                 "You cannot ignore the noise and request the sky image at the same time."
                 " Either activate the noise or remove the output sky image."
@@ -213,7 +235,7 @@ class SkyImageBuilder(NoiseImageBuilder):
 class WeightImageBuilder(NoiseImageBuilder):
 
     def _check_input(self):
-        if self.cfg_noise["ignore_noise"]:
+        if not self.cfg_noise["use_noise"]:
             raise GalSimConfigError(
                 "You cannot ignore the noise and request the weight image at the same time."
                 " Either activate the noise or remove the output sky image."

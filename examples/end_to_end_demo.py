@@ -395,9 +395,20 @@ def main(argv):
 
         # Finally, the analog-to-digital converter reads in an integer value.
         full_image.quantize()
-        sky_image.quantize()
+        # sky_image.quantize() # Quantizing the background will actually lead to some issues.
         # Note that the image type after this step is still a float.  If we want to actually
         # get integer values, we can do new_img = galsim.Image(full_image, dtype=int)
+
+        # Here we add quantization noise to the image. This prevent to have problems due
+        # to the rounding. For example, given the very low amplitude of the sky background,
+        # we can have spatial variations of only ~1 ADU. This will be impossible to 
+        # properly pick up by tools like SExtractor. Adding this noise prevents this problem
+        # and does not change the signal in the image.
+        quantization_noise = full_image.copy()
+        quantization_noise.fill(0)
+        quantization_noise.addNoise(galsim.DeviateNoise(galsim.UniformDeviate(image_rng)))
+        full_image += quantization_noise
+        full_image -= 0.5
 
         # Since many people are used to viewing background-subtracted images, we provide a
         # version with the background subtracted (also rounding that to an int).
