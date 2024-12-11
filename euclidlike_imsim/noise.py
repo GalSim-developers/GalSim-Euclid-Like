@@ -97,8 +97,15 @@ def get_noise(cfg_noise, cfg_image, base, logger):
     # Make integer ADU now.
     noise_img.quantize()
 
+    # Add quantization noise (this avoid issues related to rounding e.g.
+    # backgroud estimation)
+    quantization_noise = noise_img.copy()
+    quantization_noise.fill(0)
+    quantization_noise.addNoise(galsim.DeviateNoise(galsim.UniformDeviate(rng)))
+    noise_img += quantization_noise
+    noise_img -= 0.5
+
     sky_image /= gain
-    sky_image.quantize()
 
     base["noise_image"] = noise_img
     base["sky_image"] = sky_image
