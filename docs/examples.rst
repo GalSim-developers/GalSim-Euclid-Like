@@ -1,9 +1,9 @@
 Examples
-=========
+========
 
 The ``GalSim-Euclid-Like/examples`` directory contains example files for how use the euclidlike module.  
 
-End-to-end demo 
+End-to-end demo
 ---------------
 
 :gh-link:`end_to_end_demo.py <examples/end_to_end_demo.py>`
@@ -20,7 +20,7 @@ This first demo is the euclidlike-equivalent of  `demo13 <https://github.com/Gal
 The output generated from this file can be visualized by running the script :gh-link:`plot_VIS.py <examples/plot_VIS.py>`.
 
 
-Focal Plane Layout 
+Focal Plane Layout
 ------------------
 :gh-link:`focal_plane_layout.ipynb <examples/focal_plane_layout.ipynb>`
 
