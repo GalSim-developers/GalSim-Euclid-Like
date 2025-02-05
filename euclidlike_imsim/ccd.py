@@ -13,7 +13,6 @@ from .noise import cfg_noise_key, parse_noise_config, get_noise
 
 
 class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
-
     def setup(self, config, base, image_num, obj_num, ignore, logger):
         """Do the initialization and setup for building the image.
 
@@ -105,7 +104,9 @@ class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
         full_image.header = galsim.FitsHeader()
         full_image.header["EXPTIME"] = self.exptime
         full_image.header["MJD-OBS"] = self.mjd
-        full_image.header["DATE-OBS"] = str(Time(self.mjd, format="mjd").datetime)
+        full_image.header["DATE-OBS"] = str(
+            Time(self.mjd, format="mjd").datetime
+        )
         full_image.header["FILTER"] = self.filter
         full_image.header["GAIN"] = gain
         full_image.header["ZPTMAG"] = 2.5 * np.log10(
@@ -146,7 +147,11 @@ class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
                     end_obj_num,
                 )
             stamps, current_vars = galsim.config.BuildStamps(
-                nobj_batch, base, logger=logger, obj_num=start_obj_num, do_noise=False
+                nobj_batch,
+                base,
+                logger=logger,
+                obj_num=start_obj_num,
+                do_noise=False,
             )
             base["index_key"] = "image_num"
 
@@ -162,7 +167,9 @@ class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
                     continue
 
                 logger.debug(
-                    "image %d: full bounds = %s", image_num, str(full_image.bounds)
+                    "image %d: full bounds = %s",
+                    image_num,
+                    str(full_image.bounds),
                 )
                 logger.debug(
                     "image %d: stamp %d bounds = %s",
@@ -176,7 +183,9 @@ class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
 
         return full_image, None
 
-    def addNoise(self, image, config, base, image_num, obj_num, current_var, logger):
+    def addNoise(
+        self, image, config, base, image_num, obj_num, current_var, logger
+    ):
         """Add the final noise to a Scattered image
 
         Parameters:
@@ -189,7 +198,7 @@ class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
             logger:         If given, a logger object to log progress.
         """
         # check ignore noise
-        if self.cfg_noise["ignore_noise"]:
+        if not self.cfg_noise["use_noise"]:
             return
 
         if "noise_image" not in base.keys():
@@ -200,13 +209,13 @@ class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
         image.quantize()
 
         image += base["noise_image"]
-        
+
         # Apply saturation
-        saturation_ADU = np.round(saturation/gain)
+        saturation_ADU = np.round(saturation / gain)
         mask_saturated = image.array > saturation_ADU
         base["saturated_mask"] = mask_saturated
         image.array[mask_saturated] = saturation_ADU
-        
+
         if self.cfg_noise["sky_subtract"]:
             image -= base["sky_image"]
 
