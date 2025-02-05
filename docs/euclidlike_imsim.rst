@@ -1,11 +1,11 @@
 The Euclid-like ImSim Module
-################################
+############################
 
 This module contains configuration scripts to produce large-scale Euclid-like simulation runs based on the information in ``euclidlike``.
 It is based heavily on `roman_imsim <https://github.com/matroxel/roman_imsim>`_.
 
 API
-=====================
+===
 
 .. automodule:: euclidlike_imsim.bandpass
    :members:
@@ -57,7 +57,7 @@ API
 
 
 Use
-====
+===
 Example files needed for large-scale Euclid-like simulation runs are included in ``GalSim-Euclid-Like/config``.
 
 .. include:: ../config/README.rst
