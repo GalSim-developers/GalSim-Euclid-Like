@@ -14,7 +14,7 @@ GalSim-Euclid-Like requires ``python>=3.10`` and the following dependencies::
     galsim>=2.6,
     astropy>=2.0
                                                                               
-Instal the code
+Install the code
 ---------------
 
 The source code for GalSim-Euclid-Like has not been published to pypi. To install from source code::
