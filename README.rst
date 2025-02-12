@@ -24,7 +24,7 @@ This repository includes two distinct packages:
 
 
 References
-==================
+==========
 
 For more information about `GalSim <https://github.com/GalSim-developers/GalSim>`_, please see its README and documentation.
 
@@ -33,7 +33,7 @@ For more information about Euclid, please see the `Euclid Consortium website <ht
 Attribution for software and data used by particular routines in this library is given in the docstring for the relevant routine.
 
 Installation
-==================
+============
 
 The source code for GalSim-Euclid-Like has not been published to pypi. To install from source code::
 
@@ -49,7 +49,7 @@ and install by running::
 Please view the `Installation Instructions` (in INSTALL.rst) for further details on how to install GalSim-Euclid-Like.
 
 Downloading relevant data
-==================                                                                              
+=========================
 The Euclid-like PSF is constructed from precomputed oversampled images on a grid in focal plane position and wavelength. To use the full FOV PSF within GalSim-Euclid-Like, the images must be downloaded by running::
 
     $ euclidlike_download_psf
@@ -57,16 +57,16 @@ The Euclid-like PSF is constructed from precomputed oversampled images on a grid
 in the terminal after installation of GalSim-Euclid-Like. To install in an alternative directory to the default, use the ``--dir`` argument. Refer to the ``getPSF`` documentation for further details about the PSF. 
 
 Getting started
-==================                                                                             
+===============
 
 Please see the examples/ directory for demos illustrating the use of this code.
 
 Communicating with the developers
-==================
+=================================
 Feel free to `open a GitHub issue <https://github.com/GalSim-developers/GalSim-Euclid-Like/issues>`_ to reach the developers with questions, comments, and bug reports.  New contributors are also welcome and can indicate their interest in developing this code base through the Issues.
 
 Attribution
-==================                                   
+===========
 
 This software is open source and may be used according to the terms of its `license <https://github.com/GalSim-developers/GalSim-Euclid-Like/blob/main/LICENSE>`_.
 

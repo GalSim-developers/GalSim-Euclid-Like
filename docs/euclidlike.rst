@@ -1,5 +1,5 @@
 The Euclid-like Module
-################################
+######################
 
 The ``euclidlike`` module contains telescope information and functionality needed for image simulations.
 The demo script end_to_end_demo.py shows how to use many of the atrributes and functions described here.
