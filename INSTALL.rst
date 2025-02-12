@@ -38,7 +38,7 @@ GalSim-Euclid-Like ImSim dependencies
 -------------------------------------
 
 To use the euclidlike_imsim package part of GalSim-Euclid-Like, other dependencies are required.
-Firts, `LSST Science pipelines <https://pipelines.lsst.io/index.html#>`_ need to be installed. The easiest way to install it (on Linux distribution) is using Stackvana as follow. For more options, we reffer to the `installation instructions <https://pipelines.lsst.io/index.html#installation>`_::
+First, the `LSST Science pipelines <https://pipelines.lsst.io/index.html#>`_ need to be installed. The easiest way to install it (on Linux distribution) is using Stackvana as follow. For more options, we refer to the `installation instructions <https://pipelines.lsst.io/index.html#installation>`_::
 
     conda install stackvana
 
