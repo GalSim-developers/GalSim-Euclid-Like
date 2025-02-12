@@ -54,7 +54,7 @@ or::
 
     pip install dust_extinction
 
-Extra files are also required, they can be dowload following the instructions `here <https://lsstdesc.org/imSim/install.html#install-needed-data-files>`_. The path to those files need to be set in a environment variable::
+Extra files are also required, they can be downloaded following the instructions `here <https://lsstdesc.org/imSim/install.html#install-needed-data-files>`_. The path to those files needs to be set in a environment variable::
 
     export SIMS_SED_LIBRARY_DIR=path/to/rubin_sim_data/sims_sed_library
 
