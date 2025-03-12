@@ -7,7 +7,7 @@ When editing this file, you should also modify the imports in __init__.py
 import galsim
 
 # Set these quantities
-gain = 3.4  # e-/ADU, https://www.euclid-ec.org/public/mission/vis/
+gain = 3.48  # e-/ADU, https://www.euclid-ec.org/public/mission/vis/
 pixel_scale = 0.1  # arcsec / pixel
 diameter = 1.2  # meters
 obscuration = 0.42  # meters, inferred from diameter and collecting area
