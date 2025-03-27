@@ -16,6 +16,8 @@ class Euclidlike_stamp(StampBuilder):
 
     It uses the regular Basic functions for most things.
     It specializes the quickSkip, buildProfile, and draw methods.
+    Note that the flux used throughout this class is not equal to the flux from
+    the truth catalogs, but rather the true flux times the exposure time and collecting area.
     """
     _trivial_sed = galsim.SED(
         galsim.LookupTable(
