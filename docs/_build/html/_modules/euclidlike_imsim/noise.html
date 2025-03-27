@@ -13,7 +13,7 @@
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=39bb1c6d"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -89,7 +89,7 @@
 <span class="n">dark_current</span> <span class="o">=</span> <span class="mf">0.</span>
 
 <span class="n">cfg_noise_key</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;ignore_noise&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;use_noise&quot;</span><span class="p">,</span>
     <span class="s2">&quot;stray_light&quot;</span><span class="p">,</span>
     <span class="s2">&quot;thermal_background&quot;</span><span class="p">,</span>
     <span class="s2">&quot;reciprocity_failure&quot;</span><span class="p">,</span>
@@ -97,6 +97,7 @@
     <span class="s2">&quot;nonlinearity&quot;</span><span class="p">,</span>
     <span class="s2">&quot;ipc&quot;</span><span class="p">,</span>
     <span class="s2">&quot;read_noise&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;quantization_noise&quot;</span><span class="p">,</span>
     <span class="s2">&quot;sky_subtract&quot;</span><span class="p">,</span>
 <span class="p">]</span>
 
@@ -119,6 +120,19 @@
 <div class="viewcode-block" id="get_noise">
 <a class="viewcode-back" href="../../euclidlike_imsim.html#euclidlike_imsim.noise.get_noise">[docs]</a>
 <span class="k">def</span> <span class="nf">get_noise</span><span class="p">(</span><span class="n">cfg_noise</span><span class="p">,</span> <span class="n">cfg_image</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate and apply noise to an image based on the provided configuration.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        cfg_noise (dict): Configuration dictionary for noise parameters.</span>
+
+<span class="sd">    NOTE on the quantization: This prevents problems due to the rounding.</span>
+<span class="sd">    For example, given the very low amplitude of the sky background, we can have</span>
+<span class="sd">    spatial variations of only ~1 ADU. This will be impossible to properly pick</span>
+<span class="sd">    up by tools like SExtractor. Adding this noise prevents this problem and does not</span>
+<span class="sd">    change the signal in the image. This is discussed in [Cuillandre et al. 2025](https://arxiv.org/abs/2405.13496)</span>
+<span class="sd">    Sect. 4.2.7.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">noise_img</span> <span class="o">=</span> <span class="n">base</span><span class="p">[</span><span class="s2">&quot;current_image&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">noise_img</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -177,8 +191,16 @@
     <span class="c1"># Make integer ADU now.</span>
     <span class="n">noise_img</span><span class="o">.</span><span class="n">quantize</span><span class="p">()</span>
 
+    <span class="c1"># Add quantization noise (this avoid issues related to rounding e.g.</span>
+    <span class="c1"># background estimation)</span>
+    <span class="k">if</span> <span class="n">cfg_noise</span><span class="p">[</span><span class="s2">&quot;quantization_noise&quot;</span><span class="p">]:</span>
+        <span class="n">quantization_noise</span> <span class="o">=</span> <span class="n">noise_img</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">quantization_noise</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">quantization_noise</span><span class="o">.</span><span class="n">addNoise</span><span class="p">(</span><span class="n">galsim</span><span class="o">.</span><span class="n">DeviateNoise</span><span class="p">(</span><span class="n">galsim</span><span class="o">.</span><span class="n">UniformDeviate</span><span class="p">(</span><span class="n">rng</span><span class="p">)))</span>
+        <span class="n">noise_img</span> <span class="o">+=</span> <span class="n">quantization_noise</span>
+        <span class="n">noise_img</span> <span class="o">-=</span> <span class="mf">0.5</span>
+
     <span class="n">sky_image</span> <span class="o">/=</span> <span class="n">gain</span>
-    <span class="n">sky_image</span><span class="o">.</span><span class="n">quantize</span><span class="p">()</span>
 
     <span class="n">base</span><span class="p">[</span><span class="s2">&quot;noise_image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">noise_img</span>
     <span class="n">base</span><span class="p">[</span><span class="s2">&quot;sky_image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sky_image</span></div>
@@ -228,7 +250,7 @@
 
 
     <span class="k">def</span> <span class="nf">_check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg_noise</span><span class="p">[</span><span class="s2">&quot;ignore_noise&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg_noise</span><span class="p">[</span><span class="s2">&quot;use_noise&quot;</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="n">GalSimConfigError</span><span class="p">(</span>
                 <span class="s2">&quot;You cannot ignore the noise and request the noise image at the same time.&quot;</span>
                 <span class="s2">&quot; Either active the noise or remove the output noise image.&quot;</span>
@@ -273,7 +295,7 @@
 <span class="k">class</span> <span class="nc">SkyImageBuilder</span><span class="p">(</span><span class="n">NoiseImageBuilder</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="nf">_check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg_noise</span><span class="p">[</span><span class="s2">&quot;ignore_noise&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg_noise</span><span class="p">[</span><span class="s2">&quot;use_noise&quot;</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="n">GalSimConfigError</span><span class="p">(</span>
                 <span class="s2">&quot;You cannot ignore the noise and request the sky image at the same time.&quot;</span>
                 <span class="s2">&quot; Either activate the noise or remove the output sky image.&quot;</span>
@@ -311,7 +333,7 @@
 <span class="k">class</span> <span class="nc">WeightImageBuilder</span><span class="p">(</span><span class="n">NoiseImageBuilder</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="nf">_check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg_noise</span><span class="p">[</span><span class="s2">&quot;ignore_noise&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg_noise</span><span class="p">[</span><span class="s2">&quot;use_noise&quot;</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="n">GalSimConfigError</span><span class="p">(</span>
                 <span class="s2">&quot;You cannot ignore the noise and request the weight image at the same time.&quot;</span>
                 <span class="s2">&quot; Either activate the noise or remove the output sky image.&quot;</span>
