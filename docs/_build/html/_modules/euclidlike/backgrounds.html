@@ -13,7 +13,7 @@
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=39bb1c6d"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -86,10 +86,13 @@
 <span class="sd">    Get the expected sky level for a Euclid observation due to zodiacal light for this bandpass</span>
 <span class="sd">    and position.</span>
 
-<span class="sd">    This routine can take an arbitray galsim.Bandpass() and calculate the zodiacal background</span>
+<span class="sd">    This routine can take an arbitrary galsim.Bandpass() and calculate the zodiacal background</span>
 <span class="sd">    directly.  This is approximately 3x slower than using lookup tables.</span>
 
-<span class="sd">    The numbers that are returned are in units of e-/arcsec^2.  The result can either be multiplied</span>
+<span class="sd">    This routine starts by calling another routine to get the zodiacal background in</span>
+<span class="sd">    photons/m^2/arcsec^2/sec.  After multiplying by the collecting area in m^2 and exposure time in sec,</span>
+<span class="sd">    while using a bandpass including the quantum efficiency (to go from photons to electrons), </span>
+<span class="sd">    the numbers that are returned are in units of e-/arcsec^2.  The result can either be multiplied</span>
 <span class="sd">    by the approximate pixel area to get e-/pix, or the result can be used with wcs.makeSkyImage()</span>
 <span class="sd">    to make an image of the sky that properly includes the actual pixel area as a function of</span>
 <span class="sd">    position on the detector.</span>
@@ -152,11 +155,9 @@
                                 <span class="n">bandpass</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">bandpass</span><span class="o">.</span><span class="n">wave_list</span><span class="p">))</span>
     
     <span class="c1"># Now, convert to the right units, and return.  (See docstring for explanation.)</span>
-    <span class="c1"># Multiply by exposure time.</span>
-    <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">gain</span>
+    <span class="c1"># Multiply by exposure time, collecting area in m^2</span>
     <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">collecting_area</span>
     <span class="n">sky_val</span> <span class="o">*=</span> <span class="n">exptime</span>
-    <span class="n">sky_val</span> <span class="o">*=</span> <span class="n">gain</span>
     <span class="n">sky_val</span> <span class="o">*=</span> <span class="n">collecting_area</span><span class="o">/</span><span class="mf">1e4</span>
 
     <span class="c1"># The result is now the sky level in e-/arcsec^2.</span>

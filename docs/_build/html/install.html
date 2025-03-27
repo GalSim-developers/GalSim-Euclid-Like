@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Installation &mdash; GalSim-Euclid-Like 0.9.0 documentation</title>
@@ -14,7 +14,7 @@
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=39bb1c6d"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -47,7 +47,8 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#installation-instructions">Installation Instructions</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#dependencies">Dependencies</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id1">Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#install-the-code">Install the code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#galsim-euclid-like-imsim-dependencies">GalSim-Euclid-Like ImSim dependencies</a></li>
 </ul>
 </li>
 </ul>
@@ -98,8 +99,8 @@ further details on system requirements for GalSim see <a class="reference extern
 </pre></div>
 </div>
 </section>
-<section id="id1">
-<h3>Installation<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<section id="install-the-code">
+<h3>Install the code<a class="headerlink" href="#install-the-code" title="Link to this heading"></a></h3>
 <p>The source code for GalSim-Euclid-Like has not been published to pypi. To install from source code:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="p">:</span><span class="n">GalSim</span><span class="o">-</span><span class="n">developers</span><span class="o">/</span><span class="n">GalSim</span><span class="o">-</span><span class="n">Euclid</span><span class="o">-</span><span class="n">Like</span><span class="o">.</span><span class="n">git</span>
 </pre></div>
@@ -115,6 +116,34 @@ further details on system requirements for GalSim see <a class="reference extern
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python
 &gt;&gt;&gt; import euclidlike
 &gt;&gt;&gt; euclidlike.getBandpasses()
+</pre></div>
+</div>
+</section>
+<section id="galsim-euclid-like-imsim-dependencies">
+<h3>GalSim-Euclid-Like ImSim dependencies<a class="headerlink" href="#galsim-euclid-like-imsim-dependencies" title="Link to this heading"></a></h3>
+<p>To use the euclidlike_imsim package part of GalSim-Euclid-Like, other dependencies are required.
+First, the <a class="reference external" href="https://pipelines.lsst.io/index.html#">LSST Science pipelines</a> need to be installed. The easiest way to install it (on Linux distribution) is using Stackvana as follow. For more options, we refer to the <a class="reference external" href="https://pipelines.lsst.io/index.html#installation">installation instructions</a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="n">stackvana</span>
+</pre></div>
+</div>
+<p>In addition to the LSST Science pipelines, the <a class="reference external" href="https://lsstdesc.org/skyCatalogs/">SkyCatalogs</a> needs to be installed from an independent fork to make use of the Euclid photometry. This can be achieve by running the command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">git</span><span class="o">+</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">aguinot</span><span class="o">/</span><span class="n">skyCatalogs</span><span class="o">.</span><span class="n">git</span><span class="nd">@euclid_band</span>
+</pre></div>
+</div>
+<p>SkyCatalogs requires other dependencies:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">c</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span> <span class="n">dust_extinction</span>
+</pre></div>
+</div>
+<p>or:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">dust_extinction</span>
+</pre></div>
+</div>
+<p>Extra files are also required, they can be downloaded following the instructions <a class="reference external" href="https://lsstdesc.org/imSim/install.html#install-needed-data-files">here</a>. The path to those files needs to be set in a environment variable:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">SIMS_SED_LIBRARY_DIR</span><span class="o">=</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">rubin_sim_data</span><span class="o">/</span><span class="n">sims_sed_library</span>
+</pre></div>
+</div>
+<p>In a conda environment it is possible to automatically set environment variable upon environment activation by doing:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">env</span> <span class="n">config</span> <span class="nb">vars</span> <span class="nb">set</span> <span class="n">SIMS_SED_LIBRARY_DIR</span><span class="o">=</span><span class="s2">&quot;path/to/rubin_sim_data/sims_sed_library&quot;</span>
 </pre></div>
 </div>
 </section>

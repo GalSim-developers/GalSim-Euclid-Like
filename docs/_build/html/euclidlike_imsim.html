@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>The Euclid-like ImSim Module &mdash; GalSim-Euclid-Like 0.9.0 documentation</title>
@@ -14,7 +14,7 @@
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=39bb1c6d"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -377,7 +377,19 @@ goes up to nimages-1.</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="euclidlike_imsim.noise.get_noise">
 <span class="sig-prename descclassname"><span class="pre">euclidlike_imsim.noise.</span></span><span class="sig-name descname"><span class="pre">get_noise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg_noise</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg_image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike_imsim/noise.html#get_noise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike_imsim.noise.get_noise" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Generate and apply noise to an image based on the provided configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cfg_noise</strong> (<em>dict</em>) – Configuration dictionary for noise parameters.</p>
+</dd>
+</dl>
+<p>NOTE on the quantization: This prevents problems due to the rounding.
+For example, given the very low amplitude of the sky background, we can have
+spatial variations of only ~1 ADU. This will be impossible to properly pick
+up by tools like SExtractor. Adding this noise prevents this problem and does not
+change the signal in the image. This is discussed in [Cuillandre et al. 2025](<a class="reference external" href="https://arxiv.org/abs/2405.13496">https://arxiv.org/abs/2405.13496</a>)
+Sect. 4.2.7.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="euclidlike_imsim.noise.parse_noise_config">

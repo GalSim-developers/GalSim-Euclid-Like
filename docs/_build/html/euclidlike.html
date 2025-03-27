@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>The Euclid-like Module &mdash; GalSim-Euclid-Like 0.9.0 documentation</title>
@@ -14,7 +14,7 @@
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=39bb1c6d"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -229,9 +229,12 @@ calculations. [default: False]</p></li>
 <span class="sig-prename descclassname"><span class="pre">euclidlike.</span></span><span class="sig-name descname"><span class="pre">getSkyLevel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bandpass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">world_pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exptime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2025</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/euclidlike/backgrounds.html#getSkyLevel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#euclidlike.getSkyLevel" title="Link to this definition"></a></dt>
 <dd><p>Get the expected sky level for a Euclid observation due to zodiacal light for this bandpass
 and position.</p>
-<p>This routine can take an arbitray galsim.Bandpass() and calculate the zodiacal background
+<p>This routine can take an arbitrary galsim.Bandpass() and calculate the zodiacal background
 directly.  This is approximately 3x slower than using lookup tables.</p>
-<p>The numbers that are returned are in units of e-/arcsec^2.  The result can either be multiplied
+<p>This routine starts by calling another routine to get the zodiacal background in
+photons/m^2/arcsec^2/sec.  After multiplying by the collecting area in m^2 and exposure time in sec,
+while using a bandpass including the quantum efficiency (to go from photons to electrons),
+the numbers that are returned are in units of e-/arcsec^2.  The result can either be multiplied
 by the approximate pixel area to get e-/pix, or the result can be used with wcs.makeSkyImage()
 to make an image of the sky that properly includes the actual pixel area as a function of
 position on the detector.</p>
@@ -335,7 +338,11 @@ internally.</p>
 <p>In addition, the provided PSF images are normalized for obscuration,
 vignetting and baffle effects. However, GalSim internally handles the
 obscuration, so we remove this part of the normalization by dividing the
-PSF images by collecting_area / ((diameter/2)**2*np.pi).  As a result, the sum of the pixel values in the renormalized PSF images is very close to 1.</p>
+PSF images by collecting_area / ((diameter/2)**2*np.pi).  As a result, the sum of the pixel
+values in the renormalized PSF images is very close to 1.</p>
+<p>Members of the Euclid Consortium with access to the internal PSF toolkit can reproduce the
+precomputed PSF images using the <code class="xref any docutils literal notranslate"><span class="pre">Develop</span></code> branch as of 21 May 2024 using the config file
+<code class="xref any docutils literal notranslate"><span class="pre">data/config.zip</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
