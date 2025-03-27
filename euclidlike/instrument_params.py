@@ -7,7 +7,7 @@ When editing this file, you should also modify the imports in __init__.py
 import galsim
 
 # Set these quantities
-gain = 3.4  # e-/ADU, https://www.euclid-ec.org/public/mission/vis/
+gain = 3.48  # e-/ADU, https://www.euclid-ec.org/public/mission/vis/
 pixel_scale = 0.1  # arcsec / pixel
 diameter = 1.2  # meters
 obscuration = 0.42  # meters, inferred from diameter and collecting area
@@ -15,9 +15,11 @@ focal_length = 24.5  # meters
 fratio = focal_length / diameter  # dimension-less, inferred from diameter and focal_length
 collecting_area = 9926  # cm^2, from https://www.euclid-ec.org/science/overview/
 long_exptime = 566  # s (for the longer exposures used for VIS images)
+long_exptime_eff = 560.53  # s (effective time VIS imaging exposures) (This is the one to use for flux computation)
 nisp_exptime_total = 112  # s (total time NISP imaging exposures)
 nisp_exptime_eff = 87.2  # s (effective time NISP imaging exposures) (This is the one to use for flux computation)
 short_exptime_vis = 95 # s (for the shorter exposures with VIS taken in parallel with NISP imaging)
+short_exptime_vis_eff = 89.52  # s (effective time VIS imaging exposures) (This is the one to use for flux computation)
 read_noise = 4.4  # e-, https://www.euclid-ec.org/public/mission/vis/
 saturation = 200000 # e-, from https://www.euclid-ec.org/public/mission/vis/
 n_dithers = 4

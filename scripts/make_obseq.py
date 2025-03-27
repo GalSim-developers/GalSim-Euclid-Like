@@ -27,7 +27,9 @@ import numpy as np
 
 from euclidlike.instrument_params import (
     long_exptime,
+    long_exptime_eff,
     short_exptime_vis,
+    short_exptime_vis_eff,
     nisp_exptime_total,
     nisp_exptime_eff,
 )
@@ -85,8 +87,12 @@ def convert_ecliptic_to_equatorial(elon, elat, epa):
 shift_2_years = 365 * 2 + 1
 shift_6_years = 365 * 6 + 1
 
+VIS_exp_long_eff = long_exptime_eff
 VIS_exp_long = long_exptime
+VIS_exp_long_wait = VIS_exp_long - VIS_exp_long_eff
+VIS_exp_short_eff = short_exptime_vis_eff
 VIS_exp_short = short_exptime_vis
+VIS_exp_short_wait = VIS_exp_short - VIS_exp_short_eff
 NISP_exp_int = nisp_exptime_total
 NISP_exp_eff = nisp_exptime_eff
 NISP_exp_wait = NISP_exp_int - NISP_exp_eff
@@ -96,10 +102,11 @@ NISP_exp_wait = NISP_exp_int - NISP_exp_eff
 dither_seq = {
     0: {
         "VIS": [
-            {"wait": 8},
-            {"VIS_LONG": VIS_exp_long},
-            {"wait": 40 + NISP_exp_int + 22 + NISP_exp_int + 22},
-            {"VIS_SHORT": VIS_exp_short},
+            {"wait": 8 + VIS_exp_long_wait / 2},
+            {"VIS_LONG": VIS_exp_long_eff},
+            {"wait": VIS_exp_long_wait / 2 + 40 + NISP_exp_int + 22 + NISP_exp_int + 22 + VIS_exp_short_wait / 2},
+            {"VIS_SHORT": VIS_exp_short_eff},
+            {"wait": VIS_exp_short_wait / 2},
         ],
         "NISP": [
             {"wait": 574 + 40},
@@ -112,10 +119,11 @@ dither_seq = {
     },
     1: {
         "VIS": [
-            {"wait": 8},
-            {"VIS_LONG": VIS_exp_long},
-            {"wait": 40 + NISP_exp_int + 22 + NISP_exp_int + 22},
-            {"VIS_SHORT": VIS_exp_short},
+            {"wait": 8 + VIS_exp_long_wait / 2},
+            {"VIS_LONG": VIS_exp_long_eff},
+            {"wait": VIS_exp_long_wait / 2 + 40 + NISP_exp_int + 22 + NISP_exp_int + 22 + VIS_exp_short_wait / 2},
+            {"VIS_SHORT": VIS_exp_short_eff},
+            {"wait": VIS_exp_short_wait / 2},
         ],
         "NISP": [
             {"wait": 574 + 40},
@@ -128,9 +136,9 @@ dither_seq = {
     },
     2: {
         "VIS": [
-            {"wait": 8},
-            {"VIS_LONG": VIS_exp_long},
-            {"wait": 40 + NISP_exp_int + 22 + NISP_exp_int + 22},
+            {"wait": 8 + VIS_exp_long_wait / 2},
+            {"VIS_LONG": VIS_exp_long_eff},
+            {"wait": VIS_exp_long_wait / 2 + 40 + NISP_exp_int + 22 + NISP_exp_int + 22},
             {"VIS_SHORT": 0},
         ],
         "NISP": [
@@ -144,9 +152,9 @@ dither_seq = {
     },
     3: {
         "VIS": [
-            {"wait": 8},
-            {"VIS_LONG": VIS_exp_long},
-            {"wait": 40 + NISP_exp_int + 22 + NISP_exp_int + 22},
+            {"wait": 8 + VIS_exp_long_wait / 2},
+            {"VIS_LONG": VIS_exp_long_eff},
+            {"wait": VIS_exp_long_wait / 2 + 40 + NISP_exp_int + 22 + NISP_exp_int + 22},
             {"VIS_SHORT": 0},
         ],
         "NISP": [
