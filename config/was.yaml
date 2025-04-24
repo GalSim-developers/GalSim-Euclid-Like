@@ -210,6 +210,7 @@ output:
             gal_shear2: { type: SkyCatValue, field: shear2 }
             gal_convergence: { type: SkyCatValue, field: convergence }
             sn_host_id: { type: SkyCatValue, field: host_id }
+            # The LSST mag_AB zero_point are computed from the LSST bandpasses included with GalSim.
             lsst_flux_u: { type: SkyCatValue, field: lsst_flux_u }
             lsst_mag_u:
                 type : Eval
