@@ -21,6 +21,7 @@ nisp_exptime_eff = 87.2  # s (effective time NISP imaging exposures) (This is th
 short_exptime_vis = 95 # s (for the shorter exposures with VIS taken in parallel with NISP imaging)
 short_exptime_vis_eff = 89.52  # s (effective time VIS imaging exposures) (This is the one to use for flux computation)
 read_noise = 4.4  # e-, https://www.euclid-ec.org/public/mission/vis/
+# The reported value for the saturation in Q1 headers is closer to 44000 ADU
 saturation = 65535  # ADU, https://arxiv.org/pdf/2503.15303 Sect. 3.3 (max for uint32)
 n_dithers = 4
 n_ccd = 36
