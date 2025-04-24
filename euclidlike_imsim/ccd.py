@@ -4,12 +4,26 @@ from galsim.config import RegisterImageType
 from galsim.config.image_scattered import ScatteredImageBuilder
 from galsim.errors import GalSimConfigValueError
 from galsim.image import Image
+from galsim.config.value import ParseValue
 from astropy.time import Time
 import numpy as np
 
 import euclidlike
-from euclidlike.instrument_params import gain, saturation
+from euclidlike.instrument_params import gain, saturation, coadd_zeropoint, read_noise
 from .noise import cfg_noise_key, parse_noise_config, get_noise
+
+
+def get_flux_scaling(current_zp, target_zp=coadd_zeropoint):
+    """Get the scaling factor to apply to the flux to get the target zeropoint.
+
+    Parameters:
+        current_zp:   The current zeropoint.
+        target_zp:    The target zeropoint.
+
+    Returns:
+        The scaling factor to apply to the flux.
+    """
+    return 10.0 ** ((target_zp - current_zp) * 0.4)
 
 
 class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
@@ -52,6 +66,7 @@ class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
         req = {"CCD": int, "filter": str, "mjd": float, "exptime": float}
         opt = {
             "draw_method": str,
+            "obs_id": int,
         }
         opt.update({key: bool for key in cfg_noise_key})
         params = galsim.config.GetAllParams(
@@ -76,6 +91,14 @@ class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
             base["bandpass"] = galsim.config.BuildBandpass(
                 base["image"], "bandpass", base, logger=logger
             )
+
+        # Get obs_id
+        # NOTE: I don't understand why but I have to explicitly parse the value
+        # it is not recognize during the GetAllParams call
+        if "obs_id" in config:
+            self.obs_id = ParseValue(config, "obs_id", base, int)[0]
+        else:
+            self.obs_id = 0
 
         return euclidlike.n_pix_col, euclidlike.n_pix_row
 
@@ -102,15 +125,28 @@ class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
         full_image.setZero()
 
         full_image.header = galsim.FitsHeader()
-        full_image.header["EXPTIME"] = self.exptime
         full_image.header["MJD-OBS"] = self.mjd
         full_image.header["DATE-OBS"] = str(
             Time(self.mjd, format="mjd").datetime
         )
         full_image.header["FILTER"] = self.filter
         full_image.header["GAIN"] = gain
-        full_image.header["ZPTMAG"] = 2.5 * np.log10(
-            self.exptime * euclidlike.collecting_area
+        if self.cfg_noise["read_noise"]:
+            full_image.header["RDNOISE"] = read_noise
+        else:
+            full_image.header["RDNOISE"] = 0.0
+        full_image.header["EXPTIME"] = self.exptime
+        full_image.header["SATURATE"] = saturation
+        full_image.header["MAGZEROP"] = (
+            2.5 * np.log10(euclidlike.collecting_area)
+            - 2.5 * np.log10(gain)
+            + base["bandpass"].zeropoint
+        )
+        current_zeropoint = full_image.header["MAGZEROP"] + 2.5 * np.log10(
+            full_image.header["EXPTIME"]
+        )
+        full_image.header["FLXSCALE"] = get_flux_scaling(
+            current_zeropoint, coadd_zeropoint
         )
 
         base["current_image"] = full_image
@@ -211,10 +247,9 @@ class EuclidlikeCCDImageBuilder(ScatteredImageBuilder):
         image += base["noise_image"]
 
         # Apply saturation
-        saturation_ADU = np.round(saturation / gain)
-        mask_saturated = image.array > saturation_ADU
+        mask_saturated = image.array > saturation
         base["saturated_mask"] = mask_saturated
-        image.array[mask_saturated] = saturation_ADU
+        image.array[mask_saturated] = saturation
 
         if self.cfg_noise["sky_subtract"]:
             image -= base["sky_image"]

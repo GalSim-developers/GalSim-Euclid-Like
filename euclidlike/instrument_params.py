@@ -21,7 +21,7 @@ nisp_exptime_eff = 87.2  # s (effective time NISP imaging exposures) (This is th
 short_exptime_vis = 95 # s (for the shorter exposures with VIS taken in parallel with NISP imaging)
 short_exptime_vis_eff = 89.52  # s (effective time VIS imaging exposures) (This is the one to use for flux computation)
 read_noise = 4.4  # e-, https://www.euclid-ec.org/public/mission/vis/
-saturation = 200000 # e-, from https://www.euclid-ec.org/public/mission/vis/
+saturation = 65535  # ADU, https://arxiv.org/pdf/2503.15303 Sect. 3.3 (max for uint32)
 n_dithers = 4
 n_ccd = 36
 n_ccd_row = 6
@@ -124,6 +124,9 @@ nisp_bands = ['NISP_Y', 'NISP_J', 'NISP_H']
 vis_blue_limit = 540
 vis_red_limit = 910
 
+# Coadd info
+coadd_zeropoint = 23.9  # Euclid zero-point in AB mag, used in all bands
+
 # Items to potentially do later; part of the galsim.roman setup that currently has no correspondence
 # here.
 #   dark_current
@@ -138,5 +141,4 @@ vis_red_limit = 910
 # separately, so there is no parameter for setting them (e.g. a Gaussian sigma) in
 # this module.  However, pointing errors / jitter are quantified in the VIS paper.
 #
-# The impact of the dichroic and of charge transfer inefficiency are not included.  Same for
-# saturation (200000 e-).
+# The impact of the dichroic and of charge transfer inefficiency are not included.
