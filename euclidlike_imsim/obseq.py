@@ -60,11 +60,13 @@ class ObSeqDataLoader(object):
             _ob = {}
             _ob["visit"] = self.visit
             _ob["ccd"] = self.ccd
+            _ob["obs_id"] = ob.loc[obs_kind]["obs_id"]
+            _ob["dither_id"] = ob.loc[obs_kind]["dither_id"]
             _ob["ra"] = ob.loc[obs_kind]["ra"] * galsim.degrees
             _ob["dec"] = ob.loc[obs_kind]["dec"] * galsim.degrees
             _ob["pa"] = ob.loc[obs_kind]["pa"] * galsim.degrees
             _ob["saa"] = ob.loc[obs_kind]["saa"] * galsim.degrees
-            _ob["date"] = Time(ob.loc[obs_kind]["date"], format="mjd").datetime
+            _ob["date"] = str(Time(ob.loc[obs_kind]["date"], format="mjd").datetime)
             _ob["mjd"] = ob.loc[obs_kind]["date"]
             _ob["filter"] = ob.loc[obs_kind]["filter"]
             _ob["exptime"] = ob.loc[obs_kind]["exptime"]
