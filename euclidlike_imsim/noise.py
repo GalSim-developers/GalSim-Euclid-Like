@@ -151,6 +151,7 @@ class NoiseImageBuilder(galsim.config.ExtraOutputBuilder):
             "stamp_xsize",
             "stamp_ysize",
             "nobjects",
+            "obs_id",
         ]
         params = galsim.config.GetAllParams(
             base["image"], base, req=req, opt=opt, ignore=ignore+extra_ignore,
