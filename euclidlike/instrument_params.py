@@ -126,7 +126,7 @@ vis_blue_limit = 540
 vis_red_limit = 910
 
 # Coadd info
-coadd_zeropoint = 23.9  # Euclid zero-point in AB mag, used in all bands
+coadd_zeropoint = 23.9  # Euclid zero-point in AB mag, used in all bands. Ref: http://st-dm.pages.euclid-sgs.uk/data-product-doc/dmq1/merdpd/merphotometrycookbook.html
 
 # Items to potentially do later; part of the galsim.roman setup that currently has no correspondence
 # here.
