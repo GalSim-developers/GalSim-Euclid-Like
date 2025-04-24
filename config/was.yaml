@@ -149,7 +149,7 @@ output:
         dir: /path/to/output/noise_images
         file_name:
             type: FormattedStr
-            format: "EUC_ELSIM_SWL_VAR-%s-%s-1-%s__%sZ.fits"
+            format: "EUC_ELSIM_SWL_NOISE-%s-%s-1-%s__%sZ.fits"
             items:
                 - { type: Eval, iobsId: { type: ObSeqData, field: obs_id }, str: 'str(obsId).zfill(6)' }
                 - { type: Eval, idither: { type: ObSeqData, field: dither_id }, str: 'str(dither).zfill(2)' }
@@ -182,7 +182,7 @@ output:
         dir: /path/to/output/truth
         file_name:
             type: FormattedStr
-            format: "EUC_ELSIM_SWL_WGT-%s-%s-1-%s__%sZ.txt"
+            format: "EUC_ELSIM_SWL_CAT-%s-%s-1-%s__%sZ.txt"
             items:
                 - { type: Eval, iobsId: { type: ObSeqData, field: obs_id }, str: 'str(obsId).zfill(6)' }
                 - { type: Eval, idither: { type: ObSeqData, field: dither_id }, str: 'str(dither).zfill(2)' }
