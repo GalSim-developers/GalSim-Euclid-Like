@@ -207,7 +207,11 @@ class SkyCatalogInterface:
         self._seds = skycat_obj.get_observer_sed_components()
         if component is not None:
             if component not in self._seds:
-                raise RuntimeError(f"Component {component} not found in object {index}.")
+                # raise RuntimeError(f"Component {component} not found in object {index}.")
+                # We cannot raise an error here because it will kill the process. But it is too difficult to
+                # distinguish all cases when multiple object with different components are in the same image.
+                # We return NaN when it is not applicable.
+                return np.nan
             sed_sum = self._seds[component]
         else:
             for i, sed in enumerate(self._seds.values()):
