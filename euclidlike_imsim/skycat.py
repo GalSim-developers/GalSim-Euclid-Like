@@ -209,17 +209,13 @@ class SkyCatalogInterface:
             if component not in self._seds:
                 raise RuntimeError(f"Component {component} not found in object {index}.")
             sed_sum = self._seds[component]
-            print("here")
         else:
-            print("here2")
             for i, sed in enumerate(self._seds.values()):
                 if i == 0:
                     sed_sum = sed
                 else:
                     sed_sum += sed
         raw_flux = skycat_obj.get_euclid_flux(filter, sed_sum, mjd=mjd, cache=False)
-        if component is not None:
-            print(raw_flux)
         if hasattr(skycat_obj, "get_wl_params"):
             _, _, mu = skycat_obj.get_wl_params()
         else:
