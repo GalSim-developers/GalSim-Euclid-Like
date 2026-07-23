@@ -196,6 +196,7 @@ output:
             y: "$image_pos.y"
             realized_flux: "@realized_flux"
             flux: "@flux"
+            flux_bulge: { type: SkyCatValue, field: flux, obs_kind: '@input.obseq_data.obs_kind', component: 'bulge' }
             mag: "@mag"
             mag_AB: { type: Eval, str: '-2.5 * np.log10(@flux/@image.exptime/euclidlike.collecting_area) + euclid_AB_ZP' }
             obj_type: "@object_type"
