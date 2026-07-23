@@ -4,7 +4,9 @@
 This file includes any routines needed to define and use the Euclid-like WCS.
 Current version is based on the focal plane description detailed in 
 Scaramella et al. (Fig. 2 and Table 1).
-The distortion coefficients were derived from the ERO release.
+The effects of distortion are not included, in the sense that the coefficients
+are all set to 0 or 1.  However, it would be possible to replace the distortion file
+with a legitimate set of distortion coefficients if including it in the simulations is desired.
 
 Scaramella et al.: https://arxiv.org/abs/2108.01201
 """
