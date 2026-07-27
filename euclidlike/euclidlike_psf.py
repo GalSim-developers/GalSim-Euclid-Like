@@ -153,7 +153,9 @@ def getPSF(
             for details. [default: None]
         psf_dir (str): Directory where sampled PSF images can be accessed. If not
             given, look in ./data directory. [default: None] 
-        psf_shift (galsim.PositionD): A shift to apply to the PSF. [default: None]
+        psf_shift (galsim.PositionD): A shift to apply to the PSF. If None, apply
+            the default expected shift of (-0.5, -0.5) in pixel coordinates. [default: None]
+
 
     Returns:
         A single PSF object (either an InterpolatedChromaticObject or an
@@ -186,7 +188,7 @@ def getPSF(
     if not psf_dir.is_dir():
         warnings.warn(
             "Unable to use PSF images for full field of view because directory %s does not exist. "
-            "Defaulting to use PSF from single quadrant in CCD = %d . All PSF images can be downloaded " 
+            "Defaulting to use PSF from single quadrant in CCD = %d . All PSF images can be downloaded "
             "by running the command `euclidlike_download_psf` in the terminal." % (psf_dir, default_ccd)
         )
         psf_dir = test_dir.joinpath("psfs")
@@ -310,7 +312,9 @@ def _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength, psf_shift, psf_dir, 
     # instantiate psf object from list of images and wavelengths
     psf_obj = galsim.InterpolatedChromaticObject.from_images(psf_ims[quad_pos], wave_list, gsparams = gsparams)
     psf_pixel_scale = psf_ims[quad_pos][0].scale
-    if psf_shift is not None:
+    if psf_shift is None:
+        psf_obj = psf_obj.shift(-0.5*psf_pixel_scale, -0.5*psf_pixel_scale)
+    else:
         if isinstance(psf_shift, galsim.PositionD):
             psf_obj = psf_obj.shift(psf_shift.x*psf_pixel_scale, psf_shift.y*psf_pixel_scale)
         else:

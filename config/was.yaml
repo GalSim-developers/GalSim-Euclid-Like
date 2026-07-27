@@ -125,10 +125,6 @@ input:
     euclidlike_psf:
         CCD: '@image.CCD'
         n_waves: 5
-        psf_shift:
-            type: XY
-            x: -0.5
-            y: -0.5
     sky_catalog:
         file_name: /path/to/skyCatalog.yaml
         edge_pix: 512
