@@ -41,8 +41,9 @@ def _make_psf_list(psf_file):
     obscuration_norm = collecting_area / ((m2cm_conv*diameter/2)**2*np.pi)
     for i in range(nsample):
         psf_arr = image_array[i]/obscuration_norm
+        psf_img = galsim.Image(psf_arr, scale=scale)
         im_list.append(
-            galsim.Image(psf_arr, scale=scale)
+            psf_img
         )
     return im_list
 
@@ -67,10 +68,15 @@ def __get_quadrant_psf(ccd, bandpass, psf_dir):
 _get_quadrant_psf = LRU_Cache(__get_quadrant_psf)
 
 def getPSF(
-        ccd, bandpass,
-        ccd_pos=None, wcs=None,
-        wavelength=None, gsparams=None,
-        logger=None, psf_dir = None
+        ccd,
+        bandpass,
+        ccd_pos=None,
+        wcs=None,
+        wavelength=None,
+        psf_shift=None,
+        gsparams=None,
+        logger=None,
+        psf_dir=None,
 ):
     """Get a single PSF for a Euclid-like simulation.
 
@@ -147,6 +153,9 @@ def getPSF(
             for details. [default: None]
         psf_dir (str): Directory where sampled PSF images can be accessed. If not
             given, look in ./data directory. [default: None] 
+        psf_shift (galsim.PositionD): A shift to apply to the PSF. If None, apply
+            the default expected shift of (-0.5, -0.5) in pixel coordinates. [default: None]
+
 
     Returns:
         A single PSF object (either an InterpolatedChromaticObject or an
@@ -179,7 +188,7 @@ def getPSF(
     if not psf_dir.is_dir():
         warnings.warn(
             "Unable to use PSF images for full field of view because directory %s does not exist. "
-            "Defaulting to use PSF from single quadrant in CCD = %d . All PSF images can be downloaded " 
+            "Defaulting to use PSF from single quadrant in CCD = %d . All PSF images can be downloaded "
             "by running the command `euclidlike_download_psf` in the terminal." % (psf_dir, default_ccd)
         )
         psf_dir = test_dir.joinpath("psfs")
@@ -187,7 +196,7 @@ def getPSF(
     logger = LoggerWrapper(logger)
     logger.debug('Loading PSF images from: ' + str(psf_dir))
     # Now get psf model
-    psf = _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength, psf_dir, gsparams, logger)
+    psf = _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength, psf_shift, psf_dir, gsparams, logger)
     # Apply WCS.
     # The current version is in arcsec units, but oriented parallel to the
     # image coordinates. So to apply the right WCS, project to pixels using the
@@ -281,7 +290,7 @@ def getBrightPSF(
 
     return psf
 
-def _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength, psf_dir, gsparams, logger):
+def _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength, psf_shift, psf_dir, gsparams, logger):
     """
     Routine for making a single PSF.  This gets called by `getPSF` after it
     parses all the options that were passed in.  Users will not directly
@@ -302,6 +311,14 @@ def _get_single_psf_obj(ccd, bandpass, ccd_pos, wavelength, psf_dir, gsparams, l
     logger.debug('CCD position in quadrant ' + quad_pos)
     # instantiate psf object from list of images and wavelengths
     psf_obj = galsim.InterpolatedChromaticObject.from_images(psf_ims[quad_pos], wave_list, gsparams = gsparams)
+    psf_pixel_scale = psf_ims[quad_pos][0].scale
+    if psf_shift is None:
+        psf_obj = psf_obj.shift(-0.5*psf_pixel_scale, -0.5*psf_pixel_scale)
+    else:
+        if isinstance(psf_shift, galsim.PositionD):
+            psf_obj = psf_obj.shift(psf_shift.x*psf_pixel_scale, psf_shift.y*psf_pixel_scale)
+        else:
+            raise TypeError("psf_shift must be a galsim.PositionD object.")
     if wavelength is not None:
         if isinstance(wavelength, galsim.Bandpass):
             wave = wavelength.effective_wavelength
