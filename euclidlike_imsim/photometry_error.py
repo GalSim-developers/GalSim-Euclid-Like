@@ -91,7 +91,7 @@ def get_minor_major_axis(hlr, g1, g2):
     Parameters
     ----------
     hlr : float
-        Half-light radius.
+        Half-light radius (in any system of units).
     g1 : float
         First component of the ellipticity.
     g2 : float
