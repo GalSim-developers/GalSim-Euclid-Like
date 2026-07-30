@@ -102,7 +102,7 @@ def get_minor_major_axis(hlr, g1, g2):
     a : float
         Major axis (same units as input hlr).
     b : float
-        Minor axis.
+        Minor axis (same units as input hlr).
     """
 
     g = np.hypot(g1, g2)
