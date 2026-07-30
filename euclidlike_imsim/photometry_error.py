@@ -100,7 +100,7 @@ def get_minor_major_axis(hlr, g1, g2):
     Returns
     -------
     a : float
-        Major axis.
+        Major axis (same units as input hlr).
     b : float
         Minor axis.
     """
