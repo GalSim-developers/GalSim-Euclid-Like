@@ -12,7 +12,9 @@ from .wcs import *
 from .skycat import *
 from .photonOps import *
 from .bandpass import *
+from .photometry_error import *
 
 # from .detector_physics import *
 from ._version import __version__, __version_info__
+
 version = __version__
