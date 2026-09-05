@@ -141,12 +141,12 @@ input:
         exptime: { type: ObSeqData, field: exptime }
         obj_types: ['diffsky_galaxy','star','snana']
     photerr_config:
-        m5:
+        m5:  # The 5-sigma limiting magnitude for point source objects
             VIS: 27.0
             Y: 24.46
             J: 24.56
             H: 24.42
-        theta:
+        theta:  # The seeing FWHM in arcsec
             VIS: 0.203
             Y: 0.475
             J: 0.504
@@ -156,6 +156,8 @@ input:
             star: 'point'
             transient: 'point'
         gain:
+        # See https://euclid.esac.esa.int/dr/q1/dpdd/merdpd/dpcards/mer_bksmosaic.html
+        # for the unit of the mosaic images
             VIS:
                 type: Eval
                 str: 'euclidlike.gain'
@@ -290,6 +292,12 @@ output:
                 BTT: "@output.truth.columns.bulge2total_VIS"
                 obj_type: "@output.truth.columns.obj_type"
             flux_Y: { type: SkyCatValue, field: flux, obs_kind: "NISP_Y"}
+            flux_bulge_Y: { type: SkyCatValue, field: flux, obs_kind: "NISP_Y", component: 'bulge' }
+            flux_disk_Y: { type: SkyCatValue, field: flux, obs_kind: "NISP_Y", component: 'disk' }
+            flux_knots_Y: { type: SkyCatValue, field: flux, obs_kind: "NISP_Y", component: 'knots' }
+            bulge2total_Y:
+                type: Eval
+                str: '@output.truth.columns.flux_bulge_Y / @output.truth.columns.flux_Y'
             mag_AB_Y:
                 type: Eval
                 str: '-2.5 * np.log10(@output.truth.columns.flux_Y/euclidlike.nisp_exptime_eff/euclidlike.collecting_area) + euclid_AB_ZP_Y'
@@ -303,9 +311,15 @@ output:
                 g1_bulge: "@output.truth.columns.gal_bulge_g1"
                 g2_bulge: "@output.truth.columns.gal_bulge_g2"
                 hlr_bulge: "@output.truth.columns.gal_bulge_hlr"
-                BTT: "@output.truth.columns.bulge2total_VIS"
+                BTT: "@output.truth.columns.bulge2total_Y"
                 obj_type: "@output.truth.columns.obj_type"
             flux_J: { type: SkyCatValue, field: flux, obs_kind: "NISP_J"}
+            flux_bulge_J: { type: SkyCatValue, field: flux, obs_kind: "NISP_J", component: 'bulge' }
+            flux_disk_J: { type: SkyCatValue, field: flux, obs_kind: "NISP_J", component: 'disk' }
+            flux_knots_J: { type: SkyCatValue, field: flux, obs_kind: "NISP_J", component: 'knots' }
+            bulge2total_J:
+                type: Eval
+                str: '@output.truth.columns.flux_bulge_J / @output.truth.columns.flux_J'
             mag_AB_J:
                 type: Eval
                 str: '-2.5 * np.log10(@output.truth.columns.flux_J/euclidlike.nisp_exptime_eff/euclidlike.collecting_area) + euclid_AB_ZP_J'
@@ -319,9 +333,15 @@ output:
                 g1_bulge: "@output.truth.columns.gal_bulge_g1"
                 g2_bulge: "@output.truth.columns.gal_bulge_g2"
                 hlr_bulge: "@output.truth.columns.gal_bulge_hlr"
-                BTT: "@output.truth.columns.bulge2total_VIS"
+                BTT: "@output.truth.columns.bulge2total_J"
                 obj_type: "@output.truth.columns.obj_type"
             flux_H: { type: SkyCatValue, field: flux, obs_kind: "NISP_H"}
+            flux_bulge_H: { type: SkyCatValue, field: flux, obs_kind: "NISP_H", component: 'bulge' }
+            flux_disk_H: { type: SkyCatValue, field: flux, obs_kind: "NISP_H", component: 'disk' }
+            flux_knots_H: { type: SkyCatValue, field: flux, obs_kind: "NISP_H", component: 'knots' }
+            bulge2total_H:
+                type: Eval
+                str: '@output.truth.columns.flux_bulge_H / @output.truth.columns.flux_H'
             mag_AB_H:
                 type: Eval
                 str: '-2.5 * np.log10(@output.truth.columns.flux_H/euclidlike.nisp_exptime_eff/euclidlike.collecting_area) + euclid_AB_ZP_H'
@@ -335,5 +355,5 @@ output:
                 g1_bulge: "@output.truth.columns.gal_bulge_g1"
                 g2_bulge: "@output.truth.columns.gal_bulge_g2"
                 hlr_bulge: "@output.truth.columns.gal_bulge_hlr"
-                BTT: "@output.truth.columns.bulge2total_VIS"
+                BTT: "@output.truth.columns.bulge2total_H"
                 obj_type: "@output.truth.columns.obj_type"

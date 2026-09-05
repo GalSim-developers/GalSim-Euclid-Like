@@ -45,6 +45,8 @@ def get_effective_g_and_hlr(
 ):
     """
     Calculate the effective ellipticity for a bulge+disk galaxy.
+    NOTE: This is an approximatation as this formulation is only valid for a mixture of Gaussians. But here we
+    only try to capture an effective ellipse to estimate error through PhotErr, so this should be sufficient.
 
     Parameters
     ----------
@@ -124,48 +126,37 @@ def prepare_inputs(
     Parameters
     ----------
     minor_ : float or None
-        Minor axis.
+        Minor axis (in arcsec).
     major_ : float or None
-        Major axis.
+        Major axis (in arcsec).
     g1_ : float or None
         First component of the ellipticity.
     g2_ : float or None
         Second component of the ellipticity.
     hlr_ : float or None
-        Half-light radius.
+        Half-light radius (in arcsec).
     g1_disk_ : float or None
         First component of the ellipticity of the disk component.
     g2_disk_ : float or None
         Second component of the ellipticity of the disk component.
     hlr_disk_ : float or None
-        Half-light radius of the disk component.
+        Half-light radius of the disk component (in arcsec).
     g1_bulge_ : float or None
         First component of the ellipticity of the bulge component.
     g2_bulge_ : float or None
         Second component of the ellipticity of the bulge component.
     hlr_bulge_ : float or None
-        Half-light radius of the bulge component.
+        Half-light radius of the bulge component (in arcsec).
     BTT_ : float or None
         Bulge-to-total ratio.
-    """
 
-    check = [
-        (np.isnan(minor_)),
-        (np.isnan(major_)),
-        (np.isnan(g1_)),
-        (np.isnan(g2_)),
-        (np.isnan(hlr_)),
-        (np.isnan(g1_disk_)),
-        (np.isnan(g2_disk_)),
-        (np.isnan(hlr_disk_)),
-        (np.isnan(g1_bulge_)),
-        (np.isnan(g2_bulge_)),
-        (np.isnan(hlr_bulge_)),
-        (np.isnan(BTT_)),
-    ]
-    if any(check):
-        # This should handle the case where we get this for let's say stars and those quantities do not exist in the catalogue
-        return None, None
+    Returns
+    -------
+    minor : float or None
+        Minor axis (in arcsec).
+    major : float or None
+        Major axis (in arcsec).
+    """
 
     # check minor / major
     check = [(minor_ is None), (major_ is None)]
@@ -199,7 +190,8 @@ def prepare_inputs(
     ]
     if not any(check) and all(check):
         raise ValueError(
-            "g1_disk, g2_disk, hlr_disk, g1_bulge, g2_bulge, hlr_bulge, and BTT must all be provided or all must be None."
+            "g1_disk, g2_disk, hlr_disk, g1_bulge, g2_bulge, hlr_bulge, and BTT must all be provided or all "
+            "must be None."
         )
     if g1_disk_ is not None:
         g1_disk = np.array([g1_disk_])
@@ -265,20 +257,24 @@ def PhotErr(config, base, value_type):
     band = get_euclid_band(obs_kind)
 
     mag = np.atleast_2d(mag_)
-    minor, major = prepare_inputs(
-        minor_,
-        major_,
-        g1_,
-        g2_,
-        hlr_,
-        g1_disk_,
-        g2_disk_,
-        hlr_disk_,
-        g1_bulge_,
-        g2_bulge_,
-        hlr_bulge_,
-        BTT_,
-    )
+    if obj_type == "galaxy":
+        minor, major = prepare_inputs(
+            minor_,
+            major_,
+            g1_,
+            g2_,
+            hlr_,
+            g1_disk_,
+            g2_disk_,
+            hlr_disk_,
+            g1_bulge_,
+            g2_bulge_,
+            hlr_bulge_,
+            BTT_,
+        )
+    else:
+        minor = None
+        major = None
 
     euclid_err_model = EuclidWideErrorModel(**photerr_config.get_config(obj_type))
 
