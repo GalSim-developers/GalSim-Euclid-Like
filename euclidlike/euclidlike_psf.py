@@ -126,7 +126,7 @@ def getPSF(
     values in the renormalized PSF images is very close to 1.
 
     The provided PSF images are off-centered by (-0.5, -0.5) pixels. GalSim assumes that the PSF is centered so
-    we are shifting the back the PSF after the interpolation. Not doing this lead to a systematic shift of the
+    we are shifting back the PSF after the interpolation. Not doing this leads to a systematic shift of the
     object position in the image with respect to the true position. This is driven by the `psf_shift`
     argument.
 
