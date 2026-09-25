@@ -127,7 +127,7 @@ def getPSF(
 
     The provided PSF images are off-centered by (-0.5, -0.5) pixels. GalSim assumes that the PSF is centered so
     we are shifting the back the PSF after the interpolation. Not doing this lead to a systematic shift of the
-    object position in the image with respect to the true position. This is drived by the `psf_shift`
+    object position in the image with respect to the true position. This is driven by the `psf_shift`
     argument.
 
     Members of the Euclid Consortium with access to the internal PSF toolkit can reproduce the
