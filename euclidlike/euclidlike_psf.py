@@ -153,7 +153,7 @@ def getPSF(
             for details. [default: None]
         psf_dir (str): Directory where sampled PSF images can be accessed. If not
             given, look in ./data directory. [default: None] 
-        psf_shift (galsim.PositionD): A shift to apply to the PSF. If None, apply
+        psf_shift (galsim.PositionD): A shift to apply to the PSF in units of pixels. If None, apply
             the default expected shift of (-0.5, -0.5) in pixel coordinates. [default: None]
 
 
