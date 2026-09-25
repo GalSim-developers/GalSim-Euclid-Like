@@ -15,6 +15,7 @@ class EuclidlikePSF(object):
         WCS=None,
         n_waves=None,
         bpass=None,
+        psf_shift=None,
         extra_aberrations=None,
         logger=None,
     ):
@@ -38,11 +39,11 @@ class EuclidlikePSF(object):
         self.PSF[pupil_bin] = {}
         for tag, CCD_pos in tuple(zip(tags, corners)):
             self.PSF[pupil_bin][tag] = self._psf_call(
-                CCD, bpass, CCD_pos, WCS, pupil_bin, n_waves, logger, extra_aberrations
+                CCD, bpass, CCD_pos, WCS, pupil_bin, n_waves, psf_shift, logger, extra_aberrations
             )
         for pupil_bin in [4, 2, "achromatic"]:
             self.PSF[pupil_bin] = self._psf_call(
-                CCD, bpass, cc, WCS, pupil_bin, n_waves, logger, extra_aberrations
+                CCD, bpass, cc, WCS, pupil_bin, n_waves, psf_shift, logger, extra_aberrations
             )
 
     def _parse_pupil_bin(self, pupil_bin):
@@ -52,7 +53,7 @@ class EuclidlikePSF(object):
             return pupil_bin
 
     def _psf_call(
-        self, CCD, bpass, CCD_pos, WCS, pupil_bin, n_waves, logger, extra_aberrations
+        self, CCD, bpass, CCD_pos, WCS, pupil_bin, n_waves, psf_shift, logger, extra_aberrations
     ):
 
         if pupil_bin == 8:
@@ -63,6 +64,7 @@ class EuclidlikePSF(object):
                 wcs=WCS,
                 # pupil_bin=pupil_bin,
                 # n_waves=n_waves,
+                psf_shift=psf_shift,
                 logger=logger,
                 # Don't set wavelength for this one.
                 # We want this to be chromatic for photon shooting.
@@ -150,6 +152,7 @@ class PSFLoader(InputLoader):
         req = {}
         opt = {
             "n_waves": int,
+            "psf_shift": galsim.PositionD,
         }
         ignore = ["extra_aberrations"]
 

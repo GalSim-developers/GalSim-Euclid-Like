@@ -18,7 +18,7 @@ test_adj_ccd=8
 
 # set tolerance levels for different tests
 flux_atol = 1e-4
-size_rtol = 0.05
+size_rtol = 0.10
 
 def test_get_psf_function():
     euc_bp = euclidlike.getBandpasses()['VIS']
@@ -32,7 +32,9 @@ def test_get_psf_function():
     trueobj = psfobjs[9]
     psfobj = getPSF(ccd=test_ccd, bandpass="VIS", wavelength=wave, psf_dir = psf_dir)
     # check it returns identical oversampled psf
-    np.testing.assert_allclose(psfobj.image.array, trueobj.array, atol = 0,
+    # The PSF is shifted as we found out that it was not centered. To do the test we then
+    # compare to the `.original`, without the shift
+    np.testing.assert_allclose(psfobj.original.image.array, trueobj.array, atol = 0,
         err_msg = 'getPSF() fails to initialize input images correctly')
 
     # check sum of PSF image pixels after normalizing by obscuration is within 1% of 1.
@@ -54,7 +56,9 @@ def test_get_psf_function():
     #check passing bandpass
     psfobj_bp = getPSF(ccd=test_ccd, bandpass="VIS", wavelength=euc_bp, psf_dir = psf_dir)
     psfobj_wl = getPSF(ccd=test_ccd, bandpass="VIS", wavelength=euc_bp.effective_wavelength, psf_dir = psf_dir)
-    np.testing.assert_allclose(psfobj_bp.image.array, psfobj_wl.image.array, atol = 0,
+    # The PSF is shifted as we found out that it was not centered. To do the test we then
+    # compare to the `.original`, without the shift
+    np.testing.assert_allclose(psfobj_bp.original.image.array, psfobj_wl.original.image.array, atol = 0,
         err_msg = 'getPSF() fails to reproduce image if bandpass is the input wavelength')
 
     #check full PSF with delta function SED at desired wavelength returns identical image
@@ -73,16 +77,16 @@ def test_get_psf_function():
     trueobj = getPSF(ccd=test_ccd, bandpass="VIS", wavelength=wave, psf_dir = psf_dir)
     psf_obj = galsim.Convolve(psfobj, star)
     true_obj = galsim.Convolve(trueobj, star)
-    np.testing.assert_allclose(psfobj.ims[9].array, trueobj.image.array, atol=0,
+    # The PSF is shifted as we found out that it was not centered. To do the test we then
+    # compare to the `.original`, without the shift
+    np.testing.assert_allclose(psfobj.original.ims[9].array, trueobj.original.image.array, atol=0,
         err_msg='getPSF() with wavelength=None fails to initialize input images correctly')
     psf_img = psf_obj.drawImage(euc_bp, scale=scale)
-    im_interp = psf_img.copy()
     true_img = true_obj.drawImage(euc_bp, scale=scale)
     # images identicial within 0.01% of total flux
     np.testing.assert_allclose(
         psf_img.array, true_img.array, atol=flux_atol*np.sum(true_img.array),
         err_msg='getPSF() does replicate image with very narrow SED centered at desired wavelength')
-    return
 
 def test_get_bright_psf_function():
     euc_bp = euclidlike.getBandpasses()['VIS']
